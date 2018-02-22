@@ -1,14 +1,6 @@
 package org.spectrum3847.robot;
 
 import org.spectrum3847.lib.util.Debugger;
-import org.spectrum3847.robot.commands.auto.CenterBackpackGearAutoPID;
-import org.spectrum3847.robot.commands.auto.CurrentStopGearAuto;
-import org.spectrum3847.robot.commands.auto.DriveDistance;
-import org.spectrum3847.robot.commands.auto.Fire10Balls;
-import org.spectrum3847.robot.commands.auto.Fire10BallsAndGear;
-import org.spectrum3847.robot.commands.auto.HopperAuto;
-import org.spectrum3847.robot.commands.auto.SideBackpackGearAutoPID;
-import org.spectrum3847.robot.commands.auto.SideGearAuto;
 
 import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.Scheduler;
@@ -18,11 +10,10 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 public class Autonomous {
 	@SuppressWarnings("rawtypes")
 	public static SendableChooser autonChooser;
-	public static String AutoName = "Center: Backpack";
+	public static String AutoName = "Set to Default Auto";
 	public static int AutoNumber = 1;
 	public static boolean isRight = false;
-	static Command AutonCommand = new CenterBackpackGearAutoPID(isRight,
-			Robot.prefs.getBoolean("1A: Finish Drive?", false));
+	static Command AutonCommand;
 
 	public static void init() {
 		selectAuto();
@@ -31,7 +22,6 @@ public class Autonomous {
 		}
 		Debugger.println("Auto Init is working", Robot.auton, Debugger.info3);
 		Robot.compressor.stop();
-		Robot.headlights.headlightsOff();
 	}
 
 	// Periodic method called roughly once every 20ms
@@ -43,17 +33,29 @@ public class Autonomous {
 
 	public static void cancel() {
 		Scheduler.getInstance().removeAll();
-
 		Robot.compressor.start();
 	}
 
 	public static void selectAuto() {
 		if (AutoNumber != (int) Robot.prefs.getNumber("1A: AutoNumber", 1)
 				|| isRight != Robot.prefs.getBoolean("1A: On Right Side", false)) {
+			
 			AutoNumber = (int) Robot.prefs.getNumber("1A: AutoNumber", 1);
 			isRight = Robot.prefs.getBoolean("1A: On Right Side", false);
 			switch (AutoNumber) {
-			case (1): {
+			case (0): {
+				AutoName = "Nothing Selected";
+				AutonCommand = new Command(10) {
+					
+					@Override
+					protected boolean isFinished() {
+						// TODO Auto-generated method stub
+						return true;
+					}
+				};
+				break;
+			}
+			/*case (1): {
 				AutoName = "Center: Backpack";
 				AutonCommand = new CenterBackpackGearAutoPID(isRight,
 						Robot.prefs.getBoolean("1A: Finish Drive?", false));
@@ -83,14 +85,20 @@ public class Autonomous {
 				AutoName = "Hopper";
 				AutonCommand = new HopperAuto(isRight);
 				break;
-			}
+			}*/
 
-			default: {
-				AutoName = "Center: Backpack";
-				AutonCommand = new CenterBackpackGearAutoPID(isRight,
-						Robot.prefs.getBoolean("1A: Finish Drive?", false));
+			//Change to what should be our default auto
+			default: 
+				AutoName = "Nothing Selected";
+				AutonCommand = new Command(10) {
+					
+					@Override
+					protected boolean isFinished() {
+						// TODO Auto-generated method stub
+						return true;
+					}
+				};
 				break;
-			}
 			}
 		}
 	}

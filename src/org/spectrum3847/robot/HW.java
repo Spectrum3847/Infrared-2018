@@ -18,6 +18,7 @@ public class HW {
     // public static int rightMotor = 2;
 	//Use ecplise refacotr tool to rename values for your specific robot
 	
+	public static int CANconfigTimeOut = 10;
 	//OI
 	public static OI oi;
 	public static final XboxController Driver_Gamepad = new XboxController(0);
