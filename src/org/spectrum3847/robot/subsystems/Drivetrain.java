@@ -2,11 +2,12 @@ package org.spectrum3847.robot.subsystems;
 
 import java.util.ArrayList;
 
-import org.spectrum3847.lib.drivers.BobTalonSRX;
-import org.spectrum3847.lib.drivers.BobVictorSPX;
+import org.spectrum3847.lib.drivers.SpectrumTalonSRX;
+import org.spectrum3847.lib.drivers.SpectrumVictorSPX;
 import org.spectrum3847.lib.drivers.DriveSignal;
-import org.spectrum3847.lib.drivers.LeaderBobTalonSRX;
+import org.spectrum3847.lib.drivers.LeaderTalonSRX;
 import org.spectrum3847.robot.HW;
+import org.spectrum3847.robot.OI;
 import org.spectrum3847.robot.Robot;
 import org.spectrum3847.robot.commands.drivetrain.SpectrumDrive;
 
@@ -33,12 +34,15 @@ public class Drivetrain extends Subsystem {
 	StringBuilder _sb = new StringBuilder();
 	private static int _loops = 0;
 
-	public LeaderBobTalonSRX leftSRX = new LeaderBobTalonSRX(HW.LEFT_DRIVE_SRX_BACK, new BobVictorSPX(HW.LEFT_DRIVE_MIDDLE), new BobVictorSPX(HW.LEFT_DRIVE_FRONT_BOTTOM));
-	public LeaderBobTalonSRX rightSRX = new LeaderBobTalonSRX(HW.RIGHT_DRIVE_SRX_BACK, new BobVictorSPX(HW.RIGHT_DRIVE_MIDDLE), new BobVictorSPX(HW.RIGHT_DRIVE_FRONT_BOTTOM)); // 1
+	public SpectrumVictorSPX leftBottomSPX = new SpectrumVictorSPX(HW.LEFT_DRIVE_FRONT_BOTTOM);
+	public SpectrumVictorSPX leftMiddleSPX = new SpectrumVictorSPX(HW.LEFT_DRIVE_MIDDLE);
+	public LeaderTalonSRX leftSRX = new LeaderTalonSRX(HW.LEFT_DRIVE_SRX_BACK, leftMiddleSPX, leftBottomSPX);
+	public SpectrumVictorSPX rightBottomSPX = new SpectrumVictorSPX(HW.RIGHT_DRIVE_FRONT_BOTTOM);
+	public SpectrumVictorSPX rightMiddleSPX = new SpectrumVictorSPX(HW.RIGHT_DRIVE_MIDDLE);
+	public LeaderTalonSRX rightSRX = new LeaderTalonSRX(HW.RIGHT_DRIVE_SRX_BACK, rightMiddleSPX, rightBottomSPX);
 	public DifferentialDrive difDrive = new DifferentialDrive(leftSRX, rightSRX);
 
 	public Drivetrain() {
-
 		leftSRX.setInverted(true);
 		leftSRX.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, 0);
 		leftSRX.setSensorPhase(true);
@@ -108,7 +112,7 @@ public class Drivetrain extends Subsystem {
 	}
 
 	public boolean quickTurnController() {
-		if (HW.driverController.leftStick.getY() < 0.2 && HW.driverController.leftStick.getY() > -0.2) {
+		if (OI.driverController.leftStick.getY() < 0.2 && OI.driverController.leftStick.getY() > -0.2) {
 			return true;	
 		} else {
 			return false;
@@ -228,8 +232,8 @@ public class Drivetrain extends Subsystem {
 
 	public void velocityPIDTest() {
 
-		BobTalonSRX _talon = this.leftSRX;
-		double leftYstick = HW.operatorController.leftStick.getY();
+		SpectrumTalonSRX _talon = this.leftSRX;
+		double leftYstick = OI.operatorController.leftStick.getY();
 		double motorOutput = _talon.getMotorOutputPercent();
 
 		/* prepare line to print */
@@ -240,13 +244,13 @@ public class Drivetrain extends Subsystem {
 		//_sb.append("LowLevelspeed:");
 		//_sb.append(_talon.getSensorCollection());
 
-		if (HW.operatorController.getRawButton(1)) {
+		if (OI.operatorController.getRawButton(1)) {
 			/* Speed mode */
 			/* Convert 500 RPM to units / 100ms.
 			 * 4096 Units/Rev * 500 RPM / 600 100ms/min in either direction:
 			 * velocity setpoint is in units/100ms
 			 */
-			double targetVelocity_UnitsPer100ms = HW.operatorController.leftStick.getY() * 4700;
+			double targetVelocity_UnitsPer100ms = OI.operatorController.leftStick.getY() * 4700;
 			/* 500 RPM in either direction */
 			_talon.set(ControlMode.Velocity, targetVelocity_UnitsPer100ms);
 
@@ -258,7 +262,7 @@ public class Drivetrain extends Subsystem {
 		} else {
 			/* Percent voltage mode */
 			_talon.set(ControlMode.PercentOutput, leftYstick);
-			System.out.println("y-axis" + HW.operatorController.leftStick.getY());
+			System.out.println("y-axis" + OI.operatorController.leftStick.getY());
 		}
 
 		if (++_loops >= 10) {

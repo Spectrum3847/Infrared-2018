@@ -7,11 +7,23 @@
 
 package org.spectrum3847.robot;
 
+import org.spectrum3847.lib.controllers.SpectrumXboxController;
+
 /**
  * This class is the glue that binds the controls on the physical operator
  * interface to the commands and command groups that allow control of the robot.
  */
+
+
 public class OI {
+	public static SpectrumXboxController driverController;
+	public static SpectrumXboxController operatorController;
+	
+	public OI() {
+		driverController = new SpectrumXboxController(0, .08, .1);
+		operatorController = new SpectrumXboxController(1, .08, .08);
+		
+	}
 	//// CREATING BUTTONS
 	// One type of button is a joystick button which is any button on a
 	//// joystick.

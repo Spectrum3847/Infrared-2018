@@ -1,6 +1,6 @@
 package org.spectrum3847.robot;
 
-import org.spectrum3847.lib.controllers.BobXboxController;
+import org.spectrum3847.lib.controllers.SpectrumXboxController;
 
 import edu.wpi.first.wpilibj.PowerDistributionPanel;
 
@@ -17,11 +17,10 @@ public class HW {
     // public static int rightMotor = 2;
 	//Use ecplise refacotr tool to rename values for your specific robot
 	
-	public static int CANconfigTimeOut = 10;
+	public static int CANconfigTimeOut = 0;
 	//OI
 	public static OI oi;
-	public static final BobXboxController driverController = new BobXboxController(0);
-	public static final BobXboxController operatorController = new BobXboxController(1);
+
 	/*
 	public static final Gamepad Driver_Gamepad = new Gamepad("Driver", HW.USBPORT_0);
     public static final Gamepad Operator_Gamepad = new Gamepad("Operator", HW.USBPORT_1);

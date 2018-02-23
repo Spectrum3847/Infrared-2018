@@ -9,7 +9,9 @@ package org.spectrum3847.robot;
 
 import org.spectrum3847.lib.util.Debugger;
 import org.spectrum3847.lib.util.SpectrumPreferences;
+import org.spectrum3847.robot.subsystems.Arm;
 import org.spectrum3847.robot.subsystems.Drivetrain;
+import org.spectrum3847.robot.subsystems.Extension;
 
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.LimitSwitchNormal;
@@ -54,11 +56,9 @@ public class Robot extends TimedRobot {
 	public static PigeonIMU pigeon;
 	
 	public static Drivetrain drive;
+	public static Arm arm;
+	public static Extension extension;
 	
-	public static TalonSRX armSRX;
-	public static TalonSRX armBottomSRX;
-	public static TalonSRX extensionSRX;
-	public static TalonSRX extensionBottomSRX;
 	public static TalonSRX intakeSRX;
 	public static TalonSRX intakeBottomSRX;
 	
@@ -69,60 +69,8 @@ public class Robot extends TimedRobot {
     	
     	drive = new Drivetrain();
     	
-    	boolean armInvert = false;
-    	boolean armPhase = false;
-    	armSRX = new TalonSRX(HW.ARM_TOP);
-    	armSRX.configOpenloopRamp(0, HW.CANconfigTimeOut);
-    	armSRX.configClosedloopRamp(0, HW.CANconfigTimeOut);
-    	armSRX.setNeutralMode(NeutralMode.Brake);
-    	armSRX.setInverted(armInvert);
-    	armSRX.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, 0, HW.CANconfigTimeOut);
-    	armSRX.setSensorPhase(armPhase);
-    	armSRX.configForwardLimitSwitchSource(LimitSwitchSource.FeedbackConnector, LimitSwitchNormal.Disabled, HW.CANconfigTimeOut);
-    	armSRX.configReverseLimitSwitchSource(LimitSwitchSource.FeedbackConnector, LimitSwitchNormal.Disabled, HW.CANconfigTimeOut);
-    	armBottomSRX = new TalonSRX(HW.ARM_BOTTOM);
-    	armBottomSRX.follow(armSRX);
-    	armBottomSRX.setInverted(armInvert);
-    	armBottomSRX.setNeutralMode(NeutralMode.Brake);
-    	
-    	armSRX.configNominalOutputForward(0, HW.CANconfigTimeOut);
-    	armSRX.configNominalOutputReverse(0, HW.CANconfigTimeOut);
-    	armSRX.configPeakOutputForward(prefs.getNumber("A: Peak Output Forward Percent", 0.8), HW.CANconfigTimeOut);
-    	armSRX.configPeakOutputReverse(prefs.getNumber("A: Peak Output Forward Percent", -0.8), HW.CANconfigTimeOut);
-    	armSRX.configVoltageCompSaturation(prefs.getNumber("A: Voltage Comp", 12), HW.CANconfigTimeOut);
-    	armSRX.enableVoltageCompensation(true);
-    	armSRX.configContinuousCurrentLimit((int)prefs.getNumber("A: Current Limit", 8.0), HW.CANconfigTimeOut);
-    	armSRX.configPeakCurrentLimit((int)prefs.getNumber("A: Current Peak Limit", 10.0), HW.CANconfigTimeOut);
-    	armSRX.configPeakCurrentDuration((int)prefs.getNumber("A: Current Peak Durration(ms)", 500), HW.CANconfigTimeOut);
-    	armSRX.enableCurrentLimit(true);
-    	
-    	/** Arm Extension Config**/
-    	boolean extensionInvert = false;
-    	boolean extensionPhase = false;
-    	extensionSRX = new TalonSRX(HW.EXTENSION_TOP);
-    	extensionSRX.setNeutralMode(NeutralMode.Brake);
-    	extensionSRX.setInverted(extensionInvert);
-    	extensionSRX.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, 0, HW.CANconfigTimeOut);
-    	extensionSRX.setSensorPhase(extensionPhase);
-    	extensionSRX.configForwardLimitSwitchSource(LimitSwitchSource.FeedbackConnector, LimitSwitchNormal.NormallyOpen, HW.CANconfigTimeOut);
-    	extensionSRX.configReverseLimitSwitchSource(LimitSwitchSource.FeedbackConnector, LimitSwitchNormal.NormallyOpen, HW.CANconfigTimeOut);
-
-    	extensionBottomSRX = new TalonSRX(HW.EXTENSION_BOTTOM);
-    	extensionBottomSRX.setNeutralMode(NeutralMode.Brake);
-    	extensionBottomSRX.setInverted(extensionInvert);
-    	extensionBottomSRX.follow(armSRX);
-    	
-    	extensionSRX.configNominalOutputForward(0, HW.CANconfigTimeOut);
-    	extensionSRX.configNominalOutputReverse(0, HW.CANconfigTimeOut);
-    	extensionSRX.configPeakOutputForward(prefs.getNumber("E: Peak Output Forward Percent", 0.8), HW.CANconfigTimeOut);
-    	extensionSRX.configPeakOutputReverse(prefs.getNumber("E: Peak Output Forward Percent", -0.8), HW.CANconfigTimeOut);
-    	extensionSRX.configVoltageCompSaturation(prefs.getNumber("E: Voltage Comp", 12), HW.CANconfigTimeOut);
-    	extensionSRX.enableVoltageCompensation(true);
-    	//Set extension Current limit to 8 amp if it's over 10 amps for more than half a second.
-    	extensionSRX.configContinuousCurrentLimit((int)prefs.getNumber("E: Current Limit", 8.0), HW.CANconfigTimeOut);
-    	extensionSRX.configPeakCurrentLimit((int)prefs.getNumber("E: Current Peak Limit", 10.0), HW.CANconfigTimeOut);
-    	extensionSRX.configPeakCurrentDuration((int)prefs.getNumber("E: Current Peak Durration(ms)", 500), HW.CANconfigTimeOut);
-    	extensionSRX.enableCurrentLimit(true);
+    	arm = new Arm();
+    	extension = new Extension();
     	
     	boolean intakeInvert = false;
     	intakeSRX = new TalonSRX(HW.INTAKE_TOP);
