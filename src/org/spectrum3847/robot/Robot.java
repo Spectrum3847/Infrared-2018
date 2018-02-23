@@ -12,6 +12,7 @@ import org.spectrum3847.lib.util.SpectrumPreferences;
 import org.spectrum3847.robot.subsystems.Arm;
 import org.spectrum3847.robot.subsystems.Drivetrain;
 import org.spectrum3847.robot.subsystems.Extension;
+import org.spectrum3847.robot.subsystems.Intake;
 
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.LimitSwitchNormal;
@@ -58,6 +59,7 @@ public class Robot extends TimedRobot {
 	public static Drivetrain drive;
 	public static Arm arm;
 	public static Extension extension;
+	public static Intake intake;
 	
 	public static TalonSRX intakeSRX;
 	public static TalonSRX intakeBottomSRX;
@@ -71,21 +73,7 @@ public class Robot extends TimedRobot {
     	
     	arm = new Arm();
     	extension = new Extension();
-    	
-    	boolean intakeInvert = false;
-    	intakeSRX = new TalonSRX(HW.INTAKE_TOP);
-    	intakeSRX.setNeutralMode(NeutralMode.Brake);
-    	intakeSRX.setInverted(intakeInvert);
-    	intakeBottomSRX = new TalonSRX(HW.INTAKE_BOTTOM);
-    	intakeBottomSRX.setNeutralMode(NeutralMode.Brake);
-    	intakeBottomSRX.setInverted(!intakeInvert);
-    	intakeBottomSRX.follow(intakeSRX);
-    	intakeSRX.configNominalOutputForward(0, HW.CANconfigTimeOut);
-    	intakeSRX.configNominalOutputReverse(0, HW.CANconfigTimeOut);
-    	intakeSRX.configPeakOutputForward(1, HW.CANconfigTimeOut);
-    	intakeSRX.configPeakOutputReverse(-1, HW.CANconfigTimeOut);
-    	intakeSRX.configVoltageCompSaturation(12, HW.CANconfigTimeOut);
-    	intakeSRX.enableVoltageCompensation(true);
+    	intake = new Intake();
     	
     	//Pigeon setup has to happen after SRXs are configured
     	pigeon = new PigeonIMU(intakeBottomSRX);
