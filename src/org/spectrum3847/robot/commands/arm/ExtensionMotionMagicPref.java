@@ -15,10 +15,10 @@ import org.spectrum3847.robot.Robot;
 /**
  * An example command.  You can replace me with your own command.
  */
-public class ArmMotionMagic extends Command {
-	public ArmMotionMagic() {
+public class ExtensionMotionMagicPref extends Command {
+	public ExtensionMotionMagicPref() {
 		// Use requires() here to declare subsystem dependencies
-		requires(Robot.arm);
+		requires(Robot.extension);
 	}
 
 	// Called just before this Command runs the first time
@@ -29,7 +29,8 @@ public class ArmMotionMagic extends Command {
 	// Called repeatedly when this Command is scheduled to run
 	@Override
 	protected void execute() {
-		Robot.arm.motionMagicControl();
+		Robot.extension.setTargetPosition((int)Robot.prefs.getNumber("E: Set Pos", Robot.extension.upPositionLimit/2));
+		Robot.extension.motionMagicControl();
 	}
 
 	// Make this return true when this Command no longer needs to run execute()
@@ -41,7 +42,7 @@ public class ArmMotionMagic extends Command {
 	// Called once after isFinished returns true
 	@Override
 	protected void end() {
-		Robot.arm.setOpenLoop(0);
+		Robot.extension.setOpenLoop(0);
 	}
 
 	// Called when another command which requires one or more of the same

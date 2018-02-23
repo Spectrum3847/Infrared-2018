@@ -15,8 +15,8 @@ import org.spectrum3847.robot.Robot;
 /**
  * An example command.  You can replace me with your own command.
  */
-public class ExtensionMotionMagic extends Command {
-	public ExtensionMotionMagic() {
+public class ArmMotionMagicPref extends Command {
+	public ArmMotionMagicPref() {
 		// Use requires() here to declare subsystem dependencies
 		requires(Robot.arm);
 	}
@@ -29,6 +29,7 @@ public class ExtensionMotionMagic extends Command {
 	// Called repeatedly when this Command is scheduled to run
 	@Override
 	protected void execute() {
+		Robot.arm.setTargetPosition((int)Robot.prefs.getNumber("A: Set Pos", Robot.arm.fwdPositionLimit/2));
 		Robot.arm.motionMagicControl();
 	}
 
