@@ -19,6 +19,7 @@ import com.ctre.phoenix.motorcontrol.LimitSwitchNormal;
 import com.ctre.phoenix.motorcontrol.LimitSwitchSource;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.command.Subsystem;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -32,6 +33,9 @@ public class Intake extends Subsystem {
 	public LeaderTalonSRX intakeSRX = new LeaderTalonSRX(HW.INTAKE_TOP, intakeBottomSRX);
 	
 	public SpectrumSolenoid intakeSol = new SpectrumSolenoid(HW.INTAKE_SOL);
+	
+	public static double thresholdStart;
+	private static boolean intakeComplete;
 	
 	public Intake() {
 		boolean intakeInvert = false;
@@ -62,6 +66,32 @@ public class Intake extends Subsystem {
 	
 	public void setOpenLoop(double value) {
 		intakeSRX.set(ControlMode.PercentOutput, value);
+	}
+	
+	public double getCurrent() {
+		return (intakeSRX.getOutputCurrent());
+	}
+	
+	//check if the current has been above threshold value for enough time
+	public boolean isIntakeComplete(double currentThreshold, double thresholdTime) {
+		
+		if(intakeSRX.getOutputCurrent() > currentThreshold) {
+			
+			if(thresholdStart == 0) {
+				thresholdStart = Timer.getFPGATimestamp();
+				
+			} else {
+				if(Timer.getFPGATimestamp() - thresholdStart > thresholdTime) {
+					intakeComplete = true;		
+				}
+				
+			}
+		} else {
+			thresholdStart = 0;
+			intakeComplete = false;
+		}
+		
+		return intakeComplete;
 	}
 	
 	//Add the dashboard values for this subsystem
