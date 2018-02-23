@@ -16,7 +16,6 @@ import org.spectrum3847.robot.subsystems.Intake;
 public class IntakeUntilCurrent extends Command {
 	
 	private double speed;
-	private double startTime;
 	
 	public IntakeUntilCurrent() {
 		// Use requires() here to declare subsystem dependencies
