@@ -12,13 +12,14 @@ import org.spectrum3847.lib.drivers.LeaderTalonSRX;
 import org.spectrum3847.lib.drivers.SRXGains;
 import org.spectrum3847.robot.HW;
 import org.spectrum3847.robot.Robot;
-import org.spectrum3847.robot.commands.arm.ManualExtensionControl;
+import org.spectrum3847.robot.commands.arm.ExtensionManualControl;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.LimitSwitchNormal;
 import com.ctre.phoenix.motorcontrol.LimitSwitchSource;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.ctre.phoenix.motorcontrol.StatusFrameEnhanced;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
 import edu.wpi.first.wpilibj.command.Subsystem;
@@ -35,12 +36,17 @@ public class Extension extends Subsystem {
 	public final static int upPositionLimit = 50000;// needs to be determined manually
 	public final static int downPositionLimit = 0;
 	
+	private int accel = 0;
+	private int cruiseVel = 0;
+	
 	public SpectrumTalonSRX extensionBottomSRX = new SpectrumTalonSRX(HW.EXTENSION_BOTTOM);
 	public LeaderTalonSRX extensionSRX = new LeaderTalonSRX(HW.EXTENSION_TOP, extensionBottomSRX);
 	
-	private final SRXGains UpGains = new SRXGains(EXTENSION_UP, 0.560, 0.0, 5.600, 0.620, 100);
-	private final SRXGains DownGains = new SRXGains(EXTENSION_DOWN, 0.0, 0.0, 0.0, 0.427, 0);
+	private SRXGains upGains = new SRXGains(EXTENSION_UP, 0.560, 0.0, 5.600, 0.620, 100);
+	private SRXGains downGains = new SRXGains(EXTENSION_DOWN, 0.0, 0.0, 0.0, 0.427, 0);
 	private boolean zeroWhenDownLimit = true;
+	
+	private int targetPosition = 0;
 	
 	public Extension() {
 		super("Extension");
@@ -64,6 +70,8 @@ public class Extension extends Subsystem {
     	extensionSRX.configPeakCurrentLimit((int)Robot.prefs.getNumber("E: Current Peak Limit", 10.0));
     	extensionSRX.configPeakCurrentDuration((int)Robot.prefs.getNumber("E: Current Peak Durration(ms)", 500));
     	extensionSRX.enableCurrentLimit(true);
+    	extensionSRX.setStatusFramePeriod(StatusFrameEnhanced.Status_13_Base_PIDF0, 10);
+    	extensionSRX.setStatusFramePeriod(StatusFrameEnhanced.Status_10_MotionMagic, 10);
     	
     	extensionSRX.configForwardSoftLimitEnable(true);
     	extensionSRX.configForwardSoftLimitThreshold(upPositionLimit);
@@ -71,15 +79,36 @@ public class Extension extends Subsystem {
     	extensionSRX.configReverseSoftLimitEnable(true);
     	extensionSRX.configReverseSoftLimitThreshold(downPositionLimit);
 	}
+	
 	public void initDefaultCommand() {
 		// Set the default command for a subsystem here.
-		setDefaultCommand(new ManualExtensionControl());
+		setDefaultCommand(new ExtensionManualControl());
 	}
+	
 	public void periodic() {
 		//If we want to zero when down and we are at the limit switch and greater than zero, then set us to zero
 		if (zeroWhenDownLimit && this.getRevLimitSW() && extensionSRX.getSelectedSensorPosition(0) >= 0) {
 			extensionSRX.setSelectedSensorPosition(0, 0);
 		}
+		getPrefsGains();
+		extensionSRX.setGains(upGains);
+		extensionSRX.setGains(downGains);
+	}
+	
+	public void getPrefsGains() {
+		upGains.setGains(EXTENSION_UP,
+		Robot.prefs.getNumber("E: up P", 0.0),
+		Robot.prefs.getNumber("E: up I", 0.0),
+		Robot.prefs.getNumber("E: up D", 0.0),
+		Robot.prefs.getNumber("E: up F", 0.0),
+		0);
+		
+		downGains.setGains(EXTENSION_DOWN,
+		Robot.prefs.getNumber("E: down P", 0.0),
+		Robot.prefs.getNumber("E: down I", 0.0),
+		Robot.prefs.getNumber("E: down D", 0.0),
+		Robot.prefs.getNumber("E: down F", 0.0),
+		0);
 	}
 	
 	public void setZeroWhenDownLimit(boolean val) {
@@ -90,6 +119,13 @@ public class Extension extends Subsystem {
 		extensionSRX.set(ControlMode.PercentOutput, value);
 	}
 	
+	public void set(ControlMode controlMode, double signal) {
+    	if(controlMode == ControlMode.MotionMagic) {
+    		this.manageGainProfile(signal);
+    	}
+    	extensionSRX.set(controlMode, signal);
+    }
+	
 	public boolean getFwdLimitSW() {
 		return extensionSRX.getSensorCollection().isFwdLimitSwitchClosed();
 	}
@@ -98,10 +134,59 @@ public class Extension extends Subsystem {
 		return extensionSRX.getSensorCollection().isRevLimitSwitchClosed();
 	}
 	
+	public int getCurrentPosition() {
+    	return extensionSRX.getSelectedSensorPosition(0);
+    }
+	
+	public int getTargetPosition() {
+		return targetPosition;
+	}
+	
+	public int getSRXTarget() {
+		return extensionSRX.getClosedLoopTarget(0);
+	}
+	
+    public void setTargetPosition(int position) {
+    	targetPosition = position;
+    }
+	
+	public int getError() {
+		return extensionSRX.getClosedLoopError(0);
+	}
+	
+	public double getOutput() {
+		return extensionSRX.get();
+	}
+	
+	public void manageGainProfile(double targetPosition) {
+		double currentPosition = getCurrentPosition();
+		if (currentPosition < targetPosition) {
+				extensionSRX.selectProfileSlot(EXTENSION_UP, 0);
+		} else {
+			extensionSRX.selectProfileSlot(EXTENSION_DOWN, 0);
+		}
+	} 
+	
+	public void setMotionMagicValues(int acceleration, int cruiseVelocity) {
+		if (accel != acceleration && cruiseVel != cruiseVelocity) {
+			accel = acceleration;
+			cruiseVel = cruiseVelocity;
+			extensionSRX.configMotionAcceleration(accel);
+			extensionSRX.configMotionCruiseVelocity(cruiseVel);
+		}
+	}
+	
+	 public void motionMagicControl() {
+	    	manageGainProfile(targetPosition);
+	    	extensionSRX.set(ControlMode.MotionMagic, targetPosition);
+	 }
+	
 	//Add the dashboard values for this subsystem
 	public void dashboard() {
-		SmartDashboard.putNumber("Extension Position", extensionSRX.getSelectedSensorPosition(0));
-		SmartDashboard.putNumber("Extension Output", extensionSRX.get());
+		SmartDashboard.putNumber("Extension Position", getCurrentPosition());
+		SmartDashboard.putNumber("Extension Output", getOutput());
+		SmartDashboard.putNumber("Extension Target", getTargetPosition());
+		SmartDashboard.putNumber("Extension Error", getError());
 		SmartDashboard.putNumber("Extension Current Total", extensionSRX.getOutputCurrent() + extensionBottomSRX.getOutputCurrent());	
 	}
 	

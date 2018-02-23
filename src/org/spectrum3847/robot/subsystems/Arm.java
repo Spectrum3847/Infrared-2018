@@ -12,13 +12,14 @@ import org.spectrum3847.lib.drivers.LeaderTalonSRX;
 import org.spectrum3847.lib.drivers.SRXGains;
 import org.spectrum3847.robot.HW;
 import org.spectrum3847.robot.Robot;
-import org.spectrum3847.robot.commands.arm.ManualArmControl;
+import org.spectrum3847.robot.commands.arm.ArmManualControl;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.LimitSwitchNormal;
 import com.ctre.phoenix.motorcontrol.LimitSwitchSource;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.ctre.phoenix.motorcontrol.StatusFrameEnhanced;
 
 import edu.wpi.first.wpilibj.command.Subsystem;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -37,8 +38,13 @@ public class Arm extends Subsystem {
 	public SpectrumTalonSRX armBottomSRX = new SpectrumTalonSRX(HW.ARM_BOTTOM);
 	public LeaderTalonSRX armSRX = new LeaderTalonSRX(HW.ARM_TOP, armBottomSRX);
 	
-	private final SRXGains UpGains = new SRXGains(ARM_UP, 0.560, 0.0, 5.600, 0.620, 100);
-	private final SRXGains DownGains = new SRXGains(ARM_DOWN, 0.0, 0.0, 0.0, 0.427, 0);
+	private int accel = 0;
+	private int cruiseVel = 0;
+	
+	private final SRXGains upGains = new SRXGains(ARM_UP, 0.560, 0.0, 5.600, 0.620, 100);
+	private final SRXGains downGains = new SRXGains(ARM_DOWN, 0.0, 0.0, 0.0, 0.427, 0);
+	
+	private int targetPosition = 0;
 	
 	public Arm() {
 		super("Arm");
@@ -62,7 +68,9 @@ public class Arm extends Subsystem {
     	armSRX.configPeakCurrentLimit((int)Robot.prefs.getNumber("E: Current Peak Limit", 10.0));
     	armSRX.configPeakCurrentDuration((int)Robot.prefs.getNumber("E: Current Peak Durration(ms)", 500));
     	armSRX.enableCurrentLimit(true);
-    	
+    	armSRX.setStatusFramePeriod(StatusFrameEnhanced.Status_13_Base_PIDF0, 10);
+    	armSRX.setStatusFramePeriod(StatusFrameEnhanced.Status_10_MotionMagic, 10);
+    		
     	armSRX.configForwardSoftLimitEnable(true);
     	armSRX.configForwardSoftLimitThreshold(fwdPositionLimit);
     	
@@ -72,7 +80,30 @@ public class Arm extends Subsystem {
 	
 	public void initDefaultCommand() {
 		// Set the default command for a subsystem here.
-		setDefaultCommand(new ManualArmControl());
+		setDefaultCommand(new ArmManualControl());
+	}
+	
+	public void periodic() {
+		setMotionMagicValues((int)Robot.prefs.getNumber("A: MM Accel", 5000), (int)Robot.prefs.getNumber("A: MM CruiseVel", 2000));
+		getPrefsGains();
+		armSRX.setGains(upGains);
+		armSRX.setGains(downGains);
+	}
+	
+	public void getPrefsGains() {
+		upGains.setGains(ARM_UP,
+		Robot.prefs.getNumber("A: up P", 0.0),
+		Robot.prefs.getNumber("A: up I", 0.0),
+		Robot.prefs.getNumber("A: up D", 0.0),
+		Robot.prefs.getNumber("A: up F", 0.0),
+		0);
+		
+		downGains.setGains(ARM_DOWN,
+		Robot.prefs.getNumber("A: down P", 0.0),
+		Robot.prefs.getNumber("A: down I", 0.0),
+		Robot.prefs.getNumber("A: down D", 0.0),
+		Robot.prefs.getNumber("A: down F", 0.0),
+		0);
 	}
 	
 	public void setPositionToZero() {
@@ -93,6 +124,13 @@ public class Arm extends Subsystem {
 		armSRX.set(ControlMode.PercentOutput, value);
 	}
 	
+	public void set(ControlMode controlMode, double signal) {
+    	if(controlMode == ControlMode.MotionMagic) {
+    		this.manageGainProfile(signal);
+    	}
+    	armSRX.set(controlMode, signal);
+    }
+	
 	public boolean getFwdLimitSW() {
 		return armSRX.getSensorCollection().isFwdLimitSwitchClosed();
 	}
@@ -101,13 +139,73 @@ public class Arm extends Subsystem {
 		return armSRX.getSensorCollection().isRevLimitSwitchClosed();
 	}
 	
+	public int getCurrentPosition() {
+    	return armSRX.getSelectedSensorPosition(0);
+    }
+	
+	public double getOutput() {
+		return armSRX.get();
+	}
+	
+	public int getTargetPosition() {
+		return targetPosition;
+	}
+	
+	public int getSRXTarget() {
+		return armSRX.getClosedLoopTarget(0);
+	}
+	
+    public void setTargetPosition(int position) {
+    	targetPosition = position;
+    }
+	
+	public int getError() {
+		return armSRX.getClosedLoopError(0);
+	}
+	
+	public void motionMagicControl() {
+    	manageGainProfile(targetPosition);
+    	armSRX.set(ControlMode.MotionMagic, targetPosition);
+    }
+	
+	public void setMotionMagicValues(int acceleration, int cruiseVelocity) {
+		if (accel != acceleration && cruiseVel != cruiseVelocity) {
+			accel = acceleration;
+			cruiseVel = cruiseVelocity;
+			armSRX.configMotionAcceleration(accel);
+			armSRX.configMotionCruiseVelocity(cruiseVel);
+		}
+	}
+	
+	public void manageGainProfile(double targetPosition) {
+		double currentPosition = getCurrentPosition();
+		//Check if the arm is behind us or in front of us and figure out which way is up and down
+		if (currentPosition < fwdPositionLimit/2) {
+			if (currentPosition < targetPosition) {
+				armSRX.selectProfileSlot(ARM_UP, 0);
+			} else {
+				armSRX.selectProfileSlot(ARM_DOWN, 0);
+			}
+		} else {
+			if (currentPosition < targetPosition) {
+				armSRX.selectProfileSlot(ARM_DOWN, 0);
+			} else {
+				armSRX.selectProfileSlot(ARM_UP, 0);
+			}	
+		}
+	} 
+
+	
 	//Add the dashboard values for this subsystem
 	public void dashboard() {
-		SmartDashboard.putNumber("Arm Position", armSRX.getSelectedSensorPosition(0));
-		SmartDashboard.putNumber("Arm Output", armSRX.get());
-		SmartDashboard.putNumber("Arm Current Total", armSRX.getOutputCurrent() + armBottomSRX.getOutputCurrent());
-		
+		SmartDashboard.putNumber("Arm Position", getCurrentPosition());
+		SmartDashboard.putNumber("Arm Output", getOutput());
+		SmartDashboard.putNumber("Arm Target", getTargetPosition());
+		SmartDashboard.putNumber("Arm Error", getError());
+		SmartDashboard.putNumber("Arm Current Total", armSRX.getOutputCurrent() + armBottomSRX.getOutputCurrent());	
 	}
+	
+	
 	
 	/*Modify this method to return false if there is a problem with the subsystem
 	  Based on 254-2017 Code

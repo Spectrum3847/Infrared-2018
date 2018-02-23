@@ -16,8 +16,8 @@ import org.spectrum3847.robot.Robot;
 /**
  * An example command.  You can replace me with your own command.
  */
-public class ManualExtensionControl extends Command {
-	public ManualExtensionControl() {
+public class ExtensionManualControl extends Command {
+	public ExtensionManualControl() {
 		// Use requires() here to declare subsystem dependencies
 		requires(Robot.extension);
 	}

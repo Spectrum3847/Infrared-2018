@@ -15,8 +15,8 @@ import org.spectrum3847.robot.Robot;
 /**
  * An example command.  You can replace me with your own command.
  */
-public class ManualArmControl extends Command {
-	public ManualArmControl() {
+public class ArmMotionMagic extends Command {
+	public ArmMotionMagic() {
 		// Use requires() here to declare subsystem dependencies
 		requires(Robot.arm);
 	}
@@ -29,7 +29,7 @@ public class ManualArmControl extends Command {
 	// Called repeatedly when this Command is scheduled to run
 	@Override
 	protected void execute() {
-		Robot.arm.setOpenLoop(OI.operatorController.leftStick.getY());
+		Robot.arm.motionMagicControl();
 	}
 
 	// Make this return true when this Command no longer needs to run execute()
