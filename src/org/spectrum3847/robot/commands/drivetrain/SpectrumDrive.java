@@ -1,7 +1,8 @@
 package org.spectrum3847.robot.commands.drivetrain;
 
-import org.spectrum3847.robot.HW;
+import org.spectrum3847.robot.OI;
 import org.spectrum3847.robot.Robot;
+
 import edu.wpi.first.wpilibj.command.Command;
 
 /**
@@ -22,8 +23,8 @@ public class SpectrumDrive extends Command {
     // Called repeatedly when this Command is scheduled to run
     protected void execute() {
     	boolean quickTurn = Robot.drive.quickTurnController();
-    	double moveValue = HW.driverController.leftStick.getY();
-    	double rotateValue = HW.driverController.rightStick.getX();
+    	double moveValue = OI.driverController.leftStick.getY();
+    	double rotateValue = OI.driverController.rightStick.getX();
     	Robot.drive.difDrive.curvatureDrive(moveValue, rotateValue, quickTurn);
     }
 
