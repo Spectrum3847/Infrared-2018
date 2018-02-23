@@ -32,10 +32,9 @@ public class Dashboard {
     }
 
     private static void updatePutShort() {
-
+    	Robot.drive.dashboard();
     }
 
-    
     private static void updatePutLong(){
     	SmartDashboard.putBoolean("Compressor", Robot.compressor.enabled());
 		SmartDashboard.putString("*Auto Command*", Autonomous.AutoName); // Displays which auto should run
@@ -45,8 +44,8 @@ public class Dashboard {
 		SmartDashboard.putString("Change Battery", Util.changeBattery() ? "Yes" : "No");
     }
 
-    
     public static void updateDashboard() {
+    	dashboardFlash();
     	if (ENABLE_DASHBOARD) {
             if ((Timer.getFPGATimestamp() - shortOldTime) > SHORT_DELAY) {
                 shortOldTime = Timer.getFPGATimestamp();
@@ -58,5 +57,18 @@ public class Dashboard {
                 updatePutLong();
             }
         }
+    }
+    
+    static int t = 0;
+    static boolean b = true;
+    
+    public static void dashboardFlash(){
+        //Flash a light on the dashboard while disabled, know that the dashboard is refreshing.
+        if (t > 20) {
+            t = 0;
+            b = !b;
+            SmartDashboard.putBoolean("Disabled Toggle", b);
+        }
+        t++;
     }
 }

@@ -5,7 +5,7 @@ import java.util.List;
 import org.spectrum3847.robot.HW;
 import org.spectrum3847.robot.Robot;
 
-import com.ctre.CANTalon;
+import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
 import edu.wpi.first.wpilibj.Timer;
 
@@ -63,7 +63,7 @@ public class Util {
 	private static double[] currentValues/* = new double[number]*/; //Let number be the number of terms you want to average
 	private static int count = 0;
 	private static int total = 0;
-	public static double movingAvgCurrent(CANTalon motor) {
+	public static double movingAvgCurrent(TalonSRX motor) {
 		double a = motor.getOutputCurrent();
 		if (currentValues[count] != 0) {
 			total -= currentValues[count];
@@ -80,5 +80,52 @@ public class Util {
 	public static boolean changeBattery () {
 		return (Robot.s_robot_state == Robot.RobotState.DISABLED && HW.PDP.getVoltage() < HW.MIN_BATTERY_VOLTAGE);
 	}
+
+
+    public static boolean epsilonEquals(double a, double b, double epsilon) {
+        return (a - epsilon <= b) && (a + epsilon >= b);
+    }
+
+    public static boolean allCloseTo(List<Double> list, double value, double epsilon) {
+        boolean result = true;
+        for (Double value_in : list) {
+            result &= epsilonEquals(value_in, value, epsilon);
+        }
+        return result;
+    }
+    
+    public static double standardDeviation(double[] arr) {
+    	double mean = 0.0;    	
+    	double[] temp = new double[arr.length];
+    	
+    	mean = mean(arr);
+    	
+    	for (int i = 0; i < temp.length; i++) {
+			temp[i] = Math.pow((arr[i] - mean),2);
+		}
+    	
+    	return Math.sqrt(mean(temp));
+    }
+    
+    public static double mean(double[] arr) {
+    	double sum = 0.0;
+    	
+    	for (int i = 0; i < arr.length; i++) {
+			sum += arr[i];
+		}
+    	
+    	return sum/arr.length;
+    }
+    
+    public static double max(double[] arr) {
+    	double max = 0;
+    	for (int i = 0; i < arr.length; i++) {
+			if (arr[i] > max) {
+				max = arr[i];
+			}
+		}
+    	
+    	return max;
+    }
 
 }

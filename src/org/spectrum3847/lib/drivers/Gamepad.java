@@ -56,25 +56,25 @@ public class Gamepad extends Joystick {
 
     public double getLeftX() {
     	double value = this.getRawAxis(LeftX);
-    	Debugger.println(name +"_Left_X: " + value, Robot.controls, Debugger.debug2);
+    	Debugger.println(name +"_Left_X: " + value, Robot._controls, Debugger.debug2);
         return value;
     }
 
     public double getLeftY() {
     	double value = -this.getRawAxis(LeftY);
-    	Debugger.println(name +"_Left_Y: " + value, Robot.controls, Debugger.debug2);
+    	Debugger.println(name +"_Left_Y: " + value, Robot._controls, Debugger.debug2);
         return value;
     }
     
     public double getLeftTrigger() {
     	double value = -this.getRawAxis(LeftTrigger);
-    	Debugger.println(name +"_Left_Trigger: " + value, Robot.controls, Debugger.debug2);
+    	Debugger.println(name +"_Left_Trigger: " + value, Robot._controls, Debugger.debug2);
         return value;
     }
     
     public double getRightTrigger() {
     	double value = this.getRawAxis(RightTrigger);
-    	Debugger.println(name +"_Right_Trigger: " + value, Robot.controls, Debugger.debug2);
+    	Debugger.println(name +"_Right_Trigger: " + value, Robot._controls, Debugger.debug2);
         return value;
     	
     }
@@ -85,13 +85,13 @@ public class Gamepad extends Joystick {
 
     public double getRightX() {
     	double value = this.getRawAxis(RightX);
-    	Debugger.println(name +"_Right_X: " + value, Robot.controls, Debugger.debug2);
+    	Debugger.println(name +"_Right_X: " + value, Robot._controls, Debugger.debug2);
         return value;
     }
 
     public double getRightY() {
     	double value = this.getRawAxis(RightY);
-    	Debugger.println(name +"_Right_Y: " + value, Robot.controls, Debugger.debug2);
+    	Debugger.println(name +"_Right_Y: " + value, Robot._controls, Debugger.debug2);
         return value;
     }
 

@@ -1,9 +1,8 @@
 package org.spectrum3847.robot;
 
-import org.spectrum3847.lib.drivers.Gamepad;
+import org.spectrum3847.lib.controllers.BobXboxController;
 
 import edu.wpi.first.wpilibj.PowerDistributionPanel;
-import edu.wpi.first.wpilibj.XboxController;
 
 /**
  * The RobotMap is a mapping from the ports sensors and actuators are wired into
@@ -21,8 +20,8 @@ public class HW {
 	public static int CANconfigTimeOut = 10;
 	//OI
 	public static OI oi;
-	public static final XboxController Driver_Gamepad = new XboxController(0);
-	public static final XboxController Operator_Gamepad = new XboxController(1);
+	public static final BobXboxController driverController = new BobXboxController(0);
+	public static final BobXboxController operatorController = new BobXboxController(1);
 	/*
 	public static final Gamepad Driver_Gamepad = new Gamepad("Driver", HW.USBPORT_0);
     public static final Gamepad Operator_Gamepad = new Gamepad("Operator", HW.USBPORT_1);

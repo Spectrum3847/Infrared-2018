@@ -20,7 +20,7 @@ public class Autonomous {
 		if (SmartDashboard.getBoolean("Autonomous ENABLED", true)) {
 			AutonCommand.start();
 		}
-		Debugger.println("Auto Init is working", Robot.auton, Debugger.info3);
+		Debugger.println("Auto Init is working", Robot._auton, Debugger.info3);
 		Robot.compressor.stop();
 	}
 
@@ -28,7 +28,6 @@ public class Autonomous {
 	public static void periodic() {
 		// System.out.println("Auto is working");
 		Scheduler.getInstance().run();
-		Dashboard.updateDashboard();
 	}
 
 	public static void cancel() {

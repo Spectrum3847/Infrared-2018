@@ -36,7 +36,6 @@ public class Teleop {
     }
 
     public static void periodic() {
-    	Dashboard.updateDashboard();
         Scheduler.getInstance().run();
         
     	
