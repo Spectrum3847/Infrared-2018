@@ -5,7 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-package org.spectrum3847.robot.commands;
+package org.spectrum3847.robot.commands.intake;
 
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.command.Command;
@@ -17,8 +17,6 @@ public class IntakeUntilCurrent extends Command {
 	
 	private double speed;
 	private double startTime;
-	private double timeInState;
-	private boolean currentFlag;
 	
 	public IntakeUntilCurrent() {
 		// Use requires() here to declare subsystem dependencies
