@@ -9,10 +9,9 @@ package org.spectrum3847.robot.subsystems;
 
 import org.spectrum3847.lib.drivers.SpectrumTalonSRX;
 import org.spectrum3847.lib.drivers.LeaderTalonSRX;
-import org.spectrum3847.lib.drivers.SRXGains;
+import org.spectrum3847.lib.drivers.SpectrumSolenoid;
 import org.spectrum3847.robot.HW;
 import org.spectrum3847.robot.Robot;
-import org.spectrum3847.robot.commands.arm.ManualArmControl;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
@@ -26,86 +25,49 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 /**
  * Arm Subsystem
  */
-public class Arm extends Subsystem {
+public class Intake extends Subsystem {
+	// Put methods for controlling this subsystem
+	// here. Call these from Commands.
+	public SpectrumTalonSRX intakeBottomSRX = new SpectrumTalonSRX(HW.INTAKE_BOTTOM);
+	public LeaderTalonSRX intakeSRX = new LeaderTalonSRX(HW.INTAKE_TOP, intakeBottomSRX);
 	
-	public final static int ARM_UP = 0;
-	public final static int ARM_DOWN = 1;
+	public SpectrumSolenoid intakeSol = new SpectrumSolenoid(HW.INTAKE_SOL);
 	
-	public final static int fwdPositionLimit = 50000;// needs to be determined manually
-	public final static int revPositionLimit = 0;
-	
-	public SpectrumTalonSRX armBottomSRX = new SpectrumTalonSRX(HW.ARM_BOTTOM);
-	public LeaderTalonSRX armSRX = new LeaderTalonSRX(HW.ARM_TOP, armBottomSRX);
-	
-	private final SRXGains UpGains = new SRXGains(ARM_UP, 0.560, 0.0, 5.600, 0.620, 100);
-	private final SRXGains DownGains = new SRXGains(ARM_DOWN, 0.0, 0.0, 0.0, 0.427, 0);
-	
-	public Arm() {
-		super("Arm");
-		boolean armInvert = false;
-    	boolean armPhase = false;
-    	armSRX.configOpenloopRamp(0);
-    	armSRX.configClosedloopRamp(0);
-    	armSRX.setNeutralMode(NeutralMode.Brake);
-    	armSRX.setInverted(armInvert);
-    	armSRX.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, 0);
-    	armSRX.setSensorPhase(armPhase);
-    	armSRX.configForwardLimitSwitchSource(LimitSwitchSource.FeedbackConnector, LimitSwitchNormal.NormallyOpen);
-    	armSRX.configReverseLimitSwitchSource(LimitSwitchSource.FeedbackConnector, LimitSwitchNormal.NormallyOpen);
-    	armSRX.configNominalOutputForward(0);
-    	armSRX.configNominalOutputReverse(0);
-    	armSRX.configPeakOutputForward(Robot.prefs.getNumber("E: Peak Output Forward Percent", 0.8));
-    	armSRX.configPeakOutputReverse(Robot.prefs.getNumber("E: Peak Output Forward Percent", -0.8));
-    	armSRX.configVoltageCompSaturation(Robot.prefs.getNumber("E: Voltage Comp", 12));
-    	armSRX.enableVoltageCompensation(true);
-    	armSRX.configContinuousCurrentLimit((int)Robot.prefs.getNumber("E: Current Limit", 8.0));
-    	armSRX.configPeakCurrentLimit((int)Robot.prefs.getNumber("E: Current Peak Limit", 10.0));
-    	armSRX.configPeakCurrentDuration((int)Robot.prefs.getNumber("E: Current Peak Durration(ms)", 500));
-    	armSRX.enableCurrentLimit(true);
-    	
-    	armSRX.configForwardSoftLimitEnable(true);
-    	armSRX.configForwardSoftLimitThreshold(fwdPositionLimit);
-    	
-    	armSRX.configReverseSoftLimitEnable(true);
-    	armSRX.configReverseSoftLimitThreshold(revPositionLimit);
-	}
-	
-	public void initDefaultCommand() {
-		// Set the default command for a subsystem here.
-		setDefaultCommand(new ManualArmControl());
-	}
-	
-	public void setPositionToZero() {
-		armSRX.setSelectedSensorPosition(0, 0);
-	}
-	
-	public void setPositionToFullFwd() {
-    	armSRX.setSelectedSensorPosition(fwdPositionLimit, 0);
+	public Intake() {
+		boolean intakeInvert = false;
+    	intakeSRX.configOpenloopRamp(0);
+    	intakeSRX.configClosedloopRamp(0);
+    	intakeSRX.setNeutralMode(NeutralMode.Brake);
+    	intakeSRX.setInverted(intakeInvert);
+    	intakeSRX.configSelectedFeedbackSensor(FeedbackDevice.None, 0);
+    	intakeSRX.configForwardLimitSwitchSource(LimitSwitchSource.FeedbackConnector, LimitSwitchNormal.Disabled);
+    	intakeSRX.configReverseLimitSwitchSource(LimitSwitchSource.FeedbackConnector, LimitSwitchNormal.Disabled);
+    	intakeSRX.configNominalOutputForward(0);
+    	intakeSRX.configNominalOutputReverse(0);
+    	intakeSRX.configPeakOutputForward(Robot.prefs.getNumber("I: Peak Output Forward Percent", 1));
+    	intakeSRX.configPeakOutputReverse(Robot.prefs.getNumber("I: Peak Output Forward Percent", -1));
+    	intakeSRX.configVoltageCompSaturation(Robot.prefs.getNumber("I: Voltage Comp", 12));
+    	intakeSRX.enableVoltageCompensation(true);
+    	intakeSRX.configContinuousCurrentLimit((int)Robot.prefs.getNumber("I: Current Limit", 8.0));
+    	intakeSRX.configPeakCurrentLimit((int)Robot.prefs.getNumber("I: Current Peak Limit", 15.0));
+    	intakeSRX.configPeakCurrentDuration((int)Robot.prefs.getNumber("I: Current Peak Durration(ms)", 1000));
+    	intakeSRX.enableCurrentLimit(true);
 	}
 
 	
-	public void setPostionToCenter() {
-		armSRX.setSelectedSensorPosition(fwdPositionLimit/2, 0);
+	public void initDefaultCommand() {
+		// Set the default command for a subsystem here.
+		//setDefaultCommand();
 	}
-	
 	
 	public void setOpenLoop(double value) {
-		armSRX.set(ControlMode.PercentOutput, value);
-	}
-	
-	public boolean getFwdLimitSW() {
-		return armSRX.getSensorCollection().isFwdLimitSwitchClosed();
-	}
-	
-	public boolean getRevLimitSW() {
-		return armSRX.getSensorCollection().isRevLimitSwitchClosed();
+		intakeSRX.set(ControlMode.PercentOutput, value);
 	}
 	
 	//Add the dashboard values for this subsystem
 	public void dashboard() {
-		SmartDashboard.putNumber("Arm Position", armSRX.getSelectedSensorPosition(0));
-		SmartDashboard.putNumber("Arm Output", armSRX.get());
-		SmartDashboard.putNumber("Arm Current Total", armSRX.getOutputCurrent() + armBottomSRX.getOutputCurrent());
+		SmartDashboard.putNumber("Intake Output", intakeSRX.get());
+		SmartDashboard.putNumber("Intake Current Total", intakeSRX.getOutputCurrent() + intakeBottomSRX.getOutputCurrent());
 		
 	}
 	

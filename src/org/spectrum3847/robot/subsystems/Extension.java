@@ -9,6 +9,7 @@ package org.spectrum3847.robot.subsystems;
 
 import org.spectrum3847.lib.drivers.SpectrumTalonSRX;
 import org.spectrum3847.lib.drivers.LeaderTalonSRX;
+import org.spectrum3847.lib.drivers.SRXGains;
 import org.spectrum3847.robot.HW;
 import org.spectrum3847.robot.Robot;
 import org.spectrum3847.robot.commands.arm.ManualExtensionControl;
@@ -27,12 +28,22 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  * Extension Subsystem
  */
 public class Extension extends Subsystem {
-	// Put methods for controlling this subsystem
-	// here. Call these from Commands.
+
+	public final static int EXTENSION_UP = 0;
+	public final static int EXTENSION_DOWN = 1;
+	
+	public final static int upPositionLimit = 50000;// needs to be determined manually
+	public final static int downPositionLimit = 0;
+	
 	public SpectrumTalonSRX extensionBottomSRX = new SpectrumTalonSRX(HW.EXTENSION_BOTTOM);
 	public LeaderTalonSRX extensionSRX = new LeaderTalonSRX(HW.EXTENSION_TOP, extensionBottomSRX);
 	
+	private final SRXGains UpGains = new SRXGains(EXTENSION_UP, 0.560, 0.0, 5.600, 0.620, 100);
+	private final SRXGains DownGains = new SRXGains(EXTENSION_DOWN, 0.0, 0.0, 0.0, 0.427, 0);
+	private boolean zeroWhenDownLimit = true;
+	
 	public Extension() {
+		super("Extension");
 		boolean extensionInvert = false;
     	boolean extensionPhase = false;
     	extensionSRX.configOpenloopRamp(0);
@@ -53,14 +64,38 @@ public class Extension extends Subsystem {
     	extensionSRX.configPeakCurrentLimit((int)Robot.prefs.getNumber("E: Current Peak Limit", 10.0));
     	extensionSRX.configPeakCurrentDuration((int)Robot.prefs.getNumber("E: Current Peak Durration(ms)", 500));
     	extensionSRX.enableCurrentLimit(true);
+    	
+    	extensionSRX.configForwardSoftLimitEnable(true);
+    	extensionSRX.configForwardSoftLimitThreshold(upPositionLimit);
+    	
+    	extensionSRX.configReverseSoftLimitEnable(true);
+    	extensionSRX.configReverseSoftLimitThreshold(downPositionLimit);
 	}
 	public void initDefaultCommand() {
 		// Set the default command for a subsystem here.
 		setDefaultCommand(new ManualExtensionControl());
 	}
+	public void periodic() {
+		//If we want to zero when down and we are at the limit switch and greater than zero, then set us to zero
+		if (zeroWhenDownLimit && this.getRevLimitSW() && extensionSRX.getSelectedSensorPosition(0) >= 0) {
+			extensionSRX.setSelectedSensorPosition(0, 0);
+		}
+	}
+	
+	public void setZeroWhenDownLimit(boolean val) {
+		zeroWhenDownLimit = val;
+	}
 	
 	public void setOpenLoop(double value) {
 		extensionSRX.set(ControlMode.PercentOutput, value);
+	}
+	
+	public boolean getFwdLimitSW() {
+		return extensionSRX.getSensorCollection().isFwdLimitSwitchClosed();
+	}
+	
+	public boolean getRevLimitSW() {
+		return extensionSRX.getSensorCollection().isRevLimitSwitchClosed();
 	}
 	
 	//Add the dashboard values for this subsystem

@@ -6,6 +6,7 @@ import org.spectrum3847.lib.drivers.SpectrumTalonSRX;
 import org.spectrum3847.lib.drivers.SpectrumVictorSPX;
 import org.spectrum3847.lib.drivers.DriveSignal;
 import org.spectrum3847.lib.drivers.LeaderTalonSRX;
+import org.spectrum3847.lib.drivers.SpectrumSolenoid;
 import org.spectrum3847.robot.HW;
 import org.spectrum3847.robot.OI;
 import org.spectrum3847.robot.Robot;
@@ -41,6 +42,9 @@ public class Drivetrain extends Subsystem {
 	public SpectrumVictorSPX rightMiddleSPX = new SpectrumVictorSPX(HW.RIGHT_DRIVE_MIDDLE);
 	public LeaderTalonSRX rightSRX = new LeaderTalonSRX(HW.RIGHT_DRIVE_SRX_BACK, rightMiddleSPX, rightBottomSPX);
 	public DifferentialDrive difDrive = new DifferentialDrive(leftSRX, rightSRX);
+	
+	public SpectrumSolenoid shiftingSol = new SpectrumSolenoid(HW.SHIFT_SOL);
+	public SpectrumSolenoid brakeSol = new SpectrumSolenoid(HW.DRIVE_BRAKE_SOL);
 
 	public Drivetrain() {
 		leftSRX.setInverted(true);
@@ -85,7 +89,8 @@ public class Drivetrain extends Subsystem {
 		this.configPIDF(HIGH_GEAR_PROFILE, 0.0, 0.0, 0.0, 0.146);
 		this.configPIDF(LOW_GEAR_PROFILE, 2.400, 0.0, 48.00, 0.400);
 		
-		
+		setLowGear();
+		setBrakeOff();
 
 	}
 
@@ -109,6 +114,10 @@ public class Drivetrain extends Subsystem {
 	public void drive(ControlMode controlMode, DriveSignal driveSignal) {
 		//System.out.println(driveSignal.toString());
 		this.drive(controlMode, driveSignal.getLeft(), driveSignal.getRight());
+	}
+	
+	public void stop() {
+		drive(ControlMode.PercentOutput, 0,0);
 	}
 
 	public boolean quickTurnController() {
@@ -160,6 +169,23 @@ public class Drivetrain extends Subsystem {
 		this.leftSRX.setNeutralMode(neutralMode);
 		this.rightSRX.setNeutralMode(neutralMode);
 	}
+	
+	public void setHighGear() {
+		this.shiftingSol.set(true);
+	}
+	
+	public void setLowGear() {
+		this.shiftingSol.set(false);
+	}
+	
+	public void setBrakeOn() {
+		this.brakeSol.set(true);
+	}
+	
+	public void setBrakeOff() {
+		this.brakeSol.set(false);
+	}
+	
 	@Override
 	public void periodic() {
 
