@@ -8,7 +8,8 @@
 package org.spectrum3847.robot;
 
 import org.spectrum3847.lib.controllers.SpectrumXboxController;
-
+import org.spectrum3847.robot.commands.intake.IntakeOn;
+import org.spectrum3847.robot.commands.intake.IntakeUntilCurrent;
 /**
  * This class is the glue that binds the controls on the physical operator
  * interface to the commands and command groups that allow control of the robot.
@@ -22,6 +23,10 @@ public class OI {
 	public OI() {
 		driverController = new SpectrumXboxController(0, .08, .1);
 		operatorController = new SpectrumXboxController(1, .08, .08);
+		
+		driverController.aButton.whenPressed(new IntakeUntilCurrent());;
+		driverController.leftTriggerButton.whileHeld(new IntakeOn(Robot.prefs.getNumber("IN: Intake Speed", 1)));
+		driverController.rightTriggerButton.whileHeld(new IntakeOn(-1* Robot.prefs.getNumber("IN: Intake Speed", 1)));
 		
 	}
 	//// CREATING BUTTONS

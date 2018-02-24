@@ -106,42 +106,35 @@ public class Intake extends Subsystem {
 	*/
 	public boolean checkSystem() {
 		return true;
-		
-		/** Example checkSystem from 254's 2017 Robot
-		 System.out.println("Testing HOPPER.--------------------------------------");
-        final double kCurrentThres = 0.5;
+		/*
+		//Example checkSystem from 254's 2017 Robot
+		System.out.println("Testing INTAKE.--------------------------------------");
+        final double currentThres = 0.5;
+        
+        intakeSRX.set(0.0);
 
-        mMasterTalon.changeControlMode(CANTalon.TalonControlMode.Voltage);
-        mSlaveTalon.changeControlMode(CANTalon.TalonControlMode.Voltage);
-
-        mMasterTalon.set(0.0);
-        mSlaveTalon.set(0.0);
-
-        mMasterTalon.set(-6.0f);
+        intakeSRX.set(ControlMode.PercentOutput,-6.0);
         Timer.delay(4.0);
-        final double currentMaster = mMasterTalon.getOutputCurrent();
-        mMasterTalon.set(0.0);
+        final double currentLeader = intakeSRX.getOutputCurrent();
+        intakeSRX.set(0.0);
 
         Timer.delay(2.0);
 
-        mSlaveTalon.set(6.0f);
+        intakeBottomSRX.set(ControlMode.PercentOutput,6.0);
         Timer.delay(4.0);
-        final double currentSlave = mSlaveTalon.getOutputCurrent();
-        mSlaveTalon.set(0.0);
+        final double currentFollower = intakeBottomSRX.getOutputCurrent();
+        intakeBottomSRX.set(0.0);
 
-        mMasterTalon.changeControlMode(CANTalon.TalonControlMode.PercentVbus);
-        mSlaveTalon.changeControlMode(CANTalon.TalonControlMode.PercentVbus);
-
-        System.out.println("Hopper Master Current: " + currentMaster + " Slave current: " + currentSlave);
+        System.out.println("Hopper Leader Current: " + currentLeader + " Slave current: " + currentFollower);
 
         boolean failure = false;
 
-        if (currentMaster < kCurrentThres) {
+        if (currentLeader < currentThres) {
             failure = true;
             System.out.println("!!!!!!!!!!!!!!!!! Hopper Master Current Low !!!!!!!!!!!!!!!!!");
         }
 
-        if (currentSlave < kCurrentThres) {
+        if (currentFollower < currentThres) {
             failure = true;
             System.out.println("!!!!!!!!!!!!!!!! Hooper Slave Current Low !!!!!!!!!!!!!!!!!!!");
         }
@@ -152,6 +145,6 @@ public class Intake extends Subsystem {
         }
 
         return !failure;
-		 */
+        */
 	}
 }
