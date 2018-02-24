@@ -61,9 +61,6 @@ public class Robot extends TimedRobot {
 	public static Extension extension;
 	public static Intake intake;
 	
-	public static TalonSRX intakeSRX;
-	public static TalonSRX intakeBottomSRX;
-	
 	public static void setupSubsystems(){
     	prefs = SpectrumPreferences.getInstance();
     	
@@ -76,7 +73,7 @@ public class Robot extends TimedRobot {
     	intake = new Intake();
     	
     	//Pigeon setup has to happen after SRXs are configured
-    	pigeon = new PigeonIMU(intakeBottomSRX);
+    	pigeon = new PigeonIMU(intake.intakeBottomSRX);
     }
 	
 	//Used to keep track of the robot current state easily
@@ -212,4 +209,6 @@ public class Robot extends TimedRobot {
     public static void printWarning(String msg) {
     	Debugger.println(msg, _general, Debugger.warning4);
     }
+    
+    
 }

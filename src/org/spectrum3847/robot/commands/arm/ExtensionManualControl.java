@@ -30,7 +30,11 @@ public class ExtensionManualControl extends Command {
 	// Called repeatedly when this Command is scheduled to run
 	@Override
 	protected void execute() {
-		Robot.extension.setOpenLoop(OI.operatorController.rightStick.getY());
+		if (OI.operatorController.xButton.get()) {
+			Robot.extension.setOpenLoop(OI.operatorController.rightStick.getY()/2);
+		} else {
+			Robot.extension.setOpenLoop(0);
+		}
 	}
 
 	// Make this return true when this Command no longer needs to run execute()

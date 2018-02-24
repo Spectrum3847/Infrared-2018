@@ -50,8 +50,8 @@ public class Extension extends Subsystem {
 	
 	public Extension() {
 		super("Extension");
-		boolean extensionInvert = false;
-    	boolean extensionPhase = false;
+		boolean extensionInvert = true;
+    	boolean extensionPhase = true;
     	extensionSRX.configOpenloopRamp(0);
     	extensionSRX.configClosedloopRamp(0);
     	extensionSRX.setNeutralMode(NeutralMode.Brake);
@@ -63,7 +63,7 @@ public class Extension extends Subsystem {
     	extensionSRX.configNominalOutputForward(0);
     	extensionSRX.configNominalOutputReverse(0);
     	extensionSRX.configPeakOutputForward(Robot.prefs.getNumber("E: Peak Output Forward Percent", 0.8));
-    	extensionSRX.configPeakOutputReverse(Robot.prefs.getNumber("E: Peak Output Forward Percent", -0.8));
+    	extensionSRX.configPeakOutputReverse(Robot.prefs.getNumber("E: Peak Output Reverse Percent", -0.8));
     	extensionSRX.configVoltageCompSaturation(Robot.prefs.getNumber("E: Voltage Comp", 12));
     	extensionSRX.enableVoltageCompensation(true);
     	extensionSRX.configContinuousCurrentLimit((int)Robot.prefs.getNumber("E: Current Limit", 8.0));
@@ -76,7 +76,7 @@ public class Extension extends Subsystem {
     	extensionSRX.configForwardSoftLimitEnable(true);
     	extensionSRX.configForwardSoftLimitThreshold(upPositionLimit);
     	
-    	extensionSRX.configReverseSoftLimitEnable(true);
+    	extensionSRX.configReverseSoftLimitEnable(false);
     	extensionSRX.configReverseSoftLimitThreshold(downPositionLimit);
 	}
 	
@@ -87,7 +87,7 @@ public class Extension extends Subsystem {
 	
 	public void periodic() {
 		//If we want to zero when down and we are at the limit switch and greater than zero, then set us to zero
-		if (zeroWhenDownLimit && this.getRevLimitSW() && extensionSRX.getSelectedSensorPosition(0) >= 0) {
+		if (zeroWhenDownLimit && this.getRevLimitSW() && extensionSRX.getSelectedSensorPosition(0) != 0) {
 			extensionSRX.setSelectedSensorPosition(0, 0);
 		}
 		getPrefsGains();

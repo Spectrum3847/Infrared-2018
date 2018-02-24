@@ -23,7 +23,7 @@ public class SpectrumDrive extends Command {
     // Called repeatedly when this Command is scheduled to run
     protected void execute() {
     	boolean quickTurn = Robot.drive.quickTurnController();
-    	double moveValue = OI.driverController.leftStick.getY();
+    	double moveValue = OI.driverController.leftStick.getY() * -1;
     	double rotateValue = OI.driverController.rightStick.getX();
     	Robot.drive.difDrive.curvatureDrive(moveValue, rotateValue, quickTurn);
     }

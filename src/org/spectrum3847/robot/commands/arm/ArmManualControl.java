@@ -9,6 +9,8 @@ package org.spectrum3847.robot.commands.arm;
 
 import edu.wpi.first.wpilibj.command.Command;
 
+import org.spectrum3847.lib.controllers.SpectrumThumbStick;
+import org.spectrum3847.lib.controllers.SpectrumXboxController;
 import org.spectrum3847.robot.OI;
 import org.spectrum3847.robot.Robot;
 
@@ -29,7 +31,11 @@ public class ArmManualControl extends Command {
 	// Called repeatedly when this Command is scheduled to run
 	@Override
 	protected void execute() {
-		Robot.arm.setOpenLoop(OI.operatorController.leftStick.getY());
+		if (OI.operatorController.aButton.get()) {
+			Robot.arm.setOpenLoop(OI.operatorController.leftStick.getY()/2);
+		} else {
+			Robot.arm.setOpenLoop(0);
+		}
 	}
 
 	// Make this return true when this Command no longer needs to run execute()

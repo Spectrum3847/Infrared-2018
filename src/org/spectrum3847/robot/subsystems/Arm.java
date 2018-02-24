@@ -49,7 +49,7 @@ public class Arm extends Subsystem {
 	public Arm() {
 		super("Arm");
 		boolean armInvert = false;
-    	boolean armPhase = false;
+    	boolean armPhase = true;
     	armSRX.configOpenloopRamp(0);
     	armSRX.configClosedloopRamp(0);
     	armSRX.setNeutralMode(NeutralMode.Brake);
@@ -61,7 +61,7 @@ public class Arm extends Subsystem {
     	armSRX.configNominalOutputForward(0);
     	armSRX.configNominalOutputReverse(0);
     	armSRX.configPeakOutputForward(Robot.prefs.getNumber("E: Peak Output Forward Percent", 0.8));
-    	armSRX.configPeakOutputReverse(Robot.prefs.getNumber("E: Peak Output Forward Percent", -0.8));
+    	armSRX.configPeakOutputReverse(Robot.prefs.getNumber("E: Peak Output Reverse Percent", -0.8));
     	armSRX.configVoltageCompSaturation(Robot.prefs.getNumber("E: Voltage Comp", 12));
     	armSRX.enableVoltageCompensation(true);
     	armSRX.configContinuousCurrentLimit((int)Robot.prefs.getNumber("E: Current Limit", 8.0));
@@ -71,10 +71,10 @@ public class Arm extends Subsystem {
     	armSRX.setStatusFramePeriod(StatusFrameEnhanced.Status_13_Base_PIDF0, 10);
     	armSRX.setStatusFramePeriod(StatusFrameEnhanced.Status_10_MotionMagic, 10);
     		
-    	armSRX.configForwardSoftLimitEnable(true);
+    	armSRX.configForwardSoftLimitEnable(false);
     	armSRX.configForwardSoftLimitThreshold(fwdPositionLimit);
     	
-    	armSRX.configReverseSoftLimitEnable(true);
+    	armSRX.configReverseSoftLimitEnable(false);
     	armSRX.configReverseSoftLimitThreshold(revPositionLimit);
 	}
 	

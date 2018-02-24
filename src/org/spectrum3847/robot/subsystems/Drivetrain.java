@@ -6,6 +6,7 @@ import org.spectrum3847.lib.drivers.SpectrumTalonSRX;
 import org.spectrum3847.lib.drivers.SpectrumVictorSPX;
 import org.spectrum3847.lib.drivers.DriveSignal;
 import org.spectrum3847.lib.drivers.LeaderTalonSRX;
+import org.spectrum3847.lib.drivers.SpectrumDifferentialDrive;
 import org.spectrum3847.lib.drivers.SpectrumSolenoid;
 import org.spectrum3847.robot.HW;
 import org.spectrum3847.robot.OI;
@@ -30,7 +31,7 @@ public class Drivetrain extends Subsystem {
 
 	public static final int LOW_GEAR_PROFILE = 0;
 	public static final int HIGH_GEAR_PROFILE = 1;
-	public static final int DRIVE_DEFAULT_RAMP_RATE = 30;
+	public static final double DRIVE_DEFAULT_RAMP_RATE = 0.1;
 
 	StringBuilder _sb = new StringBuilder();
 	private static int _loops = 0;
@@ -41,15 +42,15 @@ public class Drivetrain extends Subsystem {
 	public SpectrumVictorSPX rightBottomSPX = new SpectrumVictorSPX(HW.RIGHT_DRIVE_FRONT_BOTTOM);
 	public SpectrumVictorSPX rightMiddleSPX = new SpectrumVictorSPX(HW.RIGHT_DRIVE_MIDDLE);
 	public LeaderTalonSRX rightSRX = new LeaderTalonSRX(HW.RIGHT_DRIVE_SRX_BACK, rightMiddleSPX, rightBottomSPX);
-	public DifferentialDrive difDrive = new DifferentialDrive(leftSRX, rightSRX);
+	public SpectrumDifferentialDrive difDrive = new SpectrumDifferentialDrive(leftSRX, rightSRX);
 	
 	public SpectrumSolenoid shiftingSol = new SpectrumSolenoid(HW.SHIFT_SOL);
 	public SpectrumSolenoid brakeSol = new SpectrumSolenoid(HW.DRIVE_BRAKE_SOL);
 
 	public Drivetrain() {
-		leftSRX.setInverted(true);
+		leftSRX.setInverted(false);
 		leftSRX.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, 0);
-		leftSRX.setSensorPhase(true);
+		leftSRX.setSensorPhase(false);
 		leftSRX.configForwardLimitSwitchSource(LimitSwitchSource.FeedbackConnector, LimitSwitchNormal.Disabled);
 		leftSRX.configReverseLimitSwitchSource(LimitSwitchSource.FeedbackConnector, LimitSwitchNormal.Disabled);
 		leftSRX.configOpenloopRamp(Robot.prefs.getNumber("D: Ramp Rate", DRIVE_DEFAULT_RAMP_RATE));
@@ -66,9 +67,9 @@ public class Drivetrain extends Subsystem {
 		leftSRX.enableCurrentLimit(true);
 
 		//RIGHT SIDE CONFIGURATION
-		rightSRX.setInverted(false);//true
+		rightSRX.setInverted(true);//true
 		rightSRX.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, 0);
-		rightSRX.setSensorPhase(false);
+		rightSRX.setSensorPhase(true);
 		rightSRX.configForwardLimitSwitchSource(LimitSwitchSource.FeedbackConnector, LimitSwitchNormal.Disabled);
 		rightSRX.configReverseLimitSwitchSource(LimitSwitchSource.FeedbackConnector, LimitSwitchNormal.Disabled);
 		rightSRX.configOpenloopRamp(Robot.prefs.getNumber("D: Ramp Rate", DRIVE_DEFAULT_RAMP_RATE));
