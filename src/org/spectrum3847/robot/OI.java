@@ -25,8 +25,8 @@ public class OI {
 		operatorController = new SpectrumXboxController(1, .08, .08);
 		
 		driverController.aButton.whenPressed(new IntakeUntilCurrent());;
-		driverController.leftTriggerButton.whileHeld(new IntakeOn(Robot.prefs.getNumber("IN: Intake Speed", 1)));
-		driverController.rightTriggerButton.whileHeld(new IntakeOn(-1* Robot.prefs.getNumber("IN: Intake Speed", 1)));
+		driverController.leftTriggerButton.whileHeld(new IntakeOn(Robot.prefs.getNumber("I: Intake Speed", 1)));
+		driverController.rightTriggerButton.whileHeld(new IntakeOn(-1* Robot.prefs.getNumber("I: Intake Speed", 1)));
 		
 	}
 	//// CREATING BUTTONS

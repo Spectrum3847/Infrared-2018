@@ -33,6 +33,8 @@ public class Intake extends Subsystem {
 	public LeaderTalonSRX intakeSRX = new LeaderTalonSRX(HW.INTAKE_TOP, intakeBottomSRX);
 	
 	public SpectrumSolenoid intakeSol = new SpectrumSolenoid(HW.INTAKE_SOL);
+	public SpectrumSolenoid puncherSolOne = new SpectrumSolenoid(HW.PUNCHER_ONE_SOL);
+	public SpectrumSolenoid puncherSolTwo = new SpectrumSolenoid(HW.PUNCHER_TWO_SOL);
 	
 	public static double thresholdStart;
 	private static boolean intakeComplete;
@@ -68,6 +70,17 @@ public class Intake extends Subsystem {
 		intakeSRX.set(ControlMode.PercentOutput, value);
 	}
 	
+	//retracts(opens) the intake
+	public void intakeSolRetract() {
+		intakeSol.set(true);
+	}
+	
+	//extend(closes) the intake
+	public void intakeSolExtend() {
+		intakeSol.set(false);
+	}
+	
+	//returns the current from one od the SRXs 
 	public double getCurrent() {
 		return (intakeSRX.getOutputCurrent());
 	}
