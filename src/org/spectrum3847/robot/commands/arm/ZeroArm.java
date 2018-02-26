@@ -9,32 +9,29 @@ package org.spectrum3847.robot.commands.arm;
 
 import edu.wpi.first.wpilibj.command.Command;
 
-import org.spectrum3847.robot.HW;
+import org.spectrum3847.lib.controllers.SpectrumThumbStick;
+import org.spectrum3847.lib.controllers.SpectrumXboxController;
 import org.spectrum3847.robot.OI;
 import org.spectrum3847.robot.Robot;
 
 /**
  * An example command.  You can replace me with your own command.
  */
-public class ExtensionManualControl extends Command {
-	public ExtensionManualControl() {
+public class ZeroArm extends Command {
+	public ZeroArm() {
 		// Use requires() here to declare subsystem dependencies
-		requires(Robot.extension);
+		requires(Robot.arm);
 	}
 
 	// Called just before this Command runs the first time
 	@Override
 	protected void initialize() {
+		Robot.arm.setPositionToZero();
 	}
 
 	// Called repeatedly when this Command is scheduled to run
 	@Override
 	protected void execute() {
-		if (OI.operatorController.xButton.get()) {
-			Robot.extension.setOpenLoop(OI.operatorController.rightStick.getY() *.75 * -1);
-		} else {
-			Robot.extension.setOpenLoop(0);
-		}
 	}
 
 	// Make this return true when this Command no longer needs to run execute()

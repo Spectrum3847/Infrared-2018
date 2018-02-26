@@ -8,6 +8,10 @@
 package org.spectrum3847.robot;
 
 import org.spectrum3847.lib.controllers.SpectrumXboxController;
+import org.spectrum3847.robot.commands.arm.ArmManualControl;
+import org.spectrum3847.robot.commands.arm.ArmMotionMagicPos;
+import org.spectrum3847.robot.commands.arm.ArmMotionMagicPref;
+import org.spectrum3847.robot.commands.arm.ZeroArm;
 import org.spectrum3847.robot.commands.intake.IntakeOn;
 import org.spectrum3847.robot.commands.intake.IntakeUntilCurrent;
 /**
@@ -21,13 +25,23 @@ public class OI {
 	public static SpectrumXboxController operatorController;
 	
 	public OI() {
-		driverController = new SpectrumXboxController(0, .08, .1);
-		operatorController = new SpectrumXboxController(1, .08, .08);
+		driverController = new SpectrumXboxController(0, .1, .1);
+		operatorController = new SpectrumXboxController(1, .15, .15);
 		
-		driverController.aButton.whenPressed(new IntakeUntilCurrent());;
-		driverController.leftTriggerButton.whileHeld(new IntakeOn(Robot.prefs.getNumber("IN: Intake Speed", 1)));
-		driverController.rightTriggerButton.whileHeld(new IntakeOn(-1* Robot.prefs.getNumber("IN: Intake Speed", 1)));
+		operatorController.leftBumper.whenPressed(new IntakeUntilCurrent());
+		operatorController.leftTriggerButton.whileHeld(new IntakeOn(Robot.prefs.getNumber("IN: Intake Speed", 1)));
+		operatorController.rightTriggerButton.whileHeld(new IntakeOn(-1* Robot.prefs.getNumber("IN: Intake Speed", 1)));
 		
+		operatorController.bButton.whileHeld(new ArmMotionMagicPref());
+		operatorController.Dpad.DownLeft.whenPressed(new ArmMotionMagicPos(Robot.arm.posFwdIntake, true));
+		operatorController.Dpad.Left.whenPressed(new ArmMotionMagicPos(Robot.arm.posFwdStraight, true));
+		operatorController.Dpad.UpLeft.whenPressed(new ArmMotionMagicPos(Robot.arm.posFwdScale, true));
+		operatorController.Dpad.Up.whenPressed(new ArmMotionMagicPos(Robot.arm.posCenterUp, true));
+		operatorController.Dpad.UpRight.whenPressed(new ArmMotionMagicPos(Robot.arm.posRevScale, true));
+		operatorController.Dpad.Right.whenPressed(new ArmMotionMagicPos(Robot.arm.posRevStraight, true));
+		operatorController.Dpad.DownRight.whenPressed(new ArmMotionMagicPos(Robot.arm.posRevIntake, true));
+		operatorController.aButton.whileHeld(new ArmManualControl());
+		operatorController.startButton.whenPressed(new ZeroArm());
 	}
 	//// CREATING BUTTONS
 	// One type of button is a joystick button which is any button on a

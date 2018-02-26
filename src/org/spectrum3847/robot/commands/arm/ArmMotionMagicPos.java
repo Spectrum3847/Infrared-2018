@@ -7,33 +7,55 @@
 
 package org.spectrum3847.robot.commands.arm;
 
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.command.Command;
 
-import org.spectrum3847.robot.HW;
+import org.spectrum3847.lib.util.Debugger;
 import org.spectrum3847.robot.OI;
 import org.spectrum3847.robot.Robot;
 
 /**
  * An example command.  You can replace me with your own command.
  */
-public class ExtensionManualControl extends Command {
-	public ExtensionManualControl() {
+public class ArmMotionMagicPos extends Command {
+	private int position = 0;
+	private double timestamp = 0;
+	private boolean isSet = false;
+	private boolean waitDelay = false;
+	public ArmMotionMagicPos(int pos) {
 		// Use requires() here to declare subsystem dependencies
-		requires(Robot.extension);
+		requires(Robot.arm);
+		position = pos;
+		timestamp = 0;
+	}
+	
+	public ArmMotionMagicPos(int pos, boolean w) {
+		// Use requires() here to declare subsystem dependencies
+		requires(Robot.arm);
+		position = pos;
+		waitDelay = w;
 	}
 
 	// Called just before this Command runs the first time
 	@Override
 	protected void initialize() {
+		System.out.println("Arm Command Init waiting to set position");
+		if (waitDelay) {
+			timestamp = Timer.getFPGATimestamp();
+		} else {
+			timestamp = 0;
+		}
+		isSet = false;
 	}
 
 	// Called repeatedly when this Command is scheduled to run
 	@Override
 	protected void execute() {
-		if (OI.operatorController.xButton.get()) {
-			Robot.extension.setOpenLoop(OI.operatorController.rightStick.getY() *.75 * -1);
-		} else {
-			Robot.extension.setOpenLoop(0);
+		if ((Timer.getFPGATimestamp() - timestamp) > Robot.prefs.getNumber("A: Pos Button Delay", 0.25) && isSet == false) {
+			Robot.arm.setTargetPosition(position);
+			Robot.arm.motionMagicControl();
+			isSet = true;
+			System.out.println("Position Set: " + position + " Timestamp: " + timestamp);
 		}
 	}
 

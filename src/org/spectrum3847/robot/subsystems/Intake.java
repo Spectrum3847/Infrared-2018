@@ -38,18 +38,17 @@ public class Intake extends Subsystem {
 	private static boolean intakeComplete;
 	
 	public Intake() {
-		boolean intakeInvert = false;
+		intakeBottomSRX.setInverted(true);
     	intakeSRX.configOpenloopRamp(0);
     	intakeSRX.configClosedloopRamp(0);
     	intakeSRX.setNeutralMode(NeutralMode.Brake);
-    	intakeSRX.setInverted(intakeInvert);
     	intakeSRX.configSelectedFeedbackSensor(FeedbackDevice.None, 0);
     	intakeSRX.configForwardLimitSwitchSource(LimitSwitchSource.FeedbackConnector, LimitSwitchNormal.Disabled);
     	intakeSRX.configReverseLimitSwitchSource(LimitSwitchSource.FeedbackConnector, LimitSwitchNormal.Disabled);
     	intakeSRX.configNominalOutputForward(0);
     	intakeSRX.configNominalOutputReverse(0);
     	intakeSRX.configPeakOutputForward(Robot.prefs.getNumber("I: Peak Output Forward Percent", 1));
-    	intakeSRX.configPeakOutputReverse(Robot.prefs.getNumber("I: Peak Output Forward Percent", -1));
+    	intakeSRX.configPeakOutputReverse(Robot.prefs.getNumber("I: Peak Output Reverse Percent", -1));
     	intakeSRX.configVoltageCompSaturation(Robot.prefs.getNumber("I: Voltage Comp", 12));
     	intakeSRX.enableVoltageCompensation(true);
     	intakeSRX.configContinuousCurrentLimit((int)Robot.prefs.getNumber("I: Current Limit", 8.0));

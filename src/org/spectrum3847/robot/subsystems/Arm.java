@@ -32,7 +32,7 @@ public class Arm extends Subsystem {
 	public final static int ARM_UP = 0;
 	public final static int ARM_DOWN = 1;
 	
-	public final static int fwdPositionLimit = 50000;// needs to be determined manually
+	public final static int fwdPositionLimit = 54200;// needs to be determined manually
 	public final static int revPositionLimit = 0;
 	
 	public SpectrumTalonSRX armBottomSRX = new SpectrumTalonSRX(HW.ARM_BOTTOM);
@@ -40,6 +40,14 @@ public class Arm extends Subsystem {
 	
 	private int accel = 0;
 	private int cruiseVel = 0;
+	
+	public int posFwdIntake = fwdPositionLimit;
+	public int posFwdStraight = fwdPositionLimit -7500;
+	public int posFwdScale = fwdPositionLimit * 2/3;
+	public int posCenterUp = fwdPositionLimit/2;
+	public int posRevScale = fwdPositionLimit * 1/3;
+	public int posRevStraight = 7500;
+	public int posRevIntake = 0;
 	
 	private final SRXGains upGains = new SRXGains(ARM_UP, 0.560, 0.0, 5.600, 0.620, 100);
 	private final SRXGains downGains = new SRXGains(ARM_DOWN, 0.0, 0.0, 0.0, 0.427, 0);
@@ -80,7 +88,7 @@ public class Arm extends Subsystem {
 	
 	public void initDefaultCommand() {
 		// Set the default command for a subsystem here.
-		setDefaultCommand(new ArmManualControl());
+		//setDefaultCommand(new ArmManualControl());
 	}
 	
 	public void periodic() {
@@ -200,9 +208,18 @@ public class Arm extends Subsystem {
 	public void dashboard() {
 		SmartDashboard.putNumber("Arm Position", getCurrentPosition());
 		SmartDashboard.putNumber("Arm Output", getOutput());
+		SmartDashboard.putNumber("Arm Velocity", armSRX.getSelectedSensorVelocity(0));
 		SmartDashboard.putNumber("Arm Target", getTargetPosition());
 		SmartDashboard.putNumber("Arm Error", getError());
 		SmartDashboard.putNumber("Arm Current Total", armSRX.getOutputCurrent() + armBottomSRX.getOutputCurrent());	
+		
+		if (armSRX.getControlMode() == ControlMode.MotionMagic) {
+			SmartDashboard.putNumber("Arm Acitve Traj Veloctiy", armSRX.getActiveTrajectoryVelocity());
+			SmartDashboard.putNumber("Arm Acitve Traj Position", armSRX.getActiveTrajectoryPosition());
+		} else {
+			SmartDashboard.putNumber("Arm Acitve Traj Veloctiy", -1);
+			SmartDashboard.putNumber("Arm Acitve Traj Position", -1);
+		}
 	}
 	
 	

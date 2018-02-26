@@ -29,7 +29,7 @@ public class ArmMotionMagicPref extends Command {
 	// Called repeatedly when this Command is scheduled to run
 	@Override
 	protected void execute() {
-		Robot.arm.setTargetPosition((int)Robot.prefs.getNumber("A: Set Pos", Robot.arm.fwdPositionLimit/2));
+		Robot.arm.setTargetPosition((int)Robot.prefs.getNumber("A: Set Pos", Robot.arm.fwdPositionLimit/3));
 		Robot.arm.motionMagicControl();
 	}
 

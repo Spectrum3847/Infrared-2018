@@ -32,7 +32,7 @@ public class ArmManualControl extends Command {
 	@Override
 	protected void execute() {
 		if (OI.operatorController.aButton.get()) {
-			Robot.arm.setOpenLoop(OI.operatorController.leftStick.getY()/2);
+			Robot.arm.setOpenLoop(OI.operatorController.leftStick.getY()*2/3 * -1);
 		} else {
 			Robot.arm.setOpenLoop(0);
 		}
