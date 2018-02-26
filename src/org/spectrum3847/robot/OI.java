@@ -27,16 +27,10 @@ public class OI {
 	public OI() {
 		driverController = new SpectrumXboxController(0, .1, .1);
 		operatorController = new SpectrumXboxController(1, .15, .15);
-		
-<<<<<<< HEAD
+
 		operatorController.leftBumper.whenPressed(new IntakeUntilCurrent());
 		operatorController.leftTriggerButton.whileHeld(new IntakeOn(Robot.prefs.getNumber("IN: Intake Speed", 1)));
 		operatorController.rightTriggerButton.whileHeld(new IntakeOn(-1* Robot.prefs.getNumber("IN: Intake Speed", 1)));
-=======
-		driverController.aButton.whenPressed(new IntakeUntilCurrent());;
-		driverController.leftTriggerButton.whileHeld(new IntakeOn(Robot.prefs.getNumber("I: Intake Speed", 1)));
-		driverController.rightTriggerButton.whileHeld(new IntakeOn(-1* Robot.prefs.getNumber("I: Intake Speed", 1)));
->>>>>>> origin/master
 		
 		operatorController.bButton.whileHeld(new ArmMotionMagicPref());
 		operatorController.Dpad.DownLeft.whenPressed(new ArmMotionMagicPos(Robot.arm.posFwdIntake, true));

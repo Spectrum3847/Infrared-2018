@@ -79,7 +79,7 @@ public class Intake extends Subsystem {
 		intakeSol.set(false);
 	}
 	
-	//returns the current from one od the SRXs 
+	//returns the current from one of the SRXs 
 	public double getCurrent() {
 		return (intakeSRX.getOutputCurrent());
 	}

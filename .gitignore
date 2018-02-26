@@ -49,6 +49,7 @@ Temporary Items
 .metadata
 bin/
 tmp/
+*.class
 *.tmp
 *.bak
 *.swp
