@@ -5,26 +5,24 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-package org.spectrum3847.robot.commands.intake;
+package org.spectrum3847.robot.commands.leds;
 
 import edu.wpi.first.wpilibj.command.Command;
 import org.spectrum3847.robot.Robot;
-import org.spectrum3847.robot.subsystems.Intake;
 
-
-public class OpenIntake extends Command {
-	
-	
-	public OpenIntake() {
-		requires(Robot.intake);
+/**
+ * An example command.  You can replace me with your own command.
+ */
+public class ExampleCommand extends Command {
+	public ExampleCommand() {
+		// Use requires() here to declare subsystem dependencies
 	}
 
 	// Called just before this Command runs the first time
 	@Override
 	protected void initialize() {
-		this.setTimeout(3);
-		Robot.intake.intakeSolRetract();
 	}
+
 	// Called repeatedly when this Command is scheduled to run
 	@Override
 	protected void execute() {
@@ -33,19 +31,17 @@ public class OpenIntake extends Command {
 	// Make this return true when this Command no longer needs to run execute()
 	@Override
 	protected boolean isFinished() {
-		return isTimedOut();
+		return false;
 	}
 
 	// Called once after isFinished returns true
 	@Override
 	protected void end() {
-		Robot.intake.intakeSolExtend();
 	}
 
 	// Called when another command which requires one or more of the same
 	// subsystems is scheduled to run
 	@Override
 	protected void interrupted() {
-		this.end();
 	}
 }

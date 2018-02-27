@@ -14,6 +14,7 @@ import org.spectrum3847.robot.subsystems.Drivetrain;
 import org.spectrum3847.robot.subsystems.Extension;
 import org.spectrum3847.robot.subsystems.Hook;
 import org.spectrum3847.robot.subsystems.Intake;
+import org.spectrum3847.robot.subsystems.LEDs;
 import org.spectrum3847.robot.subsystems.Puncher;
 
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
@@ -65,6 +66,8 @@ public class Robot extends TimedRobot {
 	public static Puncher puncher;
 	public static Hook hook;
 	
+	public static LEDs leds;
+	
 	public static void setupSubsystems(){
     	prefs = SpectrumPreferences.getInstance();
     	
@@ -77,6 +80,7 @@ public class Robot extends TimedRobot {
     	intake = new Intake();
     	puncher = new Puncher();
     	hook = new Hook();
+    	
     	
     	//Pigeon setup has to happen after SRXs are configured
     	pigeon = new PigeonIMU(intake.intakeBottomSRX);
