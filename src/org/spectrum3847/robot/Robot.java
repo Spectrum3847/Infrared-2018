@@ -9,6 +9,7 @@ package org.spectrum3847.robot;
 
 import org.spectrum3847.lib.util.Debugger;
 import org.spectrum3847.lib.util.SpectrumPreferences;
+import org.spectrum3847.robot.commands.leds.LEDController;
 import org.spectrum3847.robot.subsystems.Arm;
 import org.spectrum3847.robot.subsystems.Drivetrain;
 import org.spectrum3847.robot.subsystems.Extension;
@@ -81,6 +82,8 @@ public class Robot extends TimedRobot {
     	puncher = new Puncher();
     	hook = new Hook();
     	
+    	leds = new LEDs();
+    	new LEDController();
     	
     	//Pigeon setup has to happen after SRXs are configured
     	pigeon = new PigeonIMU(intake.intakeBottomSRX);

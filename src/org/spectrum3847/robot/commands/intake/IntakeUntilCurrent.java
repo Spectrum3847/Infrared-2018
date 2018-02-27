@@ -43,12 +43,14 @@ public class IntakeUntilCurrent extends Command {
 		
 		return Robot.intake.isIntakeComplete(Robot.prefs.getNumber("I: Current Threshold", 8),
 				Robot.prefs.getNumber("I: Threshold Time", 0.5));
+		
 	}
 
 	// Called once after isFinished returns true
 	@Override
 	protected void end() {
 		Robot.intake.setOpenLoop(0);
+		
 	}
 
 	// Called when another command which requires one or more of the same
