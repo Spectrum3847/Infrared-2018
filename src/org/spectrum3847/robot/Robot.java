@@ -12,6 +12,7 @@ import org.spectrum3847.lib.util.SpectrumPreferences;
 import org.spectrum3847.robot.subsystems.Arm;
 import org.spectrum3847.robot.subsystems.Drivetrain;
 import org.spectrum3847.robot.subsystems.Extension;
+import org.spectrum3847.robot.subsystems.Hook;
 import org.spectrum3847.robot.subsystems.Intake;
 import org.spectrum3847.robot.subsystems.Puncher;
 
@@ -62,6 +63,7 @@ public class Robot extends TimedRobot {
 	public static Extension extension;
 	public static Intake intake;
 	public static Puncher puncher;
+	public static Hook hook;
 	
 	public static void setupSubsystems(){
     	prefs = SpectrumPreferences.getInstance();
@@ -74,6 +76,7 @@ public class Robot extends TimedRobot {
     	extension = new Extension();
     	intake = new Intake();
     	puncher = new Puncher();
+    	hook = new Hook();
     	
     	//Pigeon setup has to happen after SRXs are configured
     	pigeon = new PigeonIMU(intake.intakeBottomSRX);

@@ -29,8 +29,8 @@ public class OI {
 		operatorController = new SpectrumXboxController(1, .15, .15);
 
 		operatorController.leftBumper.whenPressed(new IntakeUntilCurrent());
-		operatorController.leftTriggerButton.whileHeld(new IntakeOn(Robot.prefs.getNumber("IN: Intake Speed", 1)));
-		operatorController.rightTriggerButton.whileHeld(new IntakeOn(-1* Robot.prefs.getNumber("IN: Intake Speed", 1)));
+		operatorController.leftTriggerButton.whileHeld(new IntakeOn(Robot.prefs.getNumber("I: Intake Speed", 1)));
+		operatorController.rightTriggerButton.whileHeld(new IntakeOn(-1* Robot.prefs.getNumber("I: Intake Speed", 1)));
 		
 		operatorController.bButton.whileHeld(new ArmMotionMagicPref());
 		operatorController.Dpad.DownLeft.whenPressed(new ArmMotionMagicPos(Robot.arm.posFwdIntake, true));
