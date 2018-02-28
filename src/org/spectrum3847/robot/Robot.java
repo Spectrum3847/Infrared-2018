@@ -83,7 +83,6 @@ public class Robot extends TimedRobot {
     	hook = new Hook();
     	
     	leds = new LEDs();
-    	new LEDController();
     	
     	//Pigeon setup has to happen after SRXs are configured
     	pigeon = new PigeonIMU(intake.intakeBottomSRX);

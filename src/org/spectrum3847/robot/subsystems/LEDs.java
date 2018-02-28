@@ -8,6 +8,7 @@
 package org.spectrum3847.robot.subsystems;
 
 import org.spectrum3847.lib.util.Debugger;
+import org.spectrum3847.robot.commands.leds.LEDController;
 
 import edu.wpi.first.wpilibj.I2C;
 import edu.wpi.first.wpilibj.Timer;
@@ -72,7 +73,7 @@ public class LEDs extends Subsystem {
 	}
 	public void initDefaultCommand() {
 		// Set the default command for a subsystem here.
-		// setDefaultCommand(new MySpecialCommand());
+		setDefaultCommand(new LEDController());
 		
 	}
 	
