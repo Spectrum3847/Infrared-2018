@@ -3,6 +3,8 @@ package org.spectrum3847.robot.commands.drivetrain;
 import org.spectrum3847.robot.OI;
 import org.spectrum3847.robot.Robot;
 
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.MatchType;
 import edu.wpi.first.wpilibj.command.Command;
 
 /**
@@ -22,10 +24,14 @@ public class SpectrumDrive extends Command {
 
     // Called repeatedly when this Command is scheduled to run
     protected void execute() {
-    	boolean quickTurn = Robot.drive.quickTurnController();
-    	double moveValue = OI.driverController.leftStick.getY() * -1;
-    	double rotateValue = OI.driverController.rightStick.getX();
-    	Robot.drive.difDrive.curvatureDrive(moveValue, rotateValue, quickTurn);
+		if (OI.driverController.getName().equals("") || DriverStation.getInstance().getMatchType() != MatchType.None) {
+	    	boolean quickTurn = Robot.drive.quickTurnController();
+	    	double moveValue = OI.driverController.leftStick.getY() * -1;
+	    	double rotateValue = OI.driverController.rightStick.getX();
+	    	Robot.drive.difDrive.curvatureDrive(moveValue, rotateValue, quickTurn);
+	    } else {
+	    	Robot.drive.stop();
+	    }
     }
 
     // Make this return true when this Command no longer needs to run execute()

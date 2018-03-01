@@ -1,11 +1,4 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
-
-package org.spectrum3847.robot.commands.arm;
+package org.spectrum3847.robot.commands.extension;
 
 import edu.wpi.first.wpilibj.command.Command;
 
@@ -14,36 +7,44 @@ import org.spectrum3847.lib.controllers.SpectrumXboxController;
 import org.spectrum3847.robot.OI;
 import org.spectrum3847.robot.Robot;
 
+import com.ctre.phoenix.motorcontrol.ControlMode;
+
 /**
- * An example command.  You can replace me with your own command.
+ * Zero the Extension
  */
-public class ArmManualControl extends Command {
-	public ArmManualControl() {
+public class ExtensionZero extends Command {
+	public ExtensionZero() {
 		// Use requires() here to declare subsystem dependencies
-		requires(Robot.arm);
+		requires(Robot.extension);
 	}
 
 	// Called just before this Command runs the first time
 	@Override
 	protected void initialize() {
+		Robot.extension.extensionSRX.configReverseSoftLimitEnable(false);
 	}
 
 	// Called repeatedly when this Command is scheduled to run
 	@Override
 	protected void execute() {
-			Robot.arm.setOpenLoop(OI.operatorController.leftStick.getY() * -1);
+		Robot.extension.setOpenLoop( -.25);
 	}
 
 	// Make this return true when this Command no longer needs to run execute()
 	@Override
 	protected boolean isFinished() {
-		return false;
+		//stop the command if the current gets too high
+		if (Robot.extension.getCurrent() > Robot.prefs.getNumber("E: Zero Current Limit", 20)) {
+			return true;
+		}
+		return Robot.extension.getRevLimitSW();
 	}
 
 	// Called once after isFinished returns true
 	@Override
 	protected void end() {
-		Robot.arm.setOpenLoop(0);
+		Robot.extension.setOpenLoop(0);
+		Robot.extension.extensionSRX.configReverseSoftLimitEnable(true);
 	}
 
 	// Called when another command which requires one or more of the same

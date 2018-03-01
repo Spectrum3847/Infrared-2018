@@ -9,11 +9,18 @@ package org.spectrum3847.robot;
 
 import org.spectrum3847.lib.controllers.SpectrumXboxController;
 import org.spectrum3847.robot.commands.arm.ArmManualControl;
+import org.spectrum3847.robot.commands.arm.ArmMotionMagicAngle;
 import org.spectrum3847.robot.commands.arm.ArmMotionMagicPos;
 import org.spectrum3847.robot.commands.arm.ArmMotionMagicPref;
-import org.spectrum3847.robot.commands.arm.ZeroArm;
+import org.spectrum3847.robot.commands.arm.ArmZero;
+import org.spectrum3847.robot.commands.extension.ExtensionManualControl;
+import org.spectrum3847.robot.commands.extension.ExtensionMotionMagicPref;
+import org.spectrum3847.robot.commands.extension.ExtensionZero;
 import org.spectrum3847.robot.commands.intake.IntakeOn;
 import org.spectrum3847.robot.commands.intake.IntakeUntilCurrent;
+
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.MatchType;
 /**
  * This class is the glue that binds the controls on the physical operator
  * interface to the commands and command groups that allow control of the robot.
@@ -27,21 +34,33 @@ public class OI {
 	public OI() {
 		driverController = new SpectrumXboxController(0, .1, .1);
 		operatorController = new SpectrumXboxController(1, .15, .15);
-
-		operatorController.leftBumper.whenPressed(new IntakeUntilCurrent());
-		operatorController.leftTriggerButton.whileHeld(new IntakeOn(Robot.prefs.getNumber("I: Intake Speed", 1)));
-		operatorController.rightTriggerButton.whileHeld(new IntakeOn(-1* Robot.prefs.getNumber("I: Intake Speed", 1)));
 		
-		operatorController.bButton.whileHeld(new ArmMotionMagicPref());
-		operatorController.Dpad.DownLeft.whenPressed(new ArmMotionMagicPos(Robot.arm.posFwdIntake, true));
-		operatorController.Dpad.Left.whenPressed(new ArmMotionMagicPos(Robot.arm.posFwdStraight, true));
-		operatorController.Dpad.UpLeft.whenPressed(new ArmMotionMagicPos(Robot.arm.posFwdScale, true));
-		operatorController.Dpad.Up.whenPressed(new ArmMotionMagicPos(Robot.arm.posCenterUp, true));
-		operatorController.Dpad.UpRight.whenPressed(new ArmMotionMagicPos(Robot.arm.posRevScale, true));
-		operatorController.Dpad.Right.whenPressed(new ArmMotionMagicPos(Robot.arm.posRevStraight, true));
-		operatorController.Dpad.DownRight.whenPressed(new ArmMotionMagicPos(Robot.arm.posRevIntake, true));
-		operatorController.aButton.whileHeld(new ArmManualControl());
-		operatorController.startButton.whenPressed(new ZeroArm());
+		if (driverController.getName().equals("") || DriverStation.getInstance().getMatchType() != MatchType.None) {
+
+	    }
+
+		//if (operatorController.getName().equals("") || DriverStation.getInstance().getMatchType() != MatchType.None) {
+			operatorController.leftBumper.whenPressed(new IntakeUntilCurrent());
+			operatorController.leftTriggerButton.whileHeld(new IntakeOn(Robot.prefs.getNumber("I: Intake Speed", 1)));
+			operatorController.rightTriggerButton.whileHeld(new IntakeOn(-1* Robot.prefs.getNumber("I: Intake Speed", 1)));
+			
+			operatorController.bButton.whileHeld(new ArmMotionMagicPref());
+			operatorController.Dpad.DownLeft.whenPressed(new ArmMotionMagicPos(Robot.arm.posFwdIntake, true));
+			operatorController.Dpad.Left.whenPressed(new ArmMotionMagicPos(Robot.arm.posFwdStraight, true));
+			operatorController.Dpad.UpLeft.whenPressed(new ArmMotionMagicPos(Robot.arm.posFwdScale, true));
+			operatorController.Dpad.Up.whenPressed(new ArmMotionMagicPos(Robot.arm.posCenterUp, true));
+			operatorController.Dpad.UpRight.whenPressed(new ArmMotionMagicPos(Robot.arm.posRevScale, true));
+			operatorController.Dpad.Right.whenPressed(new ArmMotionMagicPos(Robot.arm.posRevStraight, true));
+			operatorController.Dpad.DownRight.whenPressed(new ArmMotionMagicPos(Robot.arm.posRevIntake, true));
+			operatorController.aButton.whileHeld(new ArmMotionMagicAngle());
+			operatorController.startButton.whenPressed(new ArmZero());
+			
+			operatorController.selectButton.whenPressed(new ExtensionZero());
+			operatorController.yButton.whenPressed(new ExtensionMotionMagicPref());
+			operatorController.xButton.whenPressed(new ExtensionManualControl());
+			
+	   // }
+		
 	}
 	//// CREATING BUTTONS
 	// One type of button is a joystick button which is any button on a

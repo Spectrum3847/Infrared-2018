@@ -33,8 +33,6 @@ public class Intake extends Subsystem {
 	public LeaderTalonSRX intakeSRX = new LeaderTalonSRX(HW.INTAKE_TOP, intakeBottomSRX);
 	
 	public SpectrumSolenoid intakeSol = new SpectrumSolenoid(HW.INTAKE_SOL);
-	public SpectrumSolenoid puncherSolOne = new SpectrumSolenoid(HW.PUNCHER_ONE_SOL);
-	public SpectrumSolenoid puncherSolTwo = new SpectrumSolenoid(HW.PUNCHER_TWO_SOL);
 	
 	public static double thresholdStart;
 	private static boolean intakeComplete;

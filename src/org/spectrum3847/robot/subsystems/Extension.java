@@ -12,8 +12,9 @@ import org.spectrum3847.lib.drivers.LeaderTalonSRX;
 import org.spectrum3847.lib.drivers.SRXGains;
 import org.spectrum3847.robot.HW;
 import org.spectrum3847.robot.Robot;
-import org.spectrum3847.robot.commands.arm.ExtensionManualControl;
+import org.spectrum3847.robot.commands.extension.ExtensionManualControl;
 
+import com.ctre.phoenix.ParamEnum;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.LimitSwitchNormal;
@@ -33,7 +34,7 @@ public class Extension extends Subsystem {
 	public final static int EXTENSION_UP = 0;
 	public final static int EXTENSION_DOWN = 1;
 	
-	public final static int upPositionLimit = 50000;// needs to be determined manually
+	public final static int upPositionLimit = 22500;// needs to be determined manually
 	public final static int downPositionLimit = 0;
 	
 	private int accel = 0;
@@ -78,18 +79,18 @@ public class Extension extends Subsystem {
     	
     	extensionSRX.configReverseSoftLimitEnable(false);
     	extensionSRX.configReverseSoftLimitThreshold(downPositionLimit);
+
+    	//Clear Extension Position on Reverse Limit Switch
+    	extensionSRX.configSetParameter(ParamEnum.eClearPositionOnLimitR, 1, 0, 0, 10);
 	}
 	
 	public void initDefaultCommand() {
 		// Set the default command for a subsystem here.
-		setDefaultCommand(new ExtensionManualControl());
+		//setDefaultCommand(new ExtensionManualControl());
 	}
 	
 	public void periodic() {
-		//If we want to zero when down and we are at the limit switch and greater than zero, then set us to zero
-		if (zeroWhenDownLimit && this.getRevLimitSW() && extensionSRX.getSelectedSensorPosition(0) != 0) {
-			extensionSRX.setSelectedSensorPosition(0, 0);
-		}
+		setMotionMagicValues((int)Robot.prefs.getNumber("E: MM Accel", 5000), (int)Robot.prefs.getNumber("E: MM CruiseVel", 2000));
 		getPrefsGains();
 		extensionSRX.setGains(upGains);
 		extensionSRX.setGains(downGains);
@@ -177,17 +178,37 @@ public class Extension extends Subsystem {
 	}
 	
 	 public void motionMagicControl() {
-	    	manageGainProfile(targetPosition);
-	    	extensionSRX.set(ControlMode.MotionMagic, targetPosition);
+		 //If we can't extend extend then set position to 0
+		 if (!Robot.arm.canExtend()) {
+			// targetPosition = 0;
+		 }
+
+		System.out.println("Extension Motion Magic Running: " + targetPosition);
+    	manageGainProfile(targetPosition);
+    	extensionSRX.set(ControlMode.MotionMagic, targetPosition);
+	 }
+	 
+	 public double getCurrent() {
+		 return extensionSRX.getOutputCurrent() + extensionBottomSRX.getOutputCurrent();
 	 }
 	
 	//Add the dashboard values for this subsystem
 	public void dashboard() {
-		SmartDashboard.putNumber("Extension Position", getCurrentPosition());
-		SmartDashboard.putNumber("Extension Output", getOutput());
-		SmartDashboard.putNumber("Extension Target", getTargetPosition());
-		SmartDashboard.putNumber("Extension Error", getError());
-		SmartDashboard.putNumber("Extension Current Total", extensionSRX.getOutputCurrent() + extensionBottomSRX.getOutputCurrent());	
+		SmartDashboard.putNumber("Extension/Position", getCurrentPosition());
+		SmartDashboard.putNumber("Extension/Output", getOutput());
+		SmartDashboard.putNumber("Extension/Target", getTargetPosition());
+		SmartDashboard.putNumber("Extension/Error", getError());
+		SmartDashboard.putNumber("Extension/Velocity", this.extensionSRX.getSelectedSensorVelocity(0));
+		
+		SmartDashboard.putNumber("Extension Current Total", getCurrent());
+		
+		if (extensionSRX.getControlMode() == ControlMode.MotionMagic) {
+			SmartDashboard.putNumber("Extension/Acitve Traj Veloctiy", extensionSRX.getActiveTrajectoryVelocity());
+			SmartDashboard.putNumber("Extension/Acitve Traj Position", extensionSRX.getActiveTrajectoryPosition());
+		} else {
+			SmartDashboard.putNumber("Extension/Acitve Traj Veloctiy", -1);
+			SmartDashboard.putNumber("Extension/Acitve Traj Position", -1);
+		}
 	}
 	
 	

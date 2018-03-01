@@ -5,22 +5,21 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-package org.spectrum3847.robot.commands.arm;
+package org.spectrum3847.robot.commands.extension;
 
 import edu.wpi.first.wpilibj.command.Command;
 
-import org.spectrum3847.lib.controllers.SpectrumThumbStick;
-import org.spectrum3847.lib.controllers.SpectrumXboxController;
+import org.spectrum3847.robot.HW;
 import org.spectrum3847.robot.OI;
 import org.spectrum3847.robot.Robot;
 
 /**
  * An example command.  You can replace me with your own command.
  */
-public class ArmManualControl extends Command {
-	public ArmManualControl() {
+public class ExtensionManualControl extends Command {
+	public ExtensionManualControl() {
 		// Use requires() here to declare subsystem dependencies
-		requires(Robot.arm);
+		requires(Robot.extension);
 	}
 
 	// Called just before this Command runs the first time
@@ -31,7 +30,7 @@ public class ArmManualControl extends Command {
 	// Called repeatedly when this Command is scheduled to run
 	@Override
 	protected void execute() {
-			Robot.arm.setOpenLoop(OI.operatorController.leftStick.getY() * -1);
+			Robot.extension.setOpenLoop(OI.operatorController.rightStick.getY() * -1);
 	}
 
 	// Make this return true when this Command no longer needs to run execute()

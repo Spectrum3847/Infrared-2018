@@ -26,7 +26,8 @@ public class Dashboard {
 
     public static void intializeDashboard() {
     	if(ENABLE_DASHBOARD){
-    		SmartDashboard.putBoolean("Autonomous ENABLED", true);
+    		SmartDashboard.putBoolean("Auto/ENABLED", true);
+    		SmartDashboard.putBoolean("Compressor ENABLE", true);
     		
     	}
     }
@@ -39,12 +40,12 @@ public class Dashboard {
     }
 
     private static void updatePutLong(){
-    	SmartDashboard.putBoolean("Compressor", Robot.compressor.enabled());
-		SmartDashboard.putString("*Auto Command*", Autonomous.AutoName); // Displays which auto should run
-		SmartDashboard.putBoolean("Auton on Right?", Autonomous.isRight);
+    	SmartDashboard.putBoolean("Compressor On?", Robot.compressor.enabled());
+		SmartDashboard.putString("Auto/*Auto Command*", Autonomous.AutoName); // Displays which auto should run
+		SmartDashboard.putBoolean("Auto/On Right?", Autonomous.isRight);
 		
 		//Can change to show a different message than "Yes" and "No"
-		SmartDashboard.putString("Change Battery", Util.changeBattery() ? "Yes" : "No");
+		SmartDashboard.putBoolean("Change Battery", Util.changeBattery() ? true : false);
     }
 
     public static void updateDashboard() {

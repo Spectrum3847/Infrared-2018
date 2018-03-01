@@ -9,44 +9,45 @@ package org.spectrum3847.robot.commands.arm;
 
 import edu.wpi.first.wpilibj.command.Command;
 
-import org.spectrum3847.robot.HW;
+import org.spectrum3847.lib.controllers.SpectrumThumbStick;
+import org.spectrum3847.lib.controllers.SpectrumXboxController;
 import org.spectrum3847.robot.OI;
 import org.spectrum3847.robot.Robot;
+
+import com.ctre.phoenix.motorcontrol.ControlMode;
 
 /**
  * An example command.  You can replace me with your own command.
  */
-public class ExtensionManualControl extends Command {
-	public ExtensionManualControl() {
+public class ArmZero extends Command {
+	public ArmZero() {
 		// Use requires() here to declare subsystem dependencies
-		requires(Robot.extension);
+		requires(Robot.arm);
 	}
 
 	// Called just before this Command runs the first time
 	@Override
 	protected void initialize() {
+		Robot.arm.armSRX.configReverseSoftLimitEnable(false);
 	}
 
 	// Called repeatedly when this Command is scheduled to run
 	@Override
 	protected void execute() {
-		if (OI.operatorController.xButton.get()) {
-			Robot.extension.setOpenLoop(OI.operatorController.rightStick.getY() *.75 * -1);
-		} else {
-			Robot.extension.setOpenLoop(0);
-		}
+		Robot.arm.setOpenLoop( -.25);
 	}
 
 	// Make this return true when this Command no longer needs to run execute()
 	@Override
 	protected boolean isFinished() {
-		return false;
+		return Robot.arm.getRevLimitSW();
 	}
 
 	// Called once after isFinished returns true
 	@Override
 	protected void end() {
 		Robot.arm.setOpenLoop(0);
+		Robot.arm.armSRX.configReverseSoftLimitEnable(true);
 	}
 
 	// Called when another command which requires one or more of the same

@@ -9,16 +9,16 @@ package org.spectrum3847.robot.commands.arm;
 
 import edu.wpi.first.wpilibj.command.Command;
 
-import org.spectrum3847.lib.controllers.SpectrumThumbStick;
-import org.spectrum3847.lib.controllers.SpectrumXboxController;
 import org.spectrum3847.robot.OI;
 import org.spectrum3847.robot.Robot;
+
+import com.ctre.phoenix.motorcontrol.ControlMode;
 
 /**
  * An example command.  You can replace me with your own command.
  */
-public class ArmManualControl extends Command {
-	public ArmManualControl() {
+public class ArmMotionMagicHold extends Command {
+	public ArmMotionMagicHold() {
 		// Use requires() here to declare subsystem dependencies
 		requires(Robot.arm);
 	}
@@ -26,12 +26,15 @@ public class ArmManualControl extends Command {
 	// Called just before this Command runs the first time
 	@Override
 	protected void initialize() {
+		if (Robot.arm.armSRX.getControlMode() == ControlMode.PercentOutput) {
+			Robot.arm.setTargetPosition(Robot.arm.getCurrentPosition());
+		}
 	}
 
 	// Called repeatedly when this Command is scheduled to run
 	@Override
 	protected void execute() {
-			Robot.arm.setOpenLoop(OI.operatorController.leftStick.getY() * -1);
+		Robot.arm.motionMagicControl();
 	}
 
 	// Make this return true when this Command no longer needs to run execute()
@@ -50,6 +53,5 @@ public class ArmManualControl extends Command {
 	// subsystems is scheduled to run
 	@Override
 	protected void interrupted() {
-		end();
 	}
 }

@@ -11,9 +11,12 @@ import org.spectrum3847.lib.drivers.SpectrumTalonSRX;
 import org.spectrum3847.lib.drivers.LeaderTalonSRX;
 import org.spectrum3847.lib.drivers.SRXGains;
 import org.spectrum3847.robot.HW;
+import org.spectrum3847.robot.OI;
 import org.spectrum3847.robot.Robot;
 import org.spectrum3847.robot.commands.arm.ArmManualControl;
+import org.spectrum3847.robot.commands.arm.ArmMotionMagicHold;
 
+import com.ctre.phoenix.ParamEnum;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.LimitSwitchNormal;
@@ -79,16 +82,19 @@ public class Arm extends Subsystem {
     	armSRX.setStatusFramePeriod(StatusFrameEnhanced.Status_13_Base_PIDF0, 10);
     	armSRX.setStatusFramePeriod(StatusFrameEnhanced.Status_10_MotionMagic, 10);
     		
-    	armSRX.configForwardSoftLimitEnable(false);
+    	armSRX.configForwardSoftLimitEnable(true);
     	armSRX.configForwardSoftLimitThreshold(fwdPositionLimit);
     	
-    	armSRX.configReverseSoftLimitEnable(false);
+    	armSRX.configReverseSoftLimitEnable(true);
     	armSRX.configReverseSoftLimitThreshold(revPositionLimit);
+    	//Clear Arm Position on Reverse Limit Switch
+    	armSRX.configSetParameter(ParamEnum.eClearPositionOnLimitR, 1, 0, 0, 10);
 	}
 	
 	public void initDefaultCommand() {
 		// Set the default command for a subsystem here.
 		//setDefaultCommand(new ArmManualControl());
+		setDefaultCommand(new ArmMotionMagicHold());
 	}
 	
 	public void periodic() {
@@ -170,9 +176,42 @@ public class Arm extends Subsystem {
 	public int getError() {
 		return armSRX.getClosedLoopError(0);
 	}
+	public int angleToPosition(double angle) {
+		if (angle > 110) {
+			angle = 130;
+		} else if (angle < -110) {
+			angle = -130;
+		}
+		
+		angle -= 130; //Make angle 0-260 instead of -130 to 130
+		angle *= -1;
+		
+		angle = angle * (this.fwdPositionLimit/260);
+		
+		return (int)angle;
+	}
+	//Start a command to hold the arm in a position
+	public void hold() {
+		new ArmMotionMagicHold().start();
+	}
+	
+	public void disabledArm() {
+		setTargetPosition(getCurrentPosition());
+	}
+	
+	public boolean canExtend() {
+		int pos = getCurrentPosition();
+		if (pos < Robot.prefs.getNumber("A: Fwd Extension Bound", fwdPositionLimit/2 + fwdPositionLimit/5) &&
+				pos > Robot.prefs.getNumber("A: Fwd Extension Bound", fwdPositionLimit/2 + fwdPositionLimit/5)) {
+			return true;
+		} else {
+			return false;
+		}
+	}
 	
 	public void motionMagicControl() {
-    	manageGainProfile(targetPosition);
+    	//manageGainProfile(targetPosition);
+		armSRX.selectProfileSlot(ARM_UP, 0);
     	armSRX.set(ControlMode.MotionMagic, targetPosition);
     }
 	
@@ -201,17 +240,20 @@ public class Arm extends Subsystem {
 				armSRX.selectProfileSlot(ARM_UP, 0);
 			}	
 		}
+		
 	} 
 
 	
 	//Add the dashboard values for this subsystem
 	public void dashboard() {
-		SmartDashboard.putNumber("Arm Position", getCurrentPosition());
-		SmartDashboard.putNumber("Arm Output", getOutput());
-		SmartDashboard.putNumber("Arm Velocity", armSRX.getSelectedSensorVelocity(0));
-		SmartDashboard.putNumber("Arm Target", getTargetPosition());
-		SmartDashboard.putNumber("Arm Error", getError());
-		SmartDashboard.putNumber("Arm Current Total", armSRX.getOutputCurrent() + armBottomSRX.getOutputCurrent());	
+		SmartDashboard.putNumber("Arm/Position", getCurrentPosition());
+		SmartDashboard.putNumber("Arm/Output", getOutput());
+		SmartDashboard.putNumber("Arm/Velocity", armSRX.getSelectedSensorVelocity(0));
+		SmartDashboard.putNumber("Arm/Target", getTargetPosition());
+		SmartDashboard.putNumber("Arm/Error", getError());
+		SmartDashboard.putNumber("Arm/Current Total", armSRX.getOutputCurrent() + armBottomSRX.getOutputCurrent());	
+		SmartDashboard.putNumber("Arm/Controller Polar", OI.operatorController.leftStick.getDirectionDegrees());
+		SmartDashboard.putBoolean("Arm/Can Extend", canExtend());
 		
 		if (armSRX.getControlMode() == ControlMode.MotionMagic) {
 			SmartDashboard.putNumber("Arm Acitve Traj Veloctiy", armSRX.getActiveTrajectoryVelocity());

@@ -5,33 +5,33 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-package org.spectrum3847.robot.commands.arm;
+package org.spectrum3847.robot.commands.extension;
 
 import edu.wpi.first.wpilibj.command.Command;
 
-import org.spectrum3847.lib.controllers.SpectrumThumbStick;
-import org.spectrum3847.lib.controllers.SpectrumXboxController;
 import org.spectrum3847.robot.OI;
 import org.spectrum3847.robot.Robot;
 
 /**
  * An example command.  You can replace me with your own command.
  */
-public class ZeroArm extends Command {
-	public ZeroArm() {
+public class ExtensionMotionMagicPref extends Command {
+	public ExtensionMotionMagicPref() {
 		// Use requires() here to declare subsystem dependencies
-		requires(Robot.arm);
+		requires(Robot.extension);
 	}
 
 	// Called just before this Command runs the first time
 	@Override
 	protected void initialize() {
-		Robot.arm.setPositionToZero();
+		System.out.println("Extension Motion Magic Pref Starting");
 	}
 
 	// Called repeatedly when this Command is scheduled to run
 	@Override
 	protected void execute() {
+		Robot.extension.setTargetPosition((int)Robot.prefs.getNumber("E: Set Pos", Robot.extension.upPositionLimit/2));
+		Robot.extension.motionMagicControl();
 	}
 
 	// Make this return true when this Command no longer needs to run execute()
@@ -43,7 +43,7 @@ public class ZeroArm extends Command {
 	// Called once after isFinished returns true
 	@Override
 	protected void end() {
-		Robot.arm.setOpenLoop(0);
+		Robot.extension.setOpenLoop(0);
 	}
 
 	// Called when another command which requires one or more of the same

@@ -7,30 +7,47 @@
 
 package org.spectrum3847.robot.commands.arm;
 
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.command.Command;
 
+import org.spectrum3847.lib.util.Debugger;
 import org.spectrum3847.robot.OI;
 import org.spectrum3847.robot.Robot;
 
 /**
  * An example command.  You can replace me with your own command.
  */
-public class ExtensionMotionMagicPref extends Command {
-	public ExtensionMotionMagicPref() {
+public class ArmMotionMagicAngle extends Command {
+	private int position = 0;
+	private double angle = 0;
+	private double timestamp = 0;
+	private boolean isSet = false;
+	private boolean waitDelay = false;
+	public ArmMotionMagicAngle() {
 		// Use requires() here to declare subsystem dependencies
-		requires(Robot.extension);
+		requires(Robot.arm);
+		timestamp = 0;
 	}
 
 	// Called just before this Command runs the first time
 	@Override
 	protected void initialize() {
+		if (waitDelay) {
+			timestamp = Timer.getFPGATimestamp();
+		} else {
+			timestamp = 0;
+		}
+		isSet = false;
 	}
 
 	// Called repeatedly when this Command is scheduled to run
 	@Override
 	protected void execute() {
-		Robot.extension.setTargetPosition((int)Robot.prefs.getNumber("E: Set Pos", Robot.extension.upPositionLimit/2));
-		Robot.extension.motionMagicControl();
+		angle = OI.operatorController.leftStick.getDirectionDegrees();
+		if (angle != 180) { //Make sure the joystick is not centered
+			Robot.arm.setTargetPosition(Robot.arm.angleToPosition(angle));
+			Robot.arm.motionMagicControl();
+		}
 	}
 
 	// Make this return true when this Command no longer needs to run execute()
@@ -42,7 +59,6 @@ public class ExtensionMotionMagicPref extends Command {
 	// Called once after isFinished returns true
 	@Override
 	protected void end() {
-		Robot.extension.setOpenLoop(0);
 	}
 
 	// Called when another command which requires one or more of the same

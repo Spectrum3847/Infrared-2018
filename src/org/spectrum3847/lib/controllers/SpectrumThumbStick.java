@@ -54,5 +54,13 @@ public class SpectrumThumbStick {
 			return input;
 		}
 	}
+	
+	public double getDirectionRadians() {
+		return Math.atan2(getX(), -getY());
+	}
+	
+	public double getDirectionDegrees() {
+		    return Math.toDegrees(getDirectionRadians());
+	}
 
 }

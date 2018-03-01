@@ -20,6 +20,10 @@ public class Puncher extends Subsystem {
 	// here. Call these from Commands.
 	public SpectrumSolenoid puncherSolOne = new SpectrumSolenoid(HW.PUNCHER_ONE_SOL);
 	public SpectrumSolenoid puncherSolTwo = new SpectrumSolenoid(HW.PUNCHER_TWO_SOL);
+	
+	public Puncher() {
+		
+	}
 
 	public void initDefaultCommand() {
 		// Set the default command for a subsystem here.
