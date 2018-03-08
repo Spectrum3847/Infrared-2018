@@ -14,6 +14,6 @@ public class Disabled {
         Dashboard.updateDashboard();
         Autonomous.selectAuto();
         Timer.delay(0.001);
-        Robot.arm.disabledArm();
+        Robot.arm.setTargetToCurrentPosition();
     }
 }

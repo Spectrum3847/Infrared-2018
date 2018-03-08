@@ -13,6 +13,7 @@ import org.spectrum3847.lib.drivers.SRXGains;
 import org.spectrum3847.robot.HW;
 import org.spectrum3847.robot.Robot;
 import org.spectrum3847.robot.commands.extension.ExtensionManualControl;
+import org.spectrum3847.robot.commands.extension.ExtensionMotionMagicHold;
 
 import com.ctre.phoenix.ParamEnum;
 import com.ctre.phoenix.motorcontrol.ControlMode;
@@ -87,6 +88,7 @@ public class Extension extends Subsystem {
 	public void initDefaultCommand() {
 		// Set the default command for a subsystem here.
 		//setDefaultCommand(new ExtensionManualControl());
+		setDefaultCommand(new ExtensionMotionMagicHold());
 	}
 	
 	public void periodic() {
@@ -159,6 +161,10 @@ public class Extension extends Subsystem {
 		return extensionSRX.get();
 	}
 	
+	public void setTargetToCurrentPosition() {
+		setTargetPosition(getCurrentPosition());
+	}
+	
 	public void manageGainProfile(double targetPosition) {
 		double currentPosition = getCurrentPosition();
 		if (currentPosition < targetPosition) {
@@ -180,7 +186,7 @@ public class Extension extends Subsystem {
 	 public void motionMagicControl() {
 		 //If we can't extend extend then set position to 0
 		 if (!Robot.arm.canExtend()) {
-			// targetPosition = 0;
+			targetPosition = 0;
 		 }
 
 		System.out.println("Extension Motion Magic Running: " + targetPosition);

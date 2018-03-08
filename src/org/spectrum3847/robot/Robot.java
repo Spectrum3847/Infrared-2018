@@ -28,9 +28,13 @@ import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
 import com.ctre.phoenix.sensors.PigeonIMU;
 import org.spectrum3847.lib.util.CrashTracker;
 
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 
 /**
@@ -120,6 +124,10 @@ public class Robot extends TimedRobot {
 	//Add any code that needs to run in all states
 	public void robotPeriodic() {
 		Dashboard.updateDashboard();
+		NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight");
+		NetworkTableEntry tx = table.getEntry("tx");
+		double x = tx.getDouble(0);
+		SmartDashboard.putNumber("Limelight x", x);
 	}
 	
 	 /**

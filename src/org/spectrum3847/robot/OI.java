@@ -32,7 +32,7 @@ public class OI {
 	public static SpectrumXboxController operatorController;
 	
 	public OI() {
-		driverController = new SpectrumXboxController(0, .1, .1);
+		driverController = new SpectrumXboxController(0, .15, .15);
 		operatorController = new SpectrumXboxController(1, .15, .15);
 		
 		if (driverController.getName().equals("") || DriverStation.getInstance().getMatchType() != MatchType.None) {
@@ -44,16 +44,17 @@ public class OI {
 			operatorController.leftTriggerButton.whileHeld(new IntakeOn(Robot.prefs.getNumber("I: Intake Speed", 1)));
 			operatorController.rightTriggerButton.whileHeld(new IntakeOn(-1* Robot.prefs.getNumber("I: Intake Speed", 1)));
 			
-			operatorController.bButton.whileHeld(new ArmMotionMagicPref());
-			operatorController.Dpad.DownLeft.whenPressed(new ArmMotionMagicPos(Robot.arm.posFwdIntake, true));
-			operatorController.Dpad.Left.whenPressed(new ArmMotionMagicPos(Robot.arm.posFwdStraight, true));
-			operatorController.Dpad.UpLeft.whenPressed(new ArmMotionMagicPos(Robot.arm.posFwdScale, true));
-			operatorController.Dpad.Up.whenPressed(new ArmMotionMagicPos(Robot.arm.posCenterUp, true));
-			operatorController.Dpad.UpRight.whenPressed(new ArmMotionMagicPos(Robot.arm.posRevScale, true));
-			operatorController.Dpad.Right.whenPressed(new ArmMotionMagicPos(Robot.arm.posRevStraight, true));
-			operatorController.Dpad.DownRight.whenPressed(new ArmMotionMagicPos(Robot.arm.posRevIntake, true));
+			//operatorController.bButton.whileHeld(new ArmMotionMagicPref());
+			//operatorController.Dpad.DownLeft.whenPressed(new ArmMotionMagicPos(Robot.arm.posFwdIntake, true));
+			//operatorController.Dpad.Left.whenPressed(new ArmMotionMagicPos(Robot.arm.posFwdStraight, true));
+			//operatorController.Dpad.UpLeft.whenPressed(new ArmMotionMagicPos(Robot.arm.posFwdScale, true));
+			//operatorController.Dpad.Up.whenPressed(new ArmMotionMagicPos(Robot.arm.posCenterUp, true));
+			//operatorController.Dpad.UpRight.whenPressed(new ArmMotionMagicPos(Robot.arm.posRevScale, true));
+			//operatorController.Dpad.Right.whenPressed(new ArmMotionMagicPos(Robot.arm.posRevStraight, true));
+			//operatorController.Dpad.DownRight.whenPressed(new ArmMotionMagicPos(Robot.arm.posRevIntake, true));
 			operatorController.aButton.whileHeld(new ArmMotionMagicAngle());
 			operatorController.startButton.whenPressed(new ArmZero());
+			operatorController.leftStickButton.toggleWhenPressed(new ArmManualControl());
 			
 			operatorController.selectButton.whenPressed(new ExtensionZero());
 			operatorController.yButton.whenPressed(new ExtensionMotionMagicPref());

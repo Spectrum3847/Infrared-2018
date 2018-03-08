@@ -195,14 +195,14 @@ public class Arm extends Subsystem {
 		new ArmMotionMagicHold().start();
 	}
 	
-	public void disabledArm() {
+	public void setTargetToCurrentPosition() {
 		setTargetPosition(getCurrentPosition());
 	}
 	
 	public boolean canExtend() {
 		int pos = getCurrentPosition();
 		if (pos < Robot.prefs.getNumber("A: Fwd Extension Bound", fwdPositionLimit/2 + fwdPositionLimit/5) &&
-				pos > Robot.prefs.getNumber("A: Fwd Extension Bound", fwdPositionLimit/2 + fwdPositionLimit/5)) {
+				pos > Robot.prefs.getNumber("A: Rev Extension Bound", fwdPositionLimit/2 - fwdPositionLimit/5)) {
 			return true;
 		} else {
 			return false;

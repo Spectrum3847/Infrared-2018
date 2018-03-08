@@ -27,7 +27,7 @@ public class ArmMotionMagicHold extends Command {
 	@Override
 	protected void initialize() {
 		if (Robot.arm.armSRX.getControlMode() == ControlMode.PercentOutput) {
-			Robot.arm.setTargetPosition(Robot.arm.getCurrentPosition());
+			Robot.arm.setTargetToCurrentPosition();
 		}
 	}
 

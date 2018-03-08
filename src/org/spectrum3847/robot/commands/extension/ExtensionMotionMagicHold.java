@@ -27,7 +27,7 @@ public class ExtensionMotionMagicHold extends Command {
 	@Override
 	protected void initialize() {
 		if (Robot.extension.extensionSRX.getControlMode() == ControlMode.PercentOutput) {
-			Robot.extension.setTargetPosition(Robot.extension.getCurrentPosition());
+			Robot.extension.setTargetToCurrentPosition();
 		}
 	}
 

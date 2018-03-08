@@ -9,6 +9,8 @@ package org.spectrum3847.robot.commands.intake;
 
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.command.Command;
+
+import org.spectrum3847.robot.OI;
 import org.spectrum3847.robot.Robot;
 import org.spectrum3847.robot.subsystems.Intake;
 
@@ -32,17 +34,15 @@ public class IntakeUntilCurrent extends Command {
 	// Called repeatedly when this Command is scheduled to run
 	@Override
 	protected void execute() {
-		
 		Robot.intake.setOpenLoop(speed);
-		
 	}
 
 	// Make this return true when this Command no longer needs to run execute()
 	@Override
 	protected boolean isFinished() {
-		
+		//check if we have a cube and the left bumper isn't pressed
 		return Robot.intake.isIntakeComplete(Robot.prefs.getNumber("I: Current Threshold", 8),
-				Robot.prefs.getNumber("I: Threshold Time", 0.5));
+				Robot.prefs.getNumber("I: Threshold Time", 0.5)) && !OI.operatorController.leftBumper.get();
 		
 	}
 
