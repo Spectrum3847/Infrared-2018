@@ -49,6 +49,8 @@ Temporary Items
 .metadata
 bin/
 tmp/
+src/bin
+*/bin
 *.class
 *.tmp
 *.bak
@@ -96,6 +98,9 @@ local.properties
 .recommenders/
 
 # Scala IDE specific (Scala & Java development for Eclipse)
-.cache-main
-.scala_dependencies
-.worksheet
+*.cache-main
+*.scala_dependencies
+*.worksheet
+
+
+*.class

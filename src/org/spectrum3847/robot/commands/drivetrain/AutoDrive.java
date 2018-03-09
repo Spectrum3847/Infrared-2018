@@ -10,10 +10,10 @@ import edu.wpi.first.wpilibj.command.Command;
 /**
  *
  */
-public class SpectrumDrive extends Command {
+public class AutoDrive extends Command {
 	double turnPow = 2;
 
-	public SpectrumDrive() {
+	public AutoDrive() {
 		requires(Robot.drive);
 		// Use requires() here to declare subsystem dependencies
 		// eg. requires(chassis);
@@ -26,9 +26,9 @@ public class SpectrumDrive extends Command {
 
 	// Called repeatedly when this Command is scheduled to run
 	protected void execute() {
-		boolean quickTurn = Robot.drive.quickTurnController();
-		double moveValue = OI.driverController.leftStick.getY() * -1;
-		double rotateValue = OI.driverController.rightStick.getX();
+		boolean quickTurn = false;
+		double moveValue = 1;
+		double rotateValue = 0;
 		Robot.drive.difDrive.curvatureDrive(moveValue, Math.pow(rotateValue, turnPow), quickTurn);
 	}
 

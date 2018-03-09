@@ -77,14 +77,14 @@ public class HW {
     public static final int DIGITAL_IO_9 = 9;  
     
     /**Pneumatics**/
-    public static final int SHIFT_SOL = 0;
-    public static final int DRIVE_BRAKE_SOL = 1;
-    public static final int ARM_BRAKE_SOL = 2;
-    public static final int EXTENSION_BRAKE_SOL = 3;
-    public static final int INTAKE_SOL = 4;
-    public static final int HOOKS_SOL = 5;
-    public static final int PUNCHER_ONE_SOL = 6;
-    public static final int PUNCHER_TWO_SOL = 7;
+    public static final int SHIFT_SOL = 7;
+    public static final int DRIVE_BRAKE_SOL = 6;
+    public static final int ARM_BRAKE_SOL = 5;
+    public static final int EXTENSION_BRAKE_SOL = 4;
+    public static final int INTAKE_SOL = 3;
+    public static final int HOOKS_SOL = 2;
+    public static final int PUNCHER_ONE_SOL = 1;
+    public static final int PUNCHER_TWO_SOL = 0;
     
     /**ANALOG SENSOR ALLOCATIONS**/
     public static final int PRESSURE_TRANSDUCER = 0;

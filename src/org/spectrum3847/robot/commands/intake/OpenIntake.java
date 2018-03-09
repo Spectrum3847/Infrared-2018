@@ -22,8 +22,9 @@ public class OpenIntake extends Command {
 	// Called just before this Command runs the first time
 	@Override
 	protected void initialize() {
-		this.setTimeout(3);
-		Robot.intake.intakeSolRetract();
+		this.setTimeout(2);
+		Robot.intake.solOpen();
+		Robot.intake.printDebug("Open Intake Start");
 	}
 	// Called repeatedly when this Command is scheduled to run
 	@Override
@@ -39,7 +40,8 @@ public class OpenIntake extends Command {
 	// Called once after isFinished returns true
 	@Override
 	protected void end() {
-		Robot.intake.intakeSolExtend();
+		Robot.intake.solClose();
+		Robot.intake.printDebug("Open Intake End");
 	}
 
 	// Called when another command which requires one or more of the same

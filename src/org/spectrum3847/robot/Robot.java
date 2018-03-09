@@ -17,6 +17,7 @@ import org.spectrum3847.robot.subsystems.Hook;
 import org.spectrum3847.robot.subsystems.Intake;
 import org.spectrum3847.robot.subsystems.LEDs;
 import org.spectrum3847.robot.subsystems.Puncher;
+import org.spectrum3847.lib.drivers.GameState;
 
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.LimitSwitchNormal;
@@ -57,6 +58,7 @@ public class Robot extends TimedRobot {
 	public static final String _hooks = "hooks";
 	public static final String _intake = "INTAKE";
 	
+	public static GameState gameState;
 	
 	public static Compressor compressor;
 	
@@ -113,6 +115,7 @@ public class Robot extends TimedRobot {
 	 */
 	@Override
 	public void robotInit() {
+		setPeriod(.02);
     	initDebugger();
     	CrashTracker.logRobotInit();
     	printInfo("Start robotInit()");

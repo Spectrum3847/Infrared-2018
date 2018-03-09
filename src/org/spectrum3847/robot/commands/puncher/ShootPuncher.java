@@ -17,6 +17,7 @@ public class ShootPuncher extends Command {
 	public ShootPuncher(double time) {
 		// Use requires() here to declare subsystem dependencies
 		requires(Robot.puncher);
+		requires(Robot.intake);
 		shotTime = time;
 	}
 
@@ -24,6 +25,7 @@ public class ShootPuncher extends Command {
 	@Override
 	protected void initialize() {
 		this.setTimeout(shotTime);
+		Robot.intake.solOpen();
 		Robot.puncher.puncherSolExtend();
 		
 	}
@@ -42,8 +44,8 @@ public class ShootPuncher extends Command {
 	// Called once after isFinished returns true
 	@Override
 	protected void end() {
-		Robot.puncher.puncherSolRetact();
-		
+		Robot.puncher.puncherSolRetract();
+		Robot.intake.solClose();
 	}
 
 	// Called when another command which requires one or more of the same

@@ -1,27 +1,35 @@
 package org.spectrum3847.robot;
 
+import org.spectrum3847.lib.drivers.GameState;
 import org.spectrum3847.lib.util.Debugger;
+import org.spectrum3847.robot.commands.auto.DriveForTime;
+import org.spectrum3847.robot.commands.auto.modes.CenterSWnoSensor;
+import org.spectrum3847.robot.commands.drivetrain.AutoDrive;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.Scheduler;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Autonomous {
-	@SuppressWarnings("rawtypes")
 	public static SendableChooser autonChooser;
-	public static String AutoName = "Set to Default Auto";
+	public static String AutoName = "Center SW No Sensor";
 	public static int AutoNumber = 1;
 	public static boolean isRight = false;
-	static Command AutonCommand;
+	static Command AutonCommand = new CenterSWnoSensor();
 
 	public static void init() {
+        Scheduler.getInstance().removeAll();
+        Scheduler.getInstance().enable();
+        Robot.drive.difDrive.setSafetyEnabled(false);
+		Robot.gameState = new GameState(DriverStation.getInstance().getGameSpecificMessage());
 		selectAuto();
 		if (SmartDashboard.getBoolean("Autonomous ENABLED", true)) {
 			AutonCommand.start();
 		}
-		Debugger.println("Auto Init is working", Robot._auton, Debugger.info3);
 		Robot.compressor.stop();
+		Debugger.println("Auto Init with GameState: " + Robot.gameState.message, Robot._auton, Debugger.info3);
 	}
 
 	// Periodic method called roughly once every 20ms
@@ -33,6 +41,7 @@ public class Autonomous {
 	public static void cancel() {
 		Scheduler.getInstance().removeAll();
 		Robot.compressor.start();
+        Robot.drive.difDrive.setSafetyEnabled(true);
 	}
 
 	public static void selectAuto() {
@@ -54,13 +63,12 @@ public class Autonomous {
 				};
 				break;
 			}
-			/*case (1): {
-				AutoName = "Center: Backpack";
-				AutonCommand = new CenterBackpackGearAutoPID(isRight,
-						Robot.prefs.getBoolean("1A: Finish Drive?", false));
+			case (1): {
+				AutoName = "Center SW No Sensor";
+				AutonCommand = new CenterSWnoSensor();
 				break;
 			}
-			case (2): {
+			/*case (2): {
 				AutoName = "Side Peg: BackPack";
 				AutonCommand = new SideBackpackGearAutoPID(isRight, false);
 				break;
@@ -101,27 +109,4 @@ public class Autonomous {
 			}
 		}
 	}
-
-	/*
-	 * @SuppressWarnings({ "rawtypes", "unchecked" }) public static void
-	 * createChooser(){ autonChooser = new SendableChooser();
-	 * 
-	 * autonChooser.addDefault("Score Gear", new CurrentStopGearAuto());
-	 * autonChooser.addObject("Drive Distance", new DriveDistance(10,2));
-	 * autonChooser.addObject("Drive Straight", new CurrentStopGearAuto(false));
-	 * autonChooser.addObject("Fire 10 then Gear RED", new
-	 * Fire10BallsAndGear(true));
-	 * autonChooser.addObject("Fire 10 then Gear BLUE", new
-	 * Fire10BallsAndGear(false)); autonChooser.addObject("Fire 10 ONLY Red",
-	 * new Fire10Balls(true)); autonChooser.addObject("Fire 10 ONLY Blue", new
-	 * Fire10Balls(false));
-	 * 
-	 * autonChooser.addObject("Side Gear Right Far", new SideGearAuto(true,
-	 * false)); autonChooser.addObject("Side Gear Right Close", new
-	 * SideGearAuto(true, true)); autonChooser.addObject("Side Gear Left Far",
-	 * new SideGearAuto(false, false));
-	 * autonChooser.addObject("Side Gear Left Close", new SideGearAuto(false,
-	 * true)); SmartDashboard.putData("AutonChooser", new SendableChooser());
-	 * SmartDashboard.putData("AutonChooser", autonChooser); }
-	 */
 }

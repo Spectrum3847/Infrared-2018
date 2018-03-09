@@ -1,5 +1,8 @@
 package org.spectrum3847.robot;
 
+import org.spectrum3847.lib.drivers.GameState;
+
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.command.Scheduler;
 
@@ -7,6 +10,8 @@ public class Disabled {
     
     public static void init() {
         Scheduler.getInstance().removeAll();
+        Robot.intake.stop();
+        Robot.puncher.stop();
     }
 
     //Periodic method called roughly once every 20ms
@@ -15,5 +20,7 @@ public class Disabled {
         Autonomous.selectAuto();
         Timer.delay(0.001);
         Robot.arm.setTargetToCurrentPosition();
+        Robot.extension.setTargetToCurrentPosition();
+		Robot.gameState = new GameState(DriverStation.getInstance().getGameSpecificMessage());
     }
 }

@@ -31,7 +31,7 @@ public class Puncher extends Subsystem {
 	}
 	
 	//retracts the puncher
-	public void puncherSolRetact() {
+	public void puncherSolRetract() {
 		puncherSolOne.set(false);
 		puncherSolTwo.set(false);
 	}
@@ -41,7 +41,11 @@ public class Puncher extends Subsystem {
 		puncherSolOne.set(true);
 		puncherSolTwo.set(true);
 		
-	}		
+	}
+	
+	public void stop() {
+		puncherSolRetract();
+	}
 	//Add the dashboard values for this subsystem
 	public void dashboard() {
 	}

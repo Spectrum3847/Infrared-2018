@@ -188,9 +188,7 @@ public class Extension extends Subsystem {
 		 if (!Robot.arm.canExtend()) {
 			targetPosition = 0;
 		 }
-
-		System.out.println("Extension Motion Magic Running: " + targetPosition);
-    	manageGainProfile(targetPosition);
+		manageGainProfile(targetPosition);
     	extensionSRX.set(ControlMode.MotionMagic, targetPosition);
 	 }
 	 

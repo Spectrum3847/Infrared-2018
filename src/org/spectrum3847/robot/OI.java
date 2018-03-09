@@ -13,11 +13,13 @@ import org.spectrum3847.robot.commands.arm.ArmMotionMagicAngle;
 import org.spectrum3847.robot.commands.arm.ArmMotionMagicPos;
 import org.spectrum3847.robot.commands.arm.ArmMotionMagicPref;
 import org.spectrum3847.robot.commands.arm.ArmZero;
+import org.spectrum3847.robot.commands.drivetrain.HighGear;
 import org.spectrum3847.robot.commands.extension.ExtensionManualControl;
 import org.spectrum3847.robot.commands.extension.ExtensionMotionMagicPref;
 import org.spectrum3847.robot.commands.extension.ExtensionZero;
 import org.spectrum3847.robot.commands.intake.IntakeOn;
 import org.spectrum3847.robot.commands.intake.IntakeUntilCurrent;
+import org.spectrum3847.robot.commands.puncher.ShootPuncher;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.MatchType;
@@ -35,30 +37,23 @@ public class OI {
 		driverController = new SpectrumXboxController(0, .15, .15);
 		operatorController = new SpectrumXboxController(1, .15, .15);
 		
-		if (driverController.getName().equals("") || DriverStation.getInstance().getMatchType() != MatchType.None) {
+		driverController.rightBumper.whileHeld(new HighGear());
 
-	    }
+		// if (operatorController.getName().equals("") ||
+		// DriverStation.getInstance().getMatchType() != MatchType.None) {
+		operatorController.leftBumper.toggleWhenPressed(new IntakeUntilCurrent());
+		operatorController.leftTriggerButton.whileHeld(new IntakeOn(Robot.prefs.getNumber("I: Intake Speed", 1)));
+		operatorController.rightTriggerButton.whileHeld(new IntakeOn(-1 * Robot.prefs.getNumber("I: Intake Speed", 1)));
 
-		//if (operatorController.getName().equals("") || DriverStation.getInstance().getMatchType() != MatchType.None) {
-			operatorController.leftBumper.whenPressed(new IntakeUntilCurrent());
-			operatorController.leftTriggerButton.whileHeld(new IntakeOn(Robot.prefs.getNumber("I: Intake Speed", 1)));
-			operatorController.rightTriggerButton.whileHeld(new IntakeOn(-1* Robot.prefs.getNumber("I: Intake Speed", 1)));
-			
-			//operatorController.bButton.whileHeld(new ArmMotionMagicPref());
-			//operatorController.Dpad.DownLeft.whenPressed(new ArmMotionMagicPos(Robot.arm.posFwdIntake, true));
-			//operatorController.Dpad.Left.whenPressed(new ArmMotionMagicPos(Robot.arm.posFwdStraight, true));
-			//operatorController.Dpad.UpLeft.whenPressed(new ArmMotionMagicPos(Robot.arm.posFwdScale, true));
-			//operatorController.Dpad.Up.whenPressed(new ArmMotionMagicPos(Robot.arm.posCenterUp, true));
-			//operatorController.Dpad.UpRight.whenPressed(new ArmMotionMagicPos(Robot.arm.posRevScale, true));
-			//operatorController.Dpad.Right.whenPressed(new ArmMotionMagicPos(Robot.arm.posRevStraight, true));
-			//operatorController.Dpad.DownRight.whenPressed(new ArmMotionMagicPos(Robot.arm.posRevIntake, true));
-			operatorController.aButton.whileHeld(new ArmMotionMagicAngle());
-			operatorController.startButton.whenPressed(new ArmZero());
-			operatorController.leftStickButton.toggleWhenPressed(new ArmManualControl());
-			
-			operatorController.selectButton.whenPressed(new ExtensionZero());
-			operatorController.yButton.whenPressed(new ExtensionMotionMagicPref());
-			operatorController.xButton.whenPressed(new ExtensionManualControl());
+		operatorController.aButton.whileHeld(new ArmMotionMagicAngle());
+		operatorController.startButton.whenPressed(new ArmZero());
+		operatorController.leftStickButton.toggleWhenPressed(new ArmManualControl());
+
+		operatorController.selectButton.whenPressed(new ExtensionZero());
+		operatorController.yButton.whenPressed(new ExtensionMotionMagicPref());
+		operatorController.xButton.whenPressed(new ExtensionManualControl());
+
+		operatorController.bButton.whenPressed(new ShootPuncher(1));
 			
 	   // }
 		

@@ -8,6 +8,7 @@
 package org.spectrum3847.robot.subsystems;
 
 import org.spectrum3847.lib.drivers.SpectrumTalonSRX;
+import org.spectrum3847.lib.util.Debugger;
 import org.spectrum3847.lib.drivers.LeaderTalonSRX;
 import org.spectrum3847.lib.drivers.SpectrumSolenoid;
 import org.spectrum3847.robot.HW;
@@ -67,13 +68,17 @@ public class Intake extends Subsystem {
 		intakeSRX.set(ControlMode.PercentOutput, value);
 	}
 	
+	public void stop() {
+		setOpenLoop(0);
+	}
+	
 	//retracts(opens) the intake
-	public void intakeSolRetract() {
+	public void solOpen() {
 		intakeSol.set(true);
 	}
 	
 	//extend(closes) the intake
-	public void intakeSolExtend() {
+	public void solClose() {
 		intakeSol.set(false);
 	}
 	
@@ -110,6 +115,18 @@ public class Intake extends Subsystem {
 		SmartDashboard.putNumber("Intake Current Total", intakeSRX.getOutputCurrent() + intakeBottomSRX.getOutputCurrent());
 		
 	}
+	
+    public static void printDebug(String msg){
+    	Debugger.println(msg, Robot._intake, Debugger.debug2);
+    }
+    
+    public static void printInfo(String msg){
+    	Debugger.println(msg, Robot._intake, Debugger.info3);
+    }
+    
+    public static void printWarning(String msg) {
+    	Debugger.println(msg, Robot._intake, Debugger.warning4);
+    }
 	
 	/*Modify this method to return false if there is a problem with the subsystem
 	  Based on 254-2017 Code
