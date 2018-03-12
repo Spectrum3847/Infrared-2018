@@ -3,7 +3,9 @@ package org.spectrum3847.lib.drivers;
 import org.spectrum3847.robot.HW;
 
 import com.ctre.phoenix.ErrorCode;
+import com.ctre.phoenix.motorcontrol.ControlFrame;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
+import com.ctre.phoenix.motorcontrol.StatusFrame;
 import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
 import com.ctre.phoenix.ParamEnum;
 
@@ -104,6 +106,23 @@ public class SpectrumVictorSPX extends WPI_VictorSPX {
 	
 	public double configGetParameter(ParamEnum param, int ordinal) {
 		return super.configGetParameter(param, ordinal, DEFAULT_TIMEOUT_MS);
+	}
+	
+	public void setFollowerFramePeriods() {
+		this.setControlFramePeriod(ControlFrame.Control_3_General, 100);
+		//this.setControlFramePeriod(ControlFrame.Control_4_Advanced, 100);
+		//this.setControlFramePeriod(ControlFrame.Control_6_MotProfAddTrajPoint, 100);
+		this.setStatusFramePeriod(StatusFrame.Status_1_General, 100, 0);
+		this.setStatusFramePeriod(StatusFrame.Status_2_Feedback0, 100, 0);
+		this.setStatusFramePeriod(StatusFrame.Status_4_AinTempVbat, 500, 0);
+		this.setStatusFramePeriod(StatusFrame.Status_6_Misc, 500, 0);
+		this.setStatusFramePeriod(StatusFrame.Status_7_CommStatus, 500, 0);
+		this.setStatusFramePeriod(StatusFrame.Status_9_MotProfBuffer, 1000, 0);
+		this.setStatusFramePeriod(StatusFrame.Status_10_Targets, 1000, 0);
+		this.setStatusFramePeriod(StatusFrame.Status_12_Feedback1, 1000, 0);
+		this.setStatusFramePeriod(StatusFrame.Status_13_Base_PIDF0, 1000, 0);
+		this.setStatusFramePeriod(StatusFrame.Status_14_Turn_PIDF1, 1000, 0);
+		this.setStatusFramePeriod(StatusFrame.Status_15_FirmwareApiStatus, 1000, 0);
 	}
 	
 }

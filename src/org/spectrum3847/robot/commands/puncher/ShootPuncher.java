@@ -26,7 +26,7 @@ public class ShootPuncher extends Command {
 	protected void initialize() {
 		this.setTimeout(shotTime);
 		Robot.intake.solOpen();
-		Robot.puncher.puncherSolExtend();
+		Robot.puncher.puncherFullExtend();
 		
 	}
 

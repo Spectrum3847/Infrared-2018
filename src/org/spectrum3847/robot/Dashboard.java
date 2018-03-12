@@ -34,8 +34,8 @@ public class Dashboard {
 
     private static void updatePutShort() {
     	Robot.drive.dashboard();
-    	Robot.arm.dashboard();
-    	Robot.extension.dashboard();
+    	//Robot.arm.dashboard();
+    	//Robot.extension.dashboard();
     	Robot.intake.dashboard();
     }
 

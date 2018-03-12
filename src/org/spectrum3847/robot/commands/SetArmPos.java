@@ -5,36 +5,41 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-package org.spectrum3847.robot.commands.arm;
+package org.spectrum3847.robot.commands;
 
 import edu.wpi.first.wpilibj.command.Command;
-
-import org.spectrum3847.robot.OI;
 import org.spectrum3847.robot.Robot;
-
-import com.ctre.phoenix.motorcontrol.ControlMode;
+import org.spectrum3847.robot.subsystems.Arm;
 
 /**
  * An example command.  You can replace me with your own command.
  */
-public class ArmMotionMagicHold extends Command {
-	public ArmMotionMagicHold() {
+public class SetArmPos extends Command {
+	Arm.Position pos;
+	public SetArmPos(Arm.Position p) {
 		// Use requires() here to declare subsystem dependencies
 		requires(Robot.arm);
+		requires(Robot.extension);
+		pos = p;
 	}
 
 	// Called just before this Command runs the first time
 	@Override
 	protected void initialize() {
-		if (Robot.arm.armSRX.getControlMode() != ControlMode.MotionMagic) {
-			Robot.arm.setTargetToCurrentPosition();
+		if (!Robot.extension.getRevLimitSW() || pos == Arm.Position.FwdHighScore || pos == Arm.Position.CENTER || pos == Arm.Position.RevHighScore) {
+			Robot.extension.setTargetPosition(0);
+		} else {
+			Robot.arm.setPos(pos);
+		}
+		
+		if (pos == Arm.Position.FwdHighScore || pos == Arm.Position.RevHighScore) {
+			Robot.extension.setTargetPosition(Robot.extension.getHighScorePos());
 		}
 	}
 
 	// Called repeatedly when this Command is scheduled to run
 	@Override
 	protected void execute() {
-		Robot.arm.motionMagicControl();
 	}
 
 	// Make this return true when this Command no longer needs to run execute()
@@ -46,7 +51,6 @@ public class ArmMotionMagicHold extends Command {
 	// Called once after isFinished returns true
 	@Override
 	protected void end() {
-		Robot.arm.setOpenLoop(0);
 	}
 
 	// Called when another command which requires one or more of the same

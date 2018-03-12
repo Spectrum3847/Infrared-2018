@@ -7,50 +7,20 @@
 
 package org.spectrum3847.robot.subsystems;
 
-import org.spectrum3847.lib.drivers.SpectrumSolenoid;
-import org.spectrum3847.robot.HW;
-
 import edu.wpi.first.wpilibj.command.Subsystem;
 
 /**
  * An example subsystem.  You can replace me with your own Subsystem.
  */
-public class Puncher extends Subsystem {
+public class Pneumatics extends Subsystem {
 	// Put methods for controlling this subsystem
 	// here. Call these from Commands.
-	public SpectrumSolenoid puncherSolOne = new SpectrumSolenoid(HW.PUNCHER_ONE_SOL);
-	public SpectrumSolenoid puncherSolTwo = new SpectrumSolenoid(HW.PUNCHER_TWO_SOL);
-	
-	public Puncher() {
-		
-	}
 
 	public void initDefaultCommand() {
 		// Set the default command for a subsystem here.
 		// setDefaultCommand(new MySpecialCommand());
 	}
 	
-	//retracts the puncher
-	public void puncherSolRetract() {
-		puncherSolOne.set(false);
-		puncherSolTwo.set(false);
-	}
-		
-	//extends the puncher
-	public void puncherFullExtend() {
-		puncherSolOne.set(true);
-		puncherSolTwo.set(true);
-		
-	}
-	public void puncherHalfExtend() {
-		puncherSolOne.set(false);
-		puncherSolTwo.set(true);
-		
-	}
-	
-	public void stop() {
-		puncherSolRetract();
-	}
 	//Add the dashboard values for this subsystem
 	public void dashboard() {
 	}

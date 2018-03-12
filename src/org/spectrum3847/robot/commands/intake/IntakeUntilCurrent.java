@@ -42,7 +42,7 @@ public class IntakeUntilCurrent extends Command {
 	protected boolean isFinished() {
 		//check if we have a cube and the left bumper isn't pressed
 		return Robot.intake.isIntakeComplete(Robot.prefs.getNumber("I: Current Threshold", 8),
-				Robot.prefs.getNumber("I: Threshold Time", 0.5)) && !OI.operatorController.leftBumper.get();
+				Robot.prefs.getNumber("I: Threshold Time", 0.5)) && !OI.operatorController.rightTriggerButton.get();
 		
 	}
 

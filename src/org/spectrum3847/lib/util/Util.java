@@ -7,6 +7,8 @@ import org.spectrum3847.robot.Robot;
 
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
+import edu.wpi.first.wpilibj.ControllerPower;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
 
 /**
@@ -78,7 +80,7 @@ public class Util {
 	 * Should return true if robot is disabled and voltage is less than 12
 	 ******************************************************************************/
 	public static boolean changeBattery () {
-		return (Robot.s_robot_state == Robot.RobotState.DISABLED && HW.PDP.getVoltage() < HW.MIN_BATTERY_VOLTAGE);
+		return (Robot.s_robot_state == Robot.RobotState.DISABLED && RobotController.getInputVoltage() < HW.MIN_BATTERY_VOLTAGE);
 	}
 
 

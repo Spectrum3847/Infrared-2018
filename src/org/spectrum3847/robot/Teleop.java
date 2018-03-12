@@ -13,6 +13,8 @@ public class Teleop {
         Scheduler.getInstance().removeAll();
         Robot.compressor.start();
         Robot.compressor.setClosedLoopControl(true);
+        Robot.arm.setTargetToCurrentPosition();
+        Robot.extension.setTargetToCurrentPosition();
         
         //Do things if connected to FMS only, so when telop starts during a match but not during testing
         if (DriverStation.getInstance().isFMSAttached()){

@@ -2,9 +2,16 @@ package org.spectrum3847.robot;
 
 import org.spectrum3847.lib.drivers.GameState;
 import org.spectrum3847.lib.util.Debugger;
+import org.spectrum3847.paths.CrossTheLine;
+import org.spectrum3847.paths.FiveFeet;
+import org.spectrum3847.paths.FiveFeetAndTurn;
+import org.spectrum3847.paths.TestSTurnAuto;
+import org.spectrum3847.paths.ThreeFeet;
+import org.spectrum3847.robot.commands.FollowTrajectory;
+import org.spectrum3847.robot.commands.AutoTune.AutoTuneVelocity;
 import org.spectrum3847.robot.commands.auto.DriveForTime;
 import org.spectrum3847.robot.commands.auto.modes.CenterSWnoSensor;
-import org.spectrum3847.robot.commands.drivetrain.AutoDrive;
+import org.spectrum3847.robot.commands.drivetrain.TestVelocityMode;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.command.Command;
@@ -66,6 +73,31 @@ public class Autonomous {
 			case (1): {
 				AutoName = "Center SW No Sensor";
 				AutonCommand = new CenterSWnoSensor();
+				break;
+			}
+			case (11):{
+				AutoName = "Cross The Line";
+				AutonCommand = new FollowTrajectory(new CrossTheLine());
+				break;
+			}
+			case (96):{
+				AutoName = "Test Velocity Mode";
+				AutonCommand = new TestVelocityMode();
+				break;
+			}
+			case (97):{
+				AutoName = "Test Trajectory Follow";
+				AutonCommand = new FollowTrajectory(new TestSTurnAuto());
+				break;
+			}
+			case (98): {
+				AutoName = "Auto Tune Left Velocity";
+				AutonCommand = new AutoTuneVelocity(Robot.drive, Robot.drive.leftSRX, 0, Robot.prefs.getNumber("9A: Tune Velocity", 10000), 500);
+				break;
+			}
+			case (99): {
+				AutoName = "Auto Tune Right Velocity";
+				AutonCommand = new AutoTuneVelocity(Robot.drive, Robot.drive.rightSRX, 0, Robot.prefs.getNumber("9A: Tune Velocity", 10000), 500);
 				break;
 			}
 			/*case (2): {

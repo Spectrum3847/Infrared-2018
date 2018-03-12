@@ -41,10 +41,10 @@ public class SpectrumDifferentialDrive extends DifferentialDrive {
 	    }
 
 	    xSpeed = limit(xSpeed);
-	    xSpeed = applyDeadband(xSpeed, m_deadband);
+	    xSpeed = applyDeadband(xSpeed, m_deadband); //We handle at the controller
 
 	    zRotation = limit(zRotation);
-	    zRotation = applyDeadband(zRotation, m_deadband);
+	    zRotation = applyDeadband(zRotation, m_deadband); //We handle at the controller
 
 	    double angularPower;
 	    boolean overPower;

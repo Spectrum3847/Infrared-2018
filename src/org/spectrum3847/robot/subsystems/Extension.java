@@ -37,6 +37,7 @@ public class Extension extends Subsystem {
 	
 	public final static int upPositionLimit = 22500;// needs to be determined manually
 	public final static int downPositionLimit = 0;
+	private static int highScorePos = 20000;
 	
 	private int accel = 0;
 	private int cruiseVel = 0;
@@ -83,6 +84,8 @@ public class Extension extends Subsystem {
 
     	//Clear Extension Position on Reverse Limit Switch
     	extensionSRX.configSetParameter(ParamEnum.eClearPositionOnLimitR, 1, 0, 0, 10);
+    	
+    	extensionBottomSRX.setFollowerFramePeriods();
 	}
 	
 	public void initDefaultCommand() {
@@ -92,10 +95,12 @@ public class Extension extends Subsystem {
 	}
 	
 	public void periodic() {
-		setMotionMagicValues((int)Robot.prefs.getNumber("E: MM Accel", 5000), (int)Robot.prefs.getNumber("E: MM CruiseVel", 2000));
-		getPrefsGains();
-		extensionSRX.setGains(upGains);
-		extensionSRX.setGains(downGains);
+		if (Robot.prefs.getBoolean("E: Set Gains", false)) {
+			setMotionMagicValues((int)Robot.prefs.getNumber("E: MM Accel", 5000), (int)Robot.prefs.getNumber("E: MM CruiseVel", 2000));
+			getPrefsGains();
+			extensionSRX.setGains(upGains);
+			extensionSRX.setGains(downGains);
+		}
 	}
 	
 	public void getPrefsGains() {
@@ -112,6 +117,14 @@ public class Extension extends Subsystem {
 		Robot.prefs.getNumber("E: down D", 0.0),
 		Robot.prefs.getNumber("E: down F", 0.0),
 		0);
+	}
+	
+	public void setHighScorePos() {
+		highScorePos = (int)Robot.prefs.getNumber("E: High Score", 20000);
+	}
+	
+	public int getHighScorePos() {
+		return highScorePos;
 	}
 	
 	public void setZeroWhenDownLimit(boolean val) {

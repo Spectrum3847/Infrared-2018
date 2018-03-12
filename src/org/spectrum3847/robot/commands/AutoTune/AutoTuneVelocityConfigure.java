@@ -1,4 +1,4 @@
-package org.spectrum3847.robot.commands;
+package org.spectrum3847.robot.commands.AutoTune;
 
 import org.spectrum3847.lib.drivers.SRXGains;
 import org.spectrum3847.lib.drivers.SpectrumTalonSRX;

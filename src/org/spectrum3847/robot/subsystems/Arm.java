@@ -45,17 +45,23 @@ public class Arm extends Subsystem {
 	private int cruiseVel = 0;
 	
 	public int posFwdIntake = fwdPositionLimit;
-	public int posFwdStraight = fwdPositionLimit -7500;
-	public int posFwdScale = fwdPositionLimit * 2/3;
+	public int posFwdPortal = fwdPositionLimit -7500;
+	public int posFwdScore = fwdPositionLimit * 2/3;
+	public int posFwdExtensionLimit = posFwdScore;
 	public int posCenterUp = fwdPositionLimit/2;
-	public int posRevScale = fwdPositionLimit * 1/3;
-	public int posRevStraight = 7500;
+	public int posRevScore = fwdPositionLimit * 1/3;
+	public int posRevExtensionLimit = posRevScore;
+	public int posRevPortal = 7500;
 	public int posRevIntake = 0;
 	
 	private final SRXGains upGains = new SRXGains(ARM_UP, 0.560, 0.0, 5.600, 0.620, 100);
 	private final SRXGains downGains = new SRXGains(ARM_DOWN, 0.0, 0.0, 0.0, 0.427, 0);
 	
 	private int targetPosition = 0;
+	
+	public enum Position {
+		FwdIntake, FwdPortal, FwdScore, FwdHighScore, CENTER, CenterClimb, RevHighScore, RevScore, RevPortal, RevIntake
+	}
 	
 	public Arm() {
 		super("Arm");
@@ -89,6 +95,8 @@ public class Arm extends Subsystem {
     	armSRX.configReverseSoftLimitThreshold(revPositionLimit);
     	//Clear Arm Position on Reverse Limit Switch
     	armSRX.configSetParameter(ParamEnum.eClearPositionOnLimitR, 1, 0, 0, 10);
+    	
+    	armBottomSRX.setFollowerFramePeriods();
 	}
 	
 	public void initDefaultCommand() {
@@ -98,10 +106,49 @@ public class Arm extends Subsystem {
 	}
 	
 	public void periodic() {
-		setMotionMagicValues((int)Robot.prefs.getNumber("A: MM Accel", 5000), (int)Robot.prefs.getNumber("A: MM CruiseVel", 2000));
-		getPrefsGains();
-		armSRX.setGains(upGains);
-		armSRX.setGains(downGains);
+		if (Robot.prefs.getBoolean("A: Set Gains", false)) {
+			setMotionMagicValues((int)Robot.prefs.getNumber("A: MM Accel", 5000), (int)Robot.prefs.getNumber("A: MM CruiseVel", 2000));
+			getPrefsGains();
+			armSRX.setGains(upGains);
+			armSRX.setGains(downGains);
+		}
+	}
+	
+	public void setPos(Arm.Position pos) {
+		int p = 0;
+		switch(pos) {
+			case FwdIntake:
+				p = Robot.arm.posFwdIntake;
+				break;
+			case FwdPortal:
+				p = Robot.arm.posFwdPortal;
+				break;
+			case FwdScore:
+				p = Robot.arm.posFwdPortal;
+				break;
+			case FwdHighScore:
+				p = Robot.arm.posFwdExtensionLimit;
+				break;
+			case CENTER:
+				p = Robot.arm.posCenterUp;
+				break;
+			case CenterClimb:
+				p = Robot.arm.posCenterUp;
+				break;
+			case RevHighScore:
+				p = Robot.arm.posRevExtensionLimit;
+				break;
+			case RevScore:
+				p = Robot.arm.posRevPortal;
+				break;
+			case RevPortal:
+				p = Robot.arm.posRevPortal;
+				break;
+			case RevIntake:
+				p = Robot.arm.posRevIntake;
+				break;
+		}
+		setTargetPosition(p);
 	}
 	
 	public void getPrefsGains() {
@@ -111,29 +158,16 @@ public class Arm extends Subsystem {
 		Robot.prefs.getNumber("A: up D", 0.0),
 		Robot.prefs.getNumber("A: up F", 0.0),
 		0);
-		
+		/*//Only useing Up gains
 		downGains.setGains(ARM_DOWN,
 		Robot.prefs.getNumber("A: down P", 0.0),
 		Robot.prefs.getNumber("A: down I", 0.0),
 		Robot.prefs.getNumber("A: down D", 0.0),
 		Robot.prefs.getNumber("A: down F", 0.0),
 		0);
-	}
-	
-	public void setPositionToZero() {
-		armSRX.setSelectedSensorPosition(0, 0);
-	}
-	
-	public void setPositionToFullFwd() {
-    	armSRX.setSelectedSensorPosition(fwdPositionLimit, 0);
+		*/
 	}
 
-	
-	public void setPostionToCenter() {
-		armSRX.setSelectedSensorPosition(fwdPositionLimit/2, 0);
-	}
-	
-	
 	public void setOpenLoop(double value) {
 		armSRX.set(ControlMode.PercentOutput, value);
 	}
@@ -211,7 +245,7 @@ public class Arm extends Subsystem {
 	
 	public void motionMagicControl() {
     	//manageGainProfile(targetPosition);
-		armSRX.selectProfileSlot(ARM_UP, 0);
+		//armSRX.selectProfileSlot(ARM_UP, 0);
     	armSRX.set(ControlMode.MotionMagic, targetPosition);
     }
 	

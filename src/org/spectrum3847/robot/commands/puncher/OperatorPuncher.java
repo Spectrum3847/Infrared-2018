@@ -5,53 +5,68 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-package org.spectrum3847.robot.commands.arm;
+package org.spectrum3847.robot.commands.puncher;
 
 import edu.wpi.first.wpilibj.command.Command;
 
 import org.spectrum3847.robot.OI;
 import org.spectrum3847.robot.Robot;
 
-import com.ctre.phoenix.motorcontrol.ControlMode;
-
-/**
- * An example command.  You can replace me with your own command.
- */
-public class ArmMotionMagicHold extends Command {
-	public ArmMotionMagicHold() {
+public class OperatorPuncher extends Command {
+	
+	public OperatorPuncher() {
 		// Use requires() here to declare subsystem dependencies
-		requires(Robot.arm);
+		requires(Robot.puncher);
+		requires(Robot.intake);
 	}
 
 	// Called just before this Command runs the first time
 	@Override
 	protected void initialize() {
-		if (Robot.arm.armSRX.getControlMode() != ControlMode.MotionMagic) {
-			Robot.arm.setTargetToCurrentPosition();
+		double trigger = OI.operatorController.triggers.getLeft();
+		
+		//If we aren't punching eject with wheels
+		if (trigger <= 0.1) {
+			Robot.intake.setOpenLoop(-1);
+		} else { //If we are punching open the intake
+			Robot.intake.solOpen();
 		}
+		
+		//punch either half or full
+		if (trigger > .9) {
+			Robot.puncher.puncherFullExtend();
+		} else if (trigger > 0.1) {
+			Robot.puncher.puncherHalfExtend();
+		}
+		
+		//Make sure the command runs for at least two seconds
+		this.setTimeout(2);
+		
 	}
 
 	// Called repeatedly when this Command is scheduled to run
 	@Override
 	protected void execute() {
-		Robot.arm.motionMagicControl();
 	}
 
 	// Make this return true when this Command no longer needs to run execute()
 	@Override
 	protected boolean isFinished() {
-		return false;
+		return isTimedOut() && !OI.operatorController.rightBumper.get();
 	}
 
 	// Called once after isFinished returns true
 	@Override
 	protected void end() {
-		Robot.arm.setOpenLoop(0);
+		Robot.puncher.puncherSolRetract();
+		Robot.intake.solClose();
 	}
 
 	// Called when another command which requires one or more of the same
 	// subsystems is scheduled to run
 	@Override
 	protected void interrupted() {
+		this.end();
 	}
+	
 }

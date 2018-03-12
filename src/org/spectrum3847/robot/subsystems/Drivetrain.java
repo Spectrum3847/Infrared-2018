@@ -1,18 +1,22 @@
 package org.spectrum3847.robot.subsystems;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import org.spectrum3847.lib.drivers.SpectrumTalonSRX;
 import org.spectrum3847.lib.drivers.SpectrumVictorSPX;
+import org.spectrum3847.lib.util.Util;
 import org.spectrum3847.lib.drivers.DriveSignal;
 import org.spectrum3847.lib.drivers.LeaderTalonSRX;
 import org.spectrum3847.lib.drivers.SpectrumDifferentialDrive;
+import org.spectrum3847.lib.drivers.SpectrumDigitalInput;
 import org.spectrum3847.lib.drivers.SpectrumSolenoid;
 import org.spectrum3847.robot.HW;
 import org.spectrum3847.robot.OI;
 import org.spectrum3847.robot.Robot;
 import org.spectrum3847.robot.commands.drivetrain.SpectrumDrive;
 
+import com.ctre.phoenix.motorcontrol.ControlFrame;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.LimitSwitchNormal;
@@ -20,6 +24,7 @@ import com.ctre.phoenix.motorcontrol.LimitSwitchSource;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.command.Subsystem;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -46,7 +51,9 @@ public class Drivetrain extends Subsystem {
 	
 	public SpectrumSolenoid shiftingSol = new SpectrumSolenoid(HW.SHIFT_SOL);
 	public SpectrumSolenoid brakeSol = new SpectrumSolenoid(HW.DRIVE_BRAKE_SOL);
-
+	
+	public SpectrumDigitalInput lineSensor = new SpectrumDigitalInput(HW.LINE_SENSOR);
+	
 	public Drivetrain() {
 		leftSRX.setInverted(false);
 		leftSRX.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, 0);
@@ -69,7 +76,7 @@ public class Drivetrain extends Subsystem {
 		//RIGHT SIDE CONFIGURATION
 		rightSRX.setInverted(true);//true
 		rightSRX.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, 0);
-		rightSRX.setSensorPhase(true);
+		rightSRX.setSensorPhase(false);
 		rightSRX.configForwardLimitSwitchSource(LimitSwitchSource.FeedbackConnector, LimitSwitchNormal.Disabled);
 		rightSRX.configReverseLimitSwitchSource(LimitSwitchSource.FeedbackConnector, LimitSwitchNormal.Disabled);
 		rightSRX.configOpenloopRamp(Robot.prefs.getNumber("D: Ramp Rate", DRIVE_DEFAULT_RAMP_RATE));
@@ -85,13 +92,23 @@ public class Drivetrain extends Subsystem {
 		rightSRX.configPeakCurrentDuration(500);
 		rightSRX.enableCurrentLimit(true);
 
+		leftBottomSPX.setFollowerFramePeriods();
+		leftMiddleSPX.setFollowerFramePeriods();
+		rightBottomSPX.setFollowerFramePeriods();
+		rightMiddleSPX.setFollowerFramePeriods();
+		
 		setNeutralMode(NeutralMode.Brake);
 
-		this.configPIDF(HIGH_GEAR_PROFILE, 0.0, 0.0, 0.0, 0.146);
-		this.configPIDF(LOW_GEAR_PROFILE, 2.400, 0.0, 48.00, 0.400);
+		this.configLeftPIDF(HIGH_GEAR_PROFILE, 0.0, 0.0, 0.0, 0);
+		//this.configLeftPIDF(LOW_GEAR_PROFILE, 3.7818853855133057, 0.0, 0, 0.05883145332336426);
+		
+
+		this.configRightPIDF(HIGH_GEAR_PROFILE, 0.0, 0.0, 0.0, 0);
+		//this.configRightPIDF(LOW_GEAR_PROFILE, 2.6692757606506348, 0.0, 0,  0.059464216232299805);
 		
 		setLowGear();
 		setBrakeOff();
+		difDrive.setSafetyEnabled(false);
 
 	}
 
@@ -101,10 +118,12 @@ public class Drivetrain extends Subsystem {
 		//setDefaultCommand(new DrivetrainVelocityPIDTest());
 	}
 
-	public void configPIDF(int profile, double p, double i, double d, double f) {
+	public void configLeftPIDF(int profile, double p, double i, double d, double f) {
 		this.leftSRX.configPIDF(profile, p, i, d, f);
+	}
+	
+	public void configRightPIDF(int profile, double p, double i, double d, double f) {
 		this.rightSRX.configPIDF(profile, p, i, d, f);
-
 	}
 
 	public void drive(ControlMode controlMode, double left, double right){
@@ -193,22 +212,122 @@ public class Drivetrain extends Subsystem {
 	}
 
 	public void dashboard() {
-		SmartDashboard.putNumber("Left Drive Position", getLeftDriveLeadDistance());
-		SmartDashboard.putNumber("Right Drive Position", getRightDriveLeadDistance());
-		SmartDashboard.putNumber("Left Drive Velocity", getLeftDriveLeadVelocity());
-		SmartDashboard.putNumber("Right Drive Velocity", getRightDriveLeadVelocity());
-		SmartDashboard.putNumber("Left SRX Current", leftSRX.getOutputCurrent());
-		SmartDashboard.putNumber("Right SRX Current", rightSRX.getOutputCurrent());
-		SmartDashboard.putNumber("Left Drive Output", leftSRX.get());
-		SmartDashboard.putNumber("Right Drive Output", rightSRX.get());
+		SmartDashboard.putNumber("Drive/Left Position", getLeftDriveLeadDistance());
+		SmartDashboard.putNumber("Drive/Right Position", getRightDriveLeadDistance());
+		SmartDashboard.putNumber("Drive/Left Velocity", getLeftDriveLeadVelocity());
+		SmartDashboard.putNumber("Drive/Right Velocity", getRightDriveLeadVelocity());
+		SmartDashboard.putNumber("Drive/Left SRX Current", leftSRX.getOutputCurrent());
+		SmartDashboard.putNumber("Drive/Right SRX Current", rightSRX.getOutputCurrent());
+		SmartDashboard.putNumber("Drive/Left Output", leftSRX.get());
+		SmartDashboard.putNumber("Drive/Right Output", rightSRX.get());
 	}
 
 	/*Modify this method to return false if there is a problem with the subsystem
 	  Based on 254-2017 Code
 	 */
 	public boolean checkSystem() {
-		return true;
+		System.out.println("Testing Drive Train.------------------------------");
+	    final double kCurrentThres = 0.5;
+	      
+		this.leftSRX.set(ControlMode.PercentOutput, 0.0);
+		this.leftBottomSPX.set(ControlMode.PercentOutput, 0.0);
+		this.leftMiddleSPX.set(ControlMode.PercentOutput, 0.0);
+		this.rightSRX.set(ControlMode.PercentOutput,0.0);
+		this.rightBottomSPX.set(ControlMode.PercentOutput, 0.0);
+		this.rightMiddleSPX.set(ControlMode.PercentOutput, 0.0);
+		
+		this.leftSRX.set(ControlMode.PercentOutput, 6.0);
+		Timer.delay(4.0);
+		final double currentLeftSRX = leftSRX.getOutputCurrent();
+		this.leftSRX.set(ControlMode.PercentOutput, 0.0);
+		
+		Timer.delay(2.0);
+		
+		this.leftMiddleSPX.set(ControlMode.PercentOutput, 6.0);
+		Timer.delay(4.0);
+		final double currentLeftMiddleSPX = HW.PDP.getCurrent(HW.LEFT_DRIVE_MIDDLE_PDP);
+		this.leftMiddleSPX.set(ControlMode.PercentOutput, 0.0);
+		
+		Timer.delay(2.0);
+		
+		this.leftBottomSPX.set(ControlMode.PercentOutput, 6.0);
+		Timer.delay(4.0);
+		final double currentLeftBottomSPX = HW.PDP.getCurrent(HW.LEFT_DRIVE_FRONT_BOTTOM_PDP);
+		this.leftBottomSPX.set(ControlMode.PercentOutput, 0.0);
+		
+		Timer.delay(2.0);
+		
+		this.rightSRX.set(ControlMode.PercentOutput, 6.0);
+		Timer.delay(4.0);
+		final double currentRightSRX = rightSRX.getOutputCurrent();
+		this.rightSRX.set(ControlMode.PercentOutput, 0.0);
+		
+		Timer.delay(2.0);
+		
+		this.rightMiddleSPX.set(ControlMode.PercentOutput, 6.0);
+		Timer.delay(4.0);
+		final double currentRightMiddleSPX = HW.PDP.getCurrent(HW.RIGHT_DRIVE_MIDDLE_PDP);
+		this.rightMiddleSPX.set(ControlMode.PercentOutput, 0.0);
+		
+		Timer.delay(2.0);
+		
+		this.rightBottomSPX.set(ControlMode.PercentOutput, 6.0);
+		Timer.delay(4.0);
+		final double currentRightBottomSPX = HW.PDP.getCurrent(HW.RIGHT_DRIVE_FRONT_BOTTOM_PDP);
+		this.rightBottomSPX.set(ControlMode.PercentOutput, 0.0);
+		
+		Timer.delay(2.0);
+		
+		System.out.println("Drive Train Left SRX: " + currentLeftSRX + " LeftMiddleSRX: " + currentLeftMiddleSPX + " LeftBottomSPX: " + currentLeftBottomSPX);
+		System.out.println("Drive Train Right SRX: " + currentRightSRX + " RightMiddleSRX: " + currentRightMiddleSPX + " RightBottomSPX: " + currentRightBottomSPX);
 
+	      boolean failure = false;
+
+	      if (currentLeftSRX < kCurrentThres) {
+	          failure = true;
+	          System.out.println("!!!!!!!!!!!!!!!!! Drive Left SRX Current Low !!!!!!!!!!!!!!!!!");
+	      }   
+	      if (currentLeftMiddleSPX < kCurrentThres) {
+	          failure = true;
+	          System.out.println("!!!!!!!!!!!!!!!!! Drive Left Middle SPX Current Low !!!!!!!!!!!!!!!!!");
+	      }	      
+	      if (currentLeftBottomSPX < kCurrentThres) {
+	          failure = true;
+	          System.out.println("!!!!!!!!!!!!!!!!! Drive Left Bottom SPX Current Low !!!!!!!!!!!!!!!!!");
+	      }
+	      if (currentRightSRX < kCurrentThres) {
+	          failure = true;
+	          System.out.println("!!!!!!!!!!!!!!!!! Drive Right SRX Current Low !!!!!!!!!!!!!!!!!");
+	      }   
+	      if (currentRightMiddleSPX < kCurrentThres) {
+	          failure = true;
+	          System.out.println("!!!!!!!!!!!!!!!!! Drive Right Middle SPX Current Low !!!!!!!!!!!!!!!!!");
+	      }	      
+	      if (currentRightBottomSPX < kCurrentThres) {
+	          failure = true;
+	          System.out.println("!!!!!!!!!!!!!!!!! Drive Right Bottom SPX Current Low !!!!!!!!!!!!!!!!!");
+	      }
+
+	      if (!Util.allCloseTo(Arrays.asList(currentRightSRX, currentRightMiddleSPX, currentRightBottomSPX), currentRightSRX, 5.0)) {
+	          failure = true;
+	          System.out.println("!!!!!!!!!!!!!!!! Right Drive Currents Different !!!!!!!!!!!!!!!!!");
+	      }
+	      
+	      if (!Util.allCloseTo(Arrays.asList(currentLeftSRX, currentLeftMiddleSPX, currentLeftBottomSPX), currentLeftSRX, 5.0)) {
+	          failure = true;
+	          System.out.println("!!!!!!!!!!!!!!!! Left Drive Currents Different !!!!!!!!!!!!!!!!!");
+	      }
+	      
+	      //Set the SPXs back to follow mode
+	      this.leftBottomSPX.follow(this.leftSRX);
+	      this.leftMiddleSPX.follow(this.leftSRX);
+	      this.rightBottomSPX.follow(this.rightSRX);
+	      this.rightMiddleSPX.follow(this.rightSRX);
+
+	      return !failure;
+	}
+		
+		
 		/** Example checkSystem from 254's 2017 Robot
 		 System.out.println("Testing HOPPER.--------------------------------------");
       final double kCurrentThres = 0.5;
@@ -255,7 +374,6 @@ public class Drivetrain extends Subsystem {
 
       return !failure;
 		 */
-	}
 
 	public void velocityPIDTest() {
 

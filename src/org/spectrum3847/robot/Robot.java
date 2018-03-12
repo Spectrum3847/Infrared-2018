@@ -19,13 +19,6 @@ import org.spectrum3847.robot.subsystems.LEDs;
 import org.spectrum3847.robot.subsystems.Puncher;
 import org.spectrum3847.lib.drivers.GameState;
 
-import com.ctre.phoenix.motorcontrol.FeedbackDevice;
-import com.ctre.phoenix.motorcontrol.LimitSwitchNormal;
-import com.ctre.phoenix.motorcontrol.LimitSwitchSource;
-import com.ctre.phoenix.motorcontrol.NeutralMode;
-import com.ctre.phoenix.motorcontrol.can.TalonSRX;
-import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
-import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
 import com.ctre.phoenix.sensors.PigeonIMU;
 import org.spectrum3847.lib.util.CrashTracker;
 
@@ -187,6 +180,7 @@ public class Robot extends TimedRobot {
 		 Timer.delay(0.5);
 		 
 		 boolean results = true;
+		 results &= drive.checkSystem();
 		 /** Examples of testing subsystems based on 254-2017 Code
 	        results &= Feeder.getInstance().checkSystem();
 	        results &= Drive.getInstance().checkSystem();

@@ -56,6 +56,8 @@ public class Intake extends Subsystem {
     	intakeSRX.configPeakCurrentLimit((int)Robot.prefs.getNumber("I: Current Peak Limit", 15.0));
     	intakeSRX.configPeakCurrentDuration((int)Robot.prefs.getNumber("I: Current Peak Durration(ms)", 1000));
     	intakeSRX.enableCurrentLimit(true);
+    	
+    	intakeBottomSRX.setFollowerFramePeriods();
 	}
 
 	
@@ -84,13 +86,13 @@ public class Intake extends Subsystem {
 	
 	//returns the current from one of the SRXs 
 	public double getCurrent() {
-		return (intakeSRX.getOutputCurrent());
+		return (intakeSRX.getOutputCurrent() + this.intakeBottomSRX.getOutputCurrent());
 	}
 	
 	//check if the current has been above threshold value for enough time
 	public boolean isIntakeComplete(double currentThreshold, double thresholdTime) {
 		
-		if(intakeSRX.getOutputCurrent() > currentThreshold) {
+		if(getCurrent() > currentThreshold) {
 			
 			if(thresholdStart == 0) {
 				thresholdStart = Timer.getFPGATimestamp();
@@ -98,6 +100,7 @@ public class Intake extends Subsystem {
 			} else {
 				if(Timer.getFPGATimestamp() - thresholdStart > thresholdTime) {
 					intakeComplete = true;		
+					this.printDebug("Intate with Current Complete");
 				}
 				
 			}
@@ -112,7 +115,7 @@ public class Intake extends Subsystem {
 	//Add the dashboard values for this subsystem
 	public void dashboard() {
 		SmartDashboard.putNumber("Intake Output", intakeSRX.get());
-		SmartDashboard.putNumber("Intake Current Total", intakeSRX.getOutputCurrent() + intakeBottomSRX.getOutputCurrent());
+		SmartDashboard.putNumber("Intake Current Total", getCurrent());
 		
 	}
 	

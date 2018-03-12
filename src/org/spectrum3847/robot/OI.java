@@ -14,12 +14,16 @@ import org.spectrum3847.robot.commands.arm.ArmMotionMagicPos;
 import org.spectrum3847.robot.commands.arm.ArmMotionMagicPref;
 import org.spectrum3847.robot.commands.arm.ArmZero;
 import org.spectrum3847.robot.commands.drivetrain.HighGear;
+import org.spectrum3847.robot.commands.extension.ExtensionClimb;
 import org.spectrum3847.robot.commands.extension.ExtensionManualControl;
+import org.spectrum3847.robot.commands.extension.ExtensionMotionMagicHold;
 import org.spectrum3847.robot.commands.extension.ExtensionMotionMagicPref;
 import org.spectrum3847.robot.commands.extension.ExtensionZero;
+import org.spectrum3847.robot.commands.hook.ReadyClimb;
 import org.spectrum3847.robot.commands.intake.IntakeOn;
 import org.spectrum3847.robot.commands.intake.IntakeUntilCurrent;
 import org.spectrum3847.robot.commands.puncher.ShootPuncher;
+import org.spectrum3847.robot.commands.puncher.OperatorPuncher;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.MatchType;
@@ -39,23 +43,18 @@ public class OI {
 		
 		driverController.rightBumper.whileHeld(new HighGear());
 
-		// if (operatorController.getName().equals("") ||
-		// DriverStation.getInstance().getMatchType() != MatchType.None) {
-		operatorController.leftBumper.toggleWhenPressed(new IntakeUntilCurrent());
-		operatorController.leftTriggerButton.whileHeld(new IntakeOn(Robot.prefs.getNumber("I: Intake Speed", 1)));
-		operatorController.rightTriggerButton.whileHeld(new IntakeOn(-1 * Robot.prefs.getNumber("I: Intake Speed", 1)));
+		operatorController.rightTriggerButton.toggleWhenPressed(new IntakeUntilCurrent());
+		operatorController.rightBumper.whenPressed(new OperatorPuncher());
 
 		operatorController.aButton.whileHeld(new ArmMotionMagicAngle());
 		operatorController.startButton.whenPressed(new ArmZero());
 		operatorController.leftStickButton.toggleWhenPressed(new ArmManualControl());
 
 		operatorController.selectButton.whenPressed(new ExtensionZero());
-		operatorController.yButton.whenPressed(new ExtensionMotionMagicPref());
-		operatorController.xButton.whenPressed(new ExtensionManualControl());
-
-		operatorController.bButton.whenPressed(new ShootPuncher(1));
-			
-	   // }
+		operatorController.Dpad.Up.toggleWhenPressed(new ReadyClimb());
+		operatorController.Dpad.Down.whileHeld(new ExtensionClimb());
+		operatorController.rightStickButton.whenPressed(new ExtensionManualControl());
+		
 		
 	}
 	//// CREATING BUTTONS
