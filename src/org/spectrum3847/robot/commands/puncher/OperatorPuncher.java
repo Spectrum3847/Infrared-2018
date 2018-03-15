@@ -18,6 +18,8 @@ public class OperatorPuncher extends Command {
 		// Use requires() here to declare subsystem dependencies
 		requires(Robot.puncher);
 		requires(Robot.intake);
+		//Make sure the command runs for at least two seconds
+		this.setTimeout(1);
 	}
 
 	// Called just before this Command runs the first time
@@ -33,14 +35,13 @@ public class OperatorPuncher extends Command {
 		}
 		
 		//punch either half or full
-		if (trigger > .9) {
+		if (trigger > .95) {
 			Robot.puncher.puncherFullExtend();
 		} else if (trigger > 0.1) {
 			Robot.puncher.puncherHalfExtend();
 		}
 		
-		//Make sure the command runs for at least two seconds
-		this.setTimeout(2);
+
 		
 	}
 
@@ -60,6 +61,7 @@ public class OperatorPuncher extends Command {
 	protected void end() {
 		Robot.puncher.puncherSolRetract();
 		Robot.intake.solClose();
+		Robot.intake.setOpenLoop(0);
 	}
 
 	// Called when another command which requires one or more of the same

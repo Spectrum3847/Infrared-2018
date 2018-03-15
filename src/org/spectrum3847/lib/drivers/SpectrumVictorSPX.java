@@ -1,11 +1,13 @@
 package org.spectrum3847.lib.drivers;
 
 import org.spectrum3847.robot.HW;
+import org.spectrum3847.robot.Robot;
 
 import com.ctre.phoenix.ErrorCode;
 import com.ctre.phoenix.motorcontrol.ControlFrame;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.StatusFrame;
+import com.ctre.phoenix.motorcontrol.StatusFrameEnhanced;
 import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
 import com.ctre.phoenix.ParamEnum;
 
@@ -110,19 +112,44 @@ public class SpectrumVictorSPX extends WPI_VictorSPX {
 	
 	public void setFollowerFramePeriods() {
 		this.setControlFramePeriod(ControlFrame.Control_3_General, 100);
-		//this.setControlFramePeriod(ControlFrame.Control_4_Advanced, 100);
-		//this.setControlFramePeriod(ControlFrame.Control_6_MotProfAddTrajPoint, 100);
 		this.setStatusFramePeriod(StatusFrame.Status_1_General, 100, 0);
 		this.setStatusFramePeriod(StatusFrame.Status_2_Feedback0, 100, 0);
-		this.setStatusFramePeriod(StatusFrame.Status_4_AinTempVbat, 500, 0);
-		this.setStatusFramePeriod(StatusFrame.Status_6_Misc, 500, 0);
-		this.setStatusFramePeriod(StatusFrame.Status_7_CommStatus, 500, 0);
-		this.setStatusFramePeriod(StatusFrame.Status_9_MotProfBuffer, 1000, 0);
-		this.setStatusFramePeriod(StatusFrame.Status_10_Targets, 1000, 0);
-		this.setStatusFramePeriod(StatusFrame.Status_12_Feedback1, 1000, 0);
-		this.setStatusFramePeriod(StatusFrame.Status_13_Base_PIDF0, 1000, 0);
-		this.setStatusFramePeriod(StatusFrame.Status_14_Turn_PIDF1, 1000, 0);
-		this.setStatusFramePeriod(StatusFrame.Status_15_FirmwareApiStatus, 1000, 0);
+		this.setStatusFramePeriod(StatusFrame.Status_4_AinTempVbat, 250, 0);
+		this.setStatusFramePeriod(StatusFrame.Status_12_Feedback1, 250, 0);
+		this.setStatusFramePeriod(StatusFrame.Status_13_Base_PIDF0, 250, 0);
+		this.setStatusFramePeriod(StatusFrame.Status_14_Turn_PIDF1, 250, 0);
+		this.setStatusFramePeriod(StatusFrame.Status_15_FirmwareApiStatus, 250, 0);
 	}
 	
+	public void printFramePeriods(String name) {
+		Robot.printDebug("SPX Frame Period: " + name);
+		Robot.printDebug("S1: " + this.getStatusFramePeriod(StatusFrame.Status_1_General, 0));
+		Robot.printDebug("S2: " + this.getStatusFramePeriod(StatusFrame.Status_2_Feedback0, 0));
+		Robot.printDebug("S4: " + this.getStatusFramePeriod(StatusFrame.Status_4_AinTempVbat, 0));
+		Robot.printDebug("S6: " + this.getStatusFramePeriod(StatusFrame.Status_6_Misc, 0));
+		Robot.printDebug("S7: " + this.getStatusFramePeriod(StatusFrame.Status_7_CommStatus, 0));
+		Robot.printDebug("S8: " + this.getStatusFramePeriod(StatusFrameEnhanced.Status_8_PulseWidth, 0));
+		Robot.printDebug("S9: " + this.getStatusFramePeriod(StatusFrame.Status_9_MotProfBuffer, 0));
+		Robot.printDebug("S10: " + this.getStatusFramePeriod(StatusFrame.Status_10_Targets,  0));
+		Robot.printDebug("S12: " + this.getStatusFramePeriod(StatusFrame.Status_12_Feedback1, 0));
+		Robot.printDebug("S13: " + this.getStatusFramePeriod(StatusFrame.Status_13_Base_PIDF0, 0));
+		Robot.printDebug("S14: " + this.getStatusFramePeriod(StatusFrame.Status_14_Turn_PIDF1,  0));
+		Robot.printDebug("S15: " + this.getStatusFramePeriod(StatusFrame.Status_15_FirmwareApiStatus, 0));
+	}
+	
+	/* Default SPX Rates
+	 	2: [GENERAL] SPX Frame Period: leftBottomSPX
+		2: [GENERAL] S1: 10
+		2: [GENERAL] S2: 20
+		2: [GENERAL] S4: 160
+		2: [GENERAL] S6: 0
+		2: [GENERAL] S7: 0
+		2: [GENERAL] S8: 0
+		2: [GENERAL] S9: 0
+		2: [GENERAL] S10: 0
+		2: [GENERAL] S12: 250
+		2: [GENERAL] S13: 160
+		2: [GENERAL] S14: 250
+		2: [GENERAL] S15: 160
+*/
 }

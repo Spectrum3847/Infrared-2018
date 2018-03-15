@@ -83,7 +83,7 @@ public class Extension extends Subsystem {
     	extensionSRX.configReverseSoftLimitThreshold(downPositionLimit);
 
     	//Clear Extension Position on Reverse Limit Switch
-    	extensionSRX.configSetParameter(ParamEnum.eClearPositionOnLimitR, 1, 0, 0, 10);
+    	extensionSRX.configSetParameter(ParamEnum.eClearPositionOnLimitR, 1, 0, 0, 0);
     	
     	extensionBottomSRX.setFollowerFramePeriods();
 	}
@@ -125,6 +125,10 @@ public class Extension extends Subsystem {
 	
 	public int getHighScorePos() {
 		return highScorePos;
+	}
+	
+	public void disableLimitSwitches(boolean t) {
+		extensionSRX.overrideLimitSwitchesEnable(!t);
 	}
 	
 	public void setZeroWhenDownLimit(boolean val) {
@@ -176,6 +180,10 @@ public class Extension extends Subsystem {
 	
 	public void setTargetToCurrentPosition() {
 		setTargetPosition(getCurrentPosition());
+	}
+	
+	public boolean isDown() {
+		return getCurrentPosition() < 40;
 	}
 	
 	public void manageGainProfile(double targetPosition) {

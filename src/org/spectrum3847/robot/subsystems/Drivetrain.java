@@ -5,6 +5,7 @@ import java.util.Arrays;
 
 import org.spectrum3847.lib.drivers.SpectrumTalonSRX;
 import org.spectrum3847.lib.drivers.SpectrumVictorSPX;
+import org.spectrum3847.lib.util.Debugger;
 import org.spectrum3847.lib.util.Util;
 import org.spectrum3847.lib.drivers.DriveSignal;
 import org.spectrum3847.lib.drivers.LeaderTalonSRX;
@@ -16,13 +17,18 @@ import org.spectrum3847.robot.OI;
 import org.spectrum3847.robot.Robot;
 import org.spectrum3847.robot.commands.drivetrain.SpectrumDrive;
 
+import com.ctre.PigeonImu;
 import com.ctre.phoenix.motorcontrol.ControlFrame;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.LimitSwitchNormal;
 import com.ctre.phoenix.motorcontrol.LimitSwitchSource;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.ctre.phoenix.motorcontrol.RemoteFeedbackDevice;
+import com.ctre.phoenix.motorcontrol.RemoteSensorSource;
+import com.ctre.phoenix.motorcontrol.StatusFrame;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
+import com.ctre.phoenix.sensors.PigeonIMU;
 
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.command.Subsystem;
@@ -35,7 +41,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 public class Drivetrain extends Subsystem {
 
 	public static final int LOW_GEAR_PROFILE = 0;
-	public static final int HIGH_GEAR_PROFILE = 1;
+	public static final int TURN_PROFILE = 1;
 	public static final double DRIVE_DEFAULT_RAMP_RATE = 0.1;
 
 	StringBuilder _sb = new StringBuilder();
@@ -54,10 +60,40 @@ public class Drivetrain extends Subsystem {
 	
 	public SpectrumDigitalInput lineSensor = new SpectrumDigitalInput(HW.LINE_SENSOR);
 	
+	public PigeonIMU imu = new PigeonIMU(Robot.intake.intakeBottomSRX);
+	
+	double targetAngle;
+	double turnThrottle;
+	
+	double currentAngle;
+	double currentAngularRate;
+	public double error = 0;
+	
 	public Drivetrain() {
+		setDefaultTalonConfig();
+
+		leftBottomSPX.setFollowerFramePeriods();
+		leftMiddleSPX.setFollowerFramePeriods();
+		rightBottomSPX.setFollowerFramePeriods();
+		rightMiddleSPX.setFollowerFramePeriods();
+		
+		setNeutralMode(NeutralMode.Brake);
+
+		//this.configLeftPIDF(TURN_PROFILE, 0.0, 0.0, 0.0, 0);
+		//this.configLeftPIDF(LOW_GEAR_PROFILE, 3.7818853855133057, 0.0, 0, 0.05883145332336426);
+		
+
+		//this.configRightPIDF(TURN_PROFILE, 0.0, 0.0, 0.0, 0);
+		//this.configRightPIDF(LOW_GEAR_PROFILE, 2.6692757606506348, 0.0, 0,  0.059464216232299805);
+		
+		setLowGear();
+		setBrakeOff();
+		difDrive.setSafetyEnabled(false);
+
+	}
+	
+	public void setDefaultTalonConfig() {
 		leftSRX.setInverted(false);
-		leftSRX.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, 0);
-		leftSRX.setSensorPhase(false);
 		leftSRX.configForwardLimitSwitchSource(LimitSwitchSource.FeedbackConnector, LimitSwitchNormal.Disabled);
 		leftSRX.configReverseLimitSwitchSource(LimitSwitchSource.FeedbackConnector, LimitSwitchNormal.Disabled);
 		leftSRX.configOpenloopRamp(Robot.prefs.getNumber("D: Ramp Rate", DRIVE_DEFAULT_RAMP_RATE));
@@ -72,11 +108,10 @@ public class Drivetrain extends Subsystem {
 		leftSRX.configPeakCurrentLimit(8);
 		leftSRX.configPeakCurrentDuration(500);
 		leftSRX.enableCurrentLimit(true);
+		leftSRX.setStatusFramePeriod(StatusFrame.Status_2_Feedback0, 5, 0);
 
 		//RIGHT SIDE CONFIGURATION
 		rightSRX.setInverted(true);//true
-		rightSRX.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, 0);
-		rightSRX.setSensorPhase(false);
 		rightSRX.configForwardLimitSwitchSource(LimitSwitchSource.FeedbackConnector, LimitSwitchNormal.Disabled);
 		rightSRX.configReverseLimitSwitchSource(LimitSwitchSource.FeedbackConnector, LimitSwitchNormal.Disabled);
 		rightSRX.configOpenloopRamp(Robot.prefs.getNumber("D: Ramp Rate", DRIVE_DEFAULT_RAMP_RATE));
@@ -91,25 +126,77 @@ public class Drivetrain extends Subsystem {
 		rightSRX.configPeakCurrentLimit(8);
 		rightSRX.configPeakCurrentDuration(500);
 		rightSRX.enableCurrentLimit(true);
-
-		leftBottomSPX.setFollowerFramePeriods();
-		leftMiddleSPX.setFollowerFramePeriods();
-		rightBottomSPX.setFollowerFramePeriods();
-		rightMiddleSPX.setFollowerFramePeriods();
+		rightSRX.setStatusFramePeriod(StatusFrame.Status_2_Feedback0, 5, 0);
 		
-		setNeutralMode(NeutralMode.Brake);
-
-		this.configLeftPIDF(HIGH_GEAR_PROFILE, 0.0, 0.0, 0.0, 0);
-		//this.configLeftPIDF(LOW_GEAR_PROFILE, 3.7818853855133057, 0.0, 0, 0.05883145332336426);
+		setPositionTalonConfig();
 		
-
-		this.configRightPIDF(HIGH_GEAR_PROFILE, 0.0, 0.0, 0.0, 0);
-		//this.configRightPIDF(LOW_GEAR_PROFILE, 2.6692757606506348, 0.0, 0,  0.059464216232299805);
+		//Setup Pigeon
+		/* turn off remote 0 */
+		leftSRX.configRemoteFeedbackFilter(
+				0x00, /* device ID does not matter since filter is off */
+				RemoteSensorSource.Off,
+				1, /* remote filter 0 */
+				10); /* timeout ms */
+		/* select a Pigeon on CAN Bus. */
+		leftSRX.configRemoteFeedbackFilter(
+				imu.getDeviceID(),
+				RemoteSensorSource.GadgeteerPigeon_Yaw,
+				0, /* remote filter 1 */
+				10); /* timeout ms */
 		
-		setLowGear();
-		setBrakeOff();
-		difDrive.setSafetyEnabled(false);
+		/* turn off remote 0 */
+		rightSRX.configRemoteFeedbackFilter(
+				0x00, /* device ID does not matter since filter is off */
+				RemoteSensorSource.Off,
+				1, /* remote filter 0 */
+				10); /* timeout ms */
+		/* select a Pigeon on CAN Bus. */
+		rightSRX.configRemoteFeedbackFilter(
+				imu.getDeviceID(),
+				RemoteSensorSource.GadgeteerPigeon_Yaw,
+				0, /* remote filter 1 */
+				10); /* timeout ms */
 
+		//Put Pigeon as Feedback Sensor 2
+		leftSRX.configSelectedFeedbackSensor(RemoteFeedbackDevice.RemoteSensor0, 1, 0);
+		rightSRX.configSelectedFeedbackSensor(RemoteFeedbackDevice.RemoteSensor0, 1, 0);
+	}
+	
+	//Not needed sense you can't get velocity from the pigeon right now as a Talon Sensor
+	public void setUpTurnTalonConfig() {
+		leftSRX.configSelectedFeedbackSensor(RemoteFeedbackDevice.RemoteSensor0, 0, 0);
+		leftSRX.setSensorPhase(false);
+		rightSRX.configSelectedFeedbackSensor(RemoteFeedbackDevice.RemoteSensor0, 0, 0);
+		rightSRX.setSensorPhase(true);
+		leftSRX.setInverted(!leftSRX.getInverted());
+		leftSRX.follow(rightSRX);
+	}
+	
+	public void cleanUpTurnMotionMagic() {
+		setPositionTalonConfig();
+		Robot.drive.leftSRX.setInverted(!leftSRX.getInverted());
+		this.difDrive.tankDrive(0, 0);
+	}
+	
+	public void setPositionTalonConfig() {
+		leftSRX.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, LOW_GEAR_PROFILE);
+		leftSRX.setSensorPhase(false);
+		rightSRX.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, LOW_GEAR_PROFILE);
+		rightSRX.setSensorPhase(false);
+	}
+	
+	public void zeroSensors() {
+		leftSRX.getSensorCollection().setQuadraturePosition(0, 0);
+		rightSRX.getSensorCollection().setQuadraturePosition(0, 0);
+		imu.setYaw(0, 0);
+		imu.setAccumZAngle(0, 0);
+		imu.setFusedHeading(0, 0);
+		printInfo("          [Sensors] All Drive sensors are zeroed.");
+	}
+	
+	
+	public void setTurnMotionMagic(double t) {
+		Robot.drive.rightSRX.set(ControlMode.MotionMagic, t);
 	}
 
 	public void initDefaultCommand() {
@@ -208,7 +295,43 @@ public class Drivetrain extends Subsystem {
 	
 	@Override
 	public void periodic() {
+	}
+	
+	public double getTurnThrottlePID(double angle, double kP, double kD) {
+		// forwardThrottle = 0;
+		double kPgain = kP;// Robot.prefs.getNumber("D: Straight P", 0.04); /* percent throttle per degree
+							// of error */
+		double kDgain = kD;// Robot.prefs.getNumber("D: Straight D", 0.0004); /* percent throttle per
+							// angular velocity dps */
+		// kMaxCorrectionRatio = Robot.prefs.getNumber("D: MaxCorrectRatio",0.30 ); /*
+		// cap corrective turning throttle to 30 percent of forward throttle */
+		/** holds the current angle to servo to */
+		targetAngle = angle;
 
+		// Debugger.println("Turning", Robot.drivetrain, Debugger.debug2);
+		currentAngle = getHeading();
+		currentAngularRate = getYawRate();
+		error = (targetAngle - currentAngle);
+
+		turnThrottle = error * kPgain - (currentAngularRate) * kDgain;
+		/*
+		 * positive turnThrottle means turn to the left, this can be replaced with
+		 * ArcadeDrive object, or teams drivetrain object
+		 */
+		turnThrottle = Util.limit(turnThrottle, 1.0);
+		return turnThrottle;
+	}
+	
+	public double getHeading() {
+		double[] ypr_deg = new double[3];
+		imu.getYawPitchRoll(ypr_deg);
+		return ypr_deg[0];
+		//return imu.getFusedHeading();
+	}
+	public double getYawRate() {
+		double[] xyz_dps = new double[3];
+		imu.getRawGyro(xyz_dps);
+		return xyz_dps[0];
 	}
 
 	public void dashboard() {
@@ -220,6 +343,11 @@ public class Drivetrain extends Subsystem {
 		SmartDashboard.putNumber("Drive/Right SRX Current", rightSRX.getOutputCurrent());
 		SmartDashboard.putNumber("Drive/Left Output", leftSRX.get());
 		SmartDashboard.putNumber("Drive/Right Output", rightSRX.get());
+	}
+	
+	public void imuDashboard() {
+		SmartDashboard.putNumber("IMU/Angle", getHeading());
+		SmartDashboard.putNumber("IMU/Angle Rate", getYawRate());
 	}
 
 	/*Modify this method to return false if there is a problem with the subsystem
@@ -385,7 +513,7 @@ public class Drivetrain extends Subsystem {
 		_sb.append("\tout:");
 		_sb.append(motorOutput);
 		_sb.append("\tspd:");
-		_sb.append(_talon.getSelectedSensorVelocity(this.HIGH_GEAR_PROFILE));
+		_sb.append(_talon.getSelectedSensorVelocity(this.TURN_PROFILE));
 		//_sb.append("LowLevelspeed:");
 		//_sb.append(_talon.getSensorCollection());
 
@@ -401,7 +529,7 @@ public class Drivetrain extends Subsystem {
 
 			/* append more signals to print when in speed mode. */
 			_sb.append("\terr:");
-			_sb.append(_talon.getClosedLoopError(this.HIGH_GEAR_PROFILE));
+			_sb.append(_talon.getClosedLoopError(this.TURN_PROFILE));
 			_sb.append("\ttrg:");
 			_sb.append(targetVelocity_UnitsPer100ms);
 		} else {
@@ -418,5 +546,16 @@ public class Drivetrain extends Subsystem {
 	}
 
 
+    public static void printDebug(String msg){
+    	Debugger.println(msg, Robot._intake, Debugger.debug2);
+    }
+    
+    public static void printInfo(String msg){
+    	Debugger.println(msg, Robot._intake, Debugger.info3);
+    }
+    
+    public static void printWarning(String msg) {
+    	Debugger.println(msg, Robot._intake, Debugger.warning4);
+    }
 }
 

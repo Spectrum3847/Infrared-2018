@@ -13,6 +13,7 @@ import org.spectrum3847.robot.commands.arm.ArmMotionMagicAngle;
 import org.spectrum3847.robot.commands.arm.ArmMotionMagicPos;
 import org.spectrum3847.robot.commands.arm.ArmMotionMagicPref;
 import org.spectrum3847.robot.commands.arm.ArmZero;
+import org.spectrum3847.robot.commands.arm.SetArmPos;
 import org.spectrum3847.robot.commands.drivetrain.HighGear;
 import org.spectrum3847.robot.commands.extension.ExtensionClimb;
 import org.spectrum3847.robot.commands.extension.ExtensionManualControl;
@@ -23,6 +24,7 @@ import org.spectrum3847.robot.commands.hook.ReadyClimb;
 import org.spectrum3847.robot.commands.intake.IntakeOn;
 import org.spectrum3847.robot.commands.intake.IntakeUntilCurrent;
 import org.spectrum3847.robot.commands.puncher.ShootPuncher;
+import org.spectrum3847.robot.subsystems.Arm;
 import org.spectrum3847.robot.commands.puncher.OperatorPuncher;
 
 import edu.wpi.first.wpilibj.DriverStation;
@@ -38,15 +40,22 @@ public class OI {
 	public static SpectrumXboxController operatorController;
 	
 	public OI() {
-		driverController = new SpectrumXboxController(0, .15, .15);
-		operatorController = new SpectrumXboxController(1, .15, .15);
+		driverController = new SpectrumXboxController(0, .02, .02);
+		operatorController = new SpectrumXboxController(1, .10, .10);
 		
 		driverController.rightBumper.whileHeld(new HighGear());
 
+		//Hold to force intake to continue past current limit, happens in IntakeUntilCurrent
 		operatorController.rightTriggerButton.toggleWhenPressed(new IntakeUntilCurrent());
-		operatorController.rightBumper.whenPressed(new OperatorPuncher());
+		
+		//Left Trigger sets the speed of the punch either wheeled outtake, soft punch, full punch in OperatorPuncher() command
+		operatorController.rightBumper.toggleWhenPressed(new OperatorPuncher());
 
-		operatorController.aButton.whileHeld(new ArmMotionMagicAngle());
+		//Left Bumper reverses these positions in SetArmPos command
+		operatorController.aButton.whileHeld(new SetArmPos(Arm.Position.FwdIntake));
+		operatorController.xButton.whileHeld(new SetArmPos(Arm.Position.FwdScore));
+		operatorController.bButton.whileHeld(new SetArmPos(Arm.Position.FwdPortal));
+		operatorController.yButton.whileHeld(new SetArmPos(Arm.Position.FwdHighScore));
 		operatorController.startButton.whenPressed(new ArmZero());
 		operatorController.leftStickButton.toggleWhenPressed(new ArmManualControl());
 

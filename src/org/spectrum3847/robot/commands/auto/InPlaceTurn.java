@@ -5,53 +5,65 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-package org.spectrum3847.robot.commands.arm;
+package org.spectrum3847.robot.commands.auto;
 
 import edu.wpi.first.wpilibj.command.Command;
 
-import org.spectrum3847.lib.controllers.SpectrumThumbStick;
-import org.spectrum3847.lib.controllers.SpectrumXboxController;
-import org.spectrum3847.robot.OI;
+import java.util.Arrays;
+
+import org.spectrum3847.lib.util.Util;
 import org.spectrum3847.robot.Robot;
+import org.spectrum3847.robot.subsystems.Drivetrain;
+
+import com.ctre.phoenix.motorcontrol.ControlMode;
 
 /**
  * An example command.  You can replace me with your own command.
  */
-public class ArmManualControl extends Command {
-	public ArmManualControl() {
+public class InPlaceTurn extends Command {
+	double angle = 0;
+	double kP = 0;
+	double kD = 0;
+	double kF = 0;
+	public InPlaceTurn(double ang) {
 		// Use requires() here to declare subsystem dependencies
-		requires(Robot.arm);
+		requires(Robot.drive);
+		angle = ang;
 	}
 
 	// Called just before this Command runs the first time
 	@Override
 	protected void initialize() {
-		Robot.arm.disableLimitSwitches(true);
+		//Backup values set on 3-12 to be good enough for 90 and 180 degree turns
+		kP = Robot.prefs.getNumber("D: IPT P", 0.014);
+		kD = Robot.prefs.getNumber("D: IPT D", 0.027);
+		Robot.drive.zeroSensors();
 	}
 
 	// Called repeatedly when this Command is scheduled to run
 	@Override
 	protected void execute() {
-			Robot.arm.setOpenLoop(OI.operatorController.leftStick.getY() * -.75);
+		double throttle = -1* Robot.drive.getTurnThrottlePID(angle,
+				kP, kD);
+		Robot.drive.difDrive.curvatureDrive(0, throttle, true);
+		Drivetrain.printDebug("Turn In Place Throttle: " + throttle);
+		Drivetrain.printDebug("Turn Error: " + Robot.drive.error);
 	}
 
 	// Make this return true when this Command no longer needs to run execute()
 	@Override
 	protected boolean isFinished() {
-		return false;
+		return Util.closeTo((double)Robot.drive.getHeading(), angle, 0.5);
 	}
 
 	// Called once after isFinished returns true
 	@Override
 	protected void end() {
-		Robot.arm.disableLimitSwitches(false);
-		Robot.arm.setOpenLoop(0);
 	}
 
 	// Called when another command which requires one or more of the same
 	// subsystems is scheduled to run
 	@Override
 	protected void interrupted() {
-		end();
 	}
 }

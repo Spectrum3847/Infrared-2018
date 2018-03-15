@@ -2,6 +2,7 @@ package org.spectrum3847.robot;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.command.Scheduler;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 
 /**
@@ -26,6 +27,11 @@ public class Teleop {
 
     public static void periodic() {
         Scheduler.getInstance().run();
+		if (SmartDashboard.getBoolean("Compressor ENABLE", true)) {
+			Robot.compressor.start();
+		} else {
+			Robot.compressor.stop();
+		}
         //Robot.logger.logAll();
     }
 

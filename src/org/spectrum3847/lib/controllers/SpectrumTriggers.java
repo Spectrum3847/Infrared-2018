@@ -21,6 +21,6 @@ public class SpectrumTriggers {
 	}
 	
 	public double getTwist() {
-		return getLeft() * - getRight();
+		return - getLeft() + getRight();
 	}
 }

@@ -12,19 +12,16 @@ import org.spectrum3847.robot.Robot;
 
 public class ShootPuncher extends Command {
 	
-	private double shotTime;
-	
-	public ShootPuncher(double time) {
+	public ShootPuncher() {
 		// Use requires() here to declare subsystem dependencies
 		requires(Robot.puncher);
 		requires(Robot.intake);
-		shotTime = time;
 	}
 
 	// Called just before this Command runs the first time
 	@Override
 	protected void initialize() {
-		this.setTimeout(shotTime);
+		this.setTimeout(1);
 		Robot.intake.solOpen();
 		Robot.puncher.puncherFullExtend();
 		

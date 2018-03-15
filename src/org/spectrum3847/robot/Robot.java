@@ -73,11 +73,14 @@ public class Robot extends TimedRobot {
     	
     	compressor = new Compressor(0);
     	
+
+    	intake = new Intake();
+    	
+    	//Intake must be declared before Drivetrain cause Pigeon is plugged into Intake
     	drive = new Drivetrain();
     	
     	arm = new Arm();
     	extension = new Extension();
-    	intake = new Intake();
     	puncher = new Puncher();
     	hook = new Hook();
     	
@@ -120,10 +123,6 @@ public class Robot extends TimedRobot {
 	//Add any code that needs to run in all states
 	public void robotPeriodic() {
 		Dashboard.updateDashboard();
-		NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight");
-		NetworkTableEntry tx = table.getEntry("tx");
-		double x = tx.getDouble(0);
-		SmartDashboard.putNumber("Limelight x", x);
 	}
 	
 	 /**

@@ -5,53 +5,54 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-package org.spectrum3847.robot.commands.arm;
+package org.spectrum3847.robot.commands.puncher;
 
 import edu.wpi.first.wpilibj.command.Command;
-
-import org.spectrum3847.lib.controllers.SpectrumThumbStick;
-import org.spectrum3847.lib.controllers.SpectrumXboxController;
-import org.spectrum3847.robot.OI;
 import org.spectrum3847.robot.Robot;
 
-/**
- * An example command.  You can replace me with your own command.
- */
-public class ArmManualControl extends Command {
-	public ArmManualControl() {
+public class HalfPuncher extends Command {
+	
+	private double shotTime;
+	
+	public HalfPuncher(double time) {
 		// Use requires() here to declare subsystem dependencies
-		requires(Robot.arm);
+		requires(Robot.puncher);
+		requires(Robot.intake);
+		shotTime = time;
 	}
 
 	// Called just before this Command runs the first time
 	@Override
 	protected void initialize() {
-		Robot.arm.disableLimitSwitches(true);
+		this.setTimeout(shotTime);
+		Robot.intake.solOpen();
+		Robot.puncher.puncherFullExtend();
+		
 	}
 
 	// Called repeatedly when this Command is scheduled to run
 	@Override
 	protected void execute() {
-			Robot.arm.setOpenLoop(OI.operatorController.leftStick.getY() * -.75);
 	}
 
 	// Make this return true when this Command no longer needs to run execute()
 	@Override
 	protected boolean isFinished() {
-		return false;
+		return isTimedOut();
 	}
 
 	// Called once after isFinished returns true
 	@Override
 	protected void end() {
-		Robot.arm.disableLimitSwitches(false);
-		Robot.arm.setOpenLoop(0);
+		Robot.puncher.puncherSolRetract();
+		Robot.intake.solClose();
 	}
 
 	// Called when another command which requires one or more of the same
 	// subsystems is scheduled to run
 	@Override
 	protected void interrupted() {
-		end();
+		this.end();
 	}
+	
 }

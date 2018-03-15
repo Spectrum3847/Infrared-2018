@@ -83,7 +83,9 @@ public class Util {
 		return (Robot.s_robot_state == Robot.RobotState.DISABLED && RobotController.getInputVoltage() < HW.MIN_BATTERY_VOLTAGE);
 	}
 
-
+    public static boolean closeTo(double a, double b, double epsilon) {
+        return epsilonEquals(a,b,epsilon);
+    }
     public static boolean epsilonEquals(double a, double b, double epsilon) {
         return (a - epsilon <= b) && (a + epsilon >= b);
     }
@@ -128,6 +130,10 @@ public class Util {
 		}
     	
     	return max;
+    }
+    
+    public static double powKeepSign(double v, double p) {
+    	return Math.signum(v)*Math.abs(Math.pow(v, p));
     }
 
 }

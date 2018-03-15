@@ -28,14 +28,14 @@ public class Dashboard {
     	if(ENABLE_DASHBOARD){
     		SmartDashboard.putBoolean("Auto/ENABLED", true);
     		SmartDashboard.putBoolean("Compressor ENABLE", true);
-    		
     	}
     }
 
     private static void updatePutShort() {
     	Robot.drive.dashboard();
-    	//Robot.arm.dashboard();
-    	//Robot.extension.dashboard();
+    	Robot.drive.imuDashboard();
+    	Robot.arm.dashboard();
+    	Robot.extension.dashboard();
     	Robot.intake.dashboard();
     }
 

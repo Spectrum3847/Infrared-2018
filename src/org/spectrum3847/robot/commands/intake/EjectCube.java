@@ -5,41 +5,29 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-package org.spectrum3847.robot.commands;
+package org.spectrum3847.robot.commands.intake;
 
 import edu.wpi.first.wpilibj.command.Command;
 import org.spectrum3847.robot.Robot;
-import org.spectrum3847.robot.subsystems.Arm;
+import org.spectrum3847.robot.subsystems.Intake;
 
-/**
- * An example command.  You can replace me with your own command.
- */
-public class SetArmPos extends Command {
-	Arm.Position pos;
-	public SetArmPos(Arm.Position p) {
-		// Use requires() here to declare subsystem dependencies
-		requires(Robot.arm);
-		requires(Robot.extension);
-		pos = p;
+
+public class EjectCube extends Command {
+	
+	public EjectCube() {
+		requires(Robot.intake);
 	}
 
 	// Called just before this Command runs the first time
 	@Override
 	protected void initialize() {
-		if (!Robot.extension.getRevLimitSW() || pos == Arm.Position.FwdHighScore || pos == Arm.Position.CENTER || pos == Arm.Position.RevHighScore) {
-			Robot.extension.setTargetPosition(0);
-		} else {
-			Robot.arm.setPos(pos);
-		}
 		
-		if (pos == Arm.Position.FwdHighScore || pos == Arm.Position.RevHighScore) {
-			Robot.extension.setTargetPosition(Robot.extension.getHighScorePos());
-		}
 	}
 
 	// Called repeatedly when this Command is scheduled to run
 	@Override
 	protected void execute() {
+		Robot.intake.setOpenLoop(-1);
 	}
 
 	// Make this return true when this Command no longer needs to run execute()
@@ -51,11 +39,13 @@ public class SetArmPos extends Command {
 	// Called once after isFinished returns true
 	@Override
 	protected void end() {
+		Robot.intake.setOpenLoop(0);
 	}
 
 	// Called when another command which requires one or more of the same
 	// subsystems is scheduled to run
 	@Override
 	protected void interrupted() {
+		this.end();
 	}
 }

@@ -8,6 +8,7 @@
 package org.spectrum3847.robot.subsystems;
 
 import org.spectrum3847.lib.drivers.SpectrumTalonSRX;
+import org.spectrum3847.lib.util.Debugger;
 import org.spectrum3847.lib.drivers.LeaderTalonSRX;
 import org.spectrum3847.lib.drivers.SRXGains;
 import org.spectrum3847.robot.HW;
@@ -22,6 +23,7 @@ import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.LimitSwitchNormal;
 import com.ctre.phoenix.motorcontrol.LimitSwitchSource;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.ctre.phoenix.motorcontrol.StatusFrame;
 import com.ctre.phoenix.motorcontrol.StatusFrameEnhanced;
 
 import edu.wpi.first.wpilibj.command.Subsystem;
@@ -35,7 +37,7 @@ public class Arm extends Subsystem {
 	public final static int ARM_UP = 0;
 	public final static int ARM_DOWN = 1;
 	
-	public final static int fwdPositionLimit = 54200;// needs to be determined manually
+	public final static int fwdPositionLimit = 54100;// needs to be determined manually
 	public final static int revPositionLimit = 0;
 	
 	public SpectrumTalonSRX armBottomSRX = new SpectrumTalonSRX(HW.ARM_BOTTOM);
@@ -44,15 +46,21 @@ public class Arm extends Subsystem {
 	private int accel = 0;
 	private int cruiseVel = 0;
 	
-	public int posFwdIntake = fwdPositionLimit;
-	public int posFwdPortal = fwdPositionLimit -7500;
-	public int posFwdScore = fwdPositionLimit * 2/3;
-	public int posFwdExtensionLimit = posFwdScore;
-	public int posCenterUp = fwdPositionLimit/2;
-	public int posRevScore = fwdPositionLimit * 1/3;
-	public int posRevExtensionLimit = posRevScore;
-	public int posRevPortal = 7500;
+
 	public int posRevIntake = 0;
+	public int posRevExchange = 4000;
+	public int posRevPortal = 9000;
+	public int posRevScore = 22000;
+	public int posRevExtensionLimit = 22000;
+	public int posRevHighScore = 25000;
+	public int posCenterUp = fwdPositionLimit/2;
+	public int posFwdHighScore = fwdPositionLimit - posRevHighScore;
+	public int posFwdExtensionLimit = fwdPositionLimit - posRevExtensionLimit;
+	public int posFwdScore = fwdPositionLimit - posRevScore;
+	public int posFwdPortal = fwdPositionLimit - posRevPortal;
+	public int posFwdExchange = fwdPositionLimit - posRevExchange;
+	public int posFwdIntake = fwdPositionLimit;
+
 	
 	private final SRXGains upGains = new SRXGains(ARM_UP, 0.560, 0.0, 5.600, 0.620, 100);
 	private final SRXGains downGains = new SRXGains(ARM_DOWN, 0.0, 0.0, 0.0, 0.427, 0);
@@ -60,7 +68,7 @@ public class Arm extends Subsystem {
 	private int targetPosition = 0;
 	
 	public enum Position {
-		FwdIntake, FwdPortal, FwdScore, FwdHighScore, CENTER, CenterClimb, RevHighScore, RevScore, RevPortal, RevIntake
+		FwdIntake, FwdExchange, FwdPortal, FwdScore, FwdHighScore, CENTER, CenterClimb, RevHighScore, RevScore, RevPortal, RevExchange, RevIntake
 	}
 	
 	public Arm() {
@@ -87,6 +95,7 @@ public class Arm extends Subsystem {
     	armSRX.enableCurrentLimit(true);
     	armSRX.setStatusFramePeriod(StatusFrameEnhanced.Status_13_Base_PIDF0, 10);
     	armSRX.setStatusFramePeriod(StatusFrameEnhanced.Status_10_MotionMagic, 10);
+		armSRX.setStatusFramePeriod(StatusFrame.Status_2_Feedback0, 5, 0);
     		
     	armSRX.configForwardSoftLimitEnable(true);
     	armSRX.configForwardSoftLimitThreshold(fwdPositionLimit);
@@ -94,7 +103,7 @@ public class Arm extends Subsystem {
     	armSRX.configReverseSoftLimitEnable(true);
     	armSRX.configReverseSoftLimitThreshold(revPositionLimit);
     	//Clear Arm Position on Reverse Limit Switch
-    	armSRX.configSetParameter(ParamEnum.eClearPositionOnLimitR, 1, 0, 0, 10);
+    	armSRX.configSetParameter(ParamEnum.eClearPositionOnLimitR, 1, 0, 0, 0);
     	
     	armBottomSRX.setFollowerFramePeriods();
 	}
@@ -114,20 +123,23 @@ public class Arm extends Subsystem {
 		}
 	}
 	
-	public void setPos(Arm.Position pos) {
+	public void setPos(Arm.Position pos, Boolean reverse) {
 		int p = 0;
 		switch(pos) {
 			case FwdIntake:
 				p = Robot.arm.posFwdIntake;
 				break;
+			case FwdExchange:
+				p = Robot.arm.posFwdExchange;
+				break;
 			case FwdPortal:
 				p = Robot.arm.posFwdPortal;
 				break;
 			case FwdScore:
-				p = Robot.arm.posFwdPortal;
+				p = Robot.arm.posFwdScore;
 				break;
 			case FwdHighScore:
-				p = Robot.arm.posFwdExtensionLimit;
+				p = Robot.arm.posFwdHighScore;
 				break;
 			case CENTER:
 				p = Robot.arm.posCenterUp;
@@ -136,19 +148,27 @@ public class Arm extends Subsystem {
 				p = Robot.arm.posCenterUp;
 				break;
 			case RevHighScore:
-				p = Robot.arm.posRevExtensionLimit;
+				p = Robot.arm.posRevHighScore;
 				break;
 			case RevScore:
-				p = Robot.arm.posRevPortal;
+				p = Robot.arm.posRevScore;
 				break;
 			case RevPortal:
 				p = Robot.arm.posRevPortal;
+				break;
+			case RevExchange:
+				p = Robot.arm.posRevExchange;
 				break;
 			case RevIntake:
 				p = Robot.arm.posRevIntake;
 				break;
 		}
-		setTargetPosition(p);
+		if (!reverse) {
+			setTargetPosition(fwdPositionLimit - p);
+		} else {
+			setTargetPosition(p);
+		}
+		
 	}
 	
 	public void getPrefsGains() {
@@ -192,7 +212,7 @@ public class Arm extends Subsystem {
     }
 	
 	public double getOutput() {
-		return armSRX.get();
+		return armSRX.getMotorOutputVoltage();
 	}
 	
 	public int getTargetPosition() {
@@ -235,12 +255,16 @@ public class Arm extends Subsystem {
 	
 	public boolean canExtend() {
 		int pos = getCurrentPosition();
-		if (pos < Robot.prefs.getNumber("A: Fwd Extension Bound", fwdPositionLimit/2 + fwdPositionLimit/5) &&
-				pos > Robot.prefs.getNumber("A: Rev Extension Bound", fwdPositionLimit/2 - fwdPositionLimit/5)) {
+		if (pos < this.posFwdExtensionLimit+2 &&
+				pos > this.posRevExtensionLimit-2) {
 			return true;
 		} else {
 			return false;
 		}
+	}
+	
+	public void disableLimitSwitches(boolean t) {
+		armSRX.overrideLimitSwitchesEnable(!t);
 	}
 	
 	public void motionMagicControl() {
@@ -297,6 +321,18 @@ public class Arm extends Subsystem {
 			SmartDashboard.putNumber("Arm Acitve Traj Position", -1);
 		}
 	}
+	
+    public static void printDebug(String msg){
+    	Debugger.println(msg, Robot._arm, Debugger.debug2);
+    }
+    
+    public static void printInfo(String msg){
+    	Debugger.println(msg, Robot._arm, Debugger.info3);
+    }
+    
+    public static void printWarning(String msg) {
+    	Debugger.println(msg, Robot._arm, Debugger.warning4);
+    }
 	
 	
 	
