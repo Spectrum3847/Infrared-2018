@@ -19,6 +19,7 @@ import org.json.simple.parser.ParseException;
 import org.spectrum3847.lib.drivers.SpectrumTalonSRX;
 import org.spectrum3847.lib.drivers.SrxMotionProfile;
 import org.spectrum3847.lib.drivers.SrxTrajectory;
+import org.spectrum3847.lib.util.Debugger;
 import org.spectrum3847.lib.util.SrxTrajectoryImporter;
 import org.spectrum3847.robot.Robot;
 
@@ -121,6 +122,7 @@ public class FollowTrajectory extends Command {
 	
 	// Called just before this Command runs the first time
 	protected void initialize() {
+		Debugger.println("Follow Traj");
 		this.hasPathStarted = false;
 		setUpTalon(rightTalon);
 		setUpTalon(leftTalon);

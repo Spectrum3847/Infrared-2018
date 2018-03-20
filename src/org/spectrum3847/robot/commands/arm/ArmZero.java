@@ -48,6 +48,7 @@ public class ArmZero extends Command {
 	protected void end() {
 		Robot.arm.setOpenLoop(0);
 		Robot.arm.armSRX.configReverseSoftLimitEnable(true);
+		Robot.arm.armSRX.setSelectedSensorPosition(0, 0); // Manually set it to zero
 	}
 
 	// Called when another command which requires one or more of the same

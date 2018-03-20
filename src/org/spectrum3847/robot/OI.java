@@ -23,6 +23,7 @@ import org.spectrum3847.robot.commands.extension.ExtensionZero;
 import org.spectrum3847.robot.commands.hook.ReadyClimb;
 import org.spectrum3847.robot.commands.intake.IntakeOn;
 import org.spectrum3847.robot.commands.intake.IntakeUntilCurrent;
+import org.spectrum3847.robot.commands.intake.OpenIntake;
 import org.spectrum3847.robot.commands.puncher.ShootPuncher;
 import org.spectrum3847.robot.subsystems.Arm;
 import org.spectrum3847.robot.commands.puncher.OperatorPuncher;
@@ -44,7 +45,11 @@ public class OI {
 		operatorController = new SpectrumXboxController(1, .10, .10);
 		
 		driverController.rightBumper.whileHeld(new HighGear());
-
+		
+		driverController.aButton.whileHeld(new OpenIntake());
+		driverController.leftTriggerButton.whileHeld(new IntakeUntilCurrent());
+		driverController.rightTriggerButton.whileHeld(new IntakeOn(-1));
+		
 		//Hold to force intake to continue past current limit, happens in IntakeUntilCurrent
 		operatorController.rightTriggerButton.toggleWhenPressed(new IntakeUntilCurrent());
 		

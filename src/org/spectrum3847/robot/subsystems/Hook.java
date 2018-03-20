@@ -22,11 +22,11 @@ public class Hook extends Subsystem {
 		// setDefaultCommand(new MySpecialCommand());
 	}
 	
-	public void hooksSolExtend() {
+	public void hooksExtend() {
 		hooksSol.set(true);
 	}
 	
-	public void hooksSolRetract() {
+	public void hooksRetract() {
 		hooksSol.set(false);
 	}
 	//Add the dashboard values for this subsystem

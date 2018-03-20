@@ -41,7 +41,8 @@ public class Intake extends Subsystem {
 	private static boolean intakeComplete;
 	
 	public Intake() {
-		intakeBottomSRX.setInverted(true);
+		intakeSRX.setInverted(true);
+		intakeBottomSRX.setInverted(false);
     	intakeSRX.configOpenloopRamp(0);
     	intakeSRX.configClosedloopRamp(0);
     	intakeSRX.setNeutralMode(NeutralMode.Brake);
