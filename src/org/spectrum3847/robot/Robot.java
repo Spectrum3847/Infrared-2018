@@ -51,7 +51,7 @@ public class Robot extends TimedRobot {
 	public static final String _hooks = "hooks";
 	public static final String _intake = "INTAKE";
 	
-	public static GameState gameState;
+	public static GameState gameState = new GameState("RRR");
 	
 	public static Compressor compressor;
 	

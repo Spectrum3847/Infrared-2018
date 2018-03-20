@@ -22,7 +22,6 @@ public class IntakeUntilCurrent extends Command {
 	public IntakeUntilCurrent() {
 		// Use requires() here to declare subsystem dependencies
 		requires(Robot.intake);
-		
 	}
 
 	// Called just before this Command runs the first time

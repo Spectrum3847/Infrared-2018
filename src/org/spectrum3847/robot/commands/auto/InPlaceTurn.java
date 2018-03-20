@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.command.Command;
 
 import java.util.Arrays;
 
+import org.spectrum3847.lib.util.Debugger;
 import org.spectrum3847.lib.util.Util;
 import org.spectrum3847.robot.Robot;
 import org.spectrum3847.robot.subsystems.Drivetrain;
@@ -38,6 +39,7 @@ public class InPlaceTurn extends Command {
 		kP = Robot.prefs.getNumber("D: IPT P", 0.014);
 		kD = Robot.prefs.getNumber("D: IPT D", 0.027);
 		Robot.drive.zeroSensors();
+		Debugger.println("In place Turn");
 	}
 
 	// Called repeatedly when this Command is scheduled to run

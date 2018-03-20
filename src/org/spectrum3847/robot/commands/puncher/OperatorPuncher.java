@@ -35,8 +35,9 @@ public class OperatorPuncher extends Command {
 		}
 		
 		//punch either half or full
-		if (trigger > .95) {
+		if (trigger > .90) {
 			Robot.puncher.puncherFullExtend();
+			Robot.intake.setOpenLoop(-1);
 		} else if (trigger > 0.1) {
 			Robot.puncher.puncherHalfExtend();
 		}

@@ -14,6 +14,7 @@ import org.spectrum3847.lib.drivers.SRXGains;
 import org.spectrum3847.robot.HW;
 import org.spectrum3847.robot.OI;
 import org.spectrum3847.robot.Robot;
+import org.spectrum3847.robot.Robot.RobotState;
 import org.spectrum3847.robot.commands.arm.ArmManualControl;
 import org.spectrum3847.robot.commands.arm.ArmMotionMagicHold;
 
@@ -37,7 +38,7 @@ public class Arm extends Subsystem {
 	public final static int ARM_UP = 0;
 	public final static int ARM_DOWN = 1;
 	
-	public final static int fwdPositionLimit = 54100;// needs to be determined manually
+	public final static int fwdPositionLimit = 55000;// needs to be determined manually
 	public final static int revPositionLimit = 0;
 	
 	public SpectrumTalonSRX armBottomSRX = new SpectrumTalonSRX(HW.ARM_BOTTOM);
@@ -48,9 +49,8 @@ public class Arm extends Subsystem {
 	
 
 	public int posRevIntake = 0;
-	public int posRevExchange = 4000;
-	public int posRevPortal = 9000;
-	public int posRevScore = 22000;
+	public int posRevPortal = 10000;
+	public int posRevScore = 23000;
 	public int posRevExtensionLimit = 22000;
 	public int posRevHighScore = 25000;
 	public int posCenterUp = fwdPositionLimit/2;
@@ -58,8 +58,7 @@ public class Arm extends Subsystem {
 	public int posFwdExtensionLimit = fwdPositionLimit - posRevExtensionLimit;
 	public int posFwdScore = fwdPositionLimit - posRevScore;
 	public int posFwdPortal = fwdPositionLimit - posRevPortal;
-	public int posFwdExchange = fwdPositionLimit - posRevExchange;
-	public int posFwdIntake = fwdPositionLimit;
+	public int posFwdIntake = fwdPositionLimit;;// - posRevExchange;//FwdIntake is the same as FwdExchange for now
 
 	
 	private final SRXGains upGains = new SRXGains(ARM_UP, 0.560, 0.0, 5.600, 0.620, 100);
@@ -68,7 +67,7 @@ public class Arm extends Subsystem {
 	private int targetPosition = 0;
 	
 	public enum Position {
-		FwdIntake, FwdExchange, FwdPortal, FwdScore, FwdHighScore, CENTER, CenterClimb, RevHighScore, RevScore, RevPortal, RevExchange, RevIntake
+		FwdIntake, FwdPortal, FwdScore, FwdHighScore, CENTER, CenterClimb, RevHighScore, RevScore, RevPortal, RevIntake
 	}
 	
 	public Arm() {
@@ -97,13 +96,13 @@ public class Arm extends Subsystem {
     	armSRX.setStatusFramePeriod(StatusFrameEnhanced.Status_10_MotionMagic, 10);
 		armSRX.setStatusFramePeriod(StatusFrame.Status_2_Feedback0, 5, 0);
     		
-    	armSRX.configForwardSoftLimitEnable(true);
+    	armSRX.configForwardSoftLimitEnable(false);
     	armSRX.configForwardSoftLimitThreshold(fwdPositionLimit);
     	
-    	armSRX.configReverseSoftLimitEnable(true);
+    	armSRX.configReverseSoftLimitEnable(false);
     	armSRX.configReverseSoftLimitThreshold(revPositionLimit);
     	//Clear Arm Position on Reverse Limit Switch
-    	armSRX.configSetParameter(ParamEnum.eClearPositionOnLimitR, 1, 0, 0, 0);
+    	armSRX.configSetParameter(ParamEnum.eClearPositionOnLimitR, 0, 0, 0, 0);
     	
     	armBottomSRX.setFollowerFramePeriods();
 	}
@@ -120,7 +119,7 @@ public class Arm extends Subsystem {
 			getPrefsGains();
 			armSRX.setGains(upGains);
 			armSRX.setGains(downGains);
-		}
+		} 
 	}
 	
 	public void setPos(Arm.Position pos, Boolean reverse) {
@@ -128,9 +127,6 @@ public class Arm extends Subsystem {
 		switch(pos) {
 			case FwdIntake:
 				p = Robot.arm.posFwdIntake;
-				break;
-			case FwdExchange:
-				p = Robot.arm.posFwdExchange;
 				break;
 			case FwdPortal:
 				p = Robot.arm.posFwdPortal;
@@ -155,9 +151,6 @@ public class Arm extends Subsystem {
 				break;
 			case RevPortal:
 				p = Robot.arm.posRevPortal;
-				break;
-			case RevExchange:
-				p = Robot.arm.posRevExchange;
 				break;
 			case RevIntake:
 				p = Robot.arm.posRevIntake;
@@ -312,6 +305,8 @@ public class Arm extends Subsystem {
 		SmartDashboard.putNumber("Arm/Current Total", armSRX.getOutputCurrent() + armBottomSRX.getOutputCurrent());	
 		SmartDashboard.putNumber("Arm/Controller Polar", OI.operatorController.leftStick.getDirectionDegrees());
 		SmartDashboard.putBoolean("Arm/Can Extend", canExtend());
+		SmartDashboard.putBoolean("Arm/Rev Limit SW", this.getRevLimitSW());
+		SmartDashboard.putBoolean("Arm/Fwd Limit SW", this.getFwdLimitSW());
 		
 		if (armSRX.getControlMode() == ControlMode.MotionMagic) {
 			SmartDashboard.putNumber("Arm Acitve Traj Veloctiy", armSRX.getActiveTrajectoryVelocity());

@@ -27,7 +27,7 @@ public class ExtensionZero extends Command {
 	// Called repeatedly when this Command is scheduled to run
 	@Override
 	protected void execute() {
-		Robot.extension.setOpenLoop( -.25);
+		Robot.extension.setOpenLoop(Robot.prefs.getNumber("E: Zero Speed", -.4));
 	}
 
 	// Make this return true when this Command no longer needs to run execute()

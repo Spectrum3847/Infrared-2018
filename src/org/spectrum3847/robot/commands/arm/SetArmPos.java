@@ -48,16 +48,12 @@ public class SetArmPos extends Command {
 			//Robot.extension.setTargetPosition(0);
 			new ExtensionZero().start();
 		} else {
-			/*Arm.printDebug("Setting Position: buttonReleased: " + buttonReleased);
-			if (Robot.arm.getRevLimitSW() && pos == Arm.Position.RevIntake && buttonReleased == true) {
-				pos = Arm.Position.RevExchange;
-			} else if (Robot.arm.getFwdLimitSW() && pos == Arm.Position.FwdIntake && buttonReleased == true){
-				pos = Arm.Position.FwdExchange;
-			}
-			buttonReleased = false;
-			*/
 			Robot.arm.setPos(pos, !OI.operatorController.leftBumper.get()); //Reverse based on he left bumper
 		}	
+		
+		if (pos != Arm.Position.CenterClimb) {
+			Robot.hook.hooksRetract();
+		}
 
 	}
 

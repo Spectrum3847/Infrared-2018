@@ -1,6 +1,7 @@
 package org.spectrum3847.robot;
 
 import org.spectrum3847.lib.drivers.GameState;
+import org.spectrum3847.lib.drivers.GameState.Side;
 import org.spectrum3847.lib.util.Debugger;
 import org.spectrum3847.paths.CrossTheLine;
 import org.spectrum3847.paths.FiveFeet;
@@ -13,6 +14,9 @@ import org.spectrum3847.robot.commands.auto.DriveForTime;
 import org.spectrum3847.robot.commands.auto.InPlaceTurn;
 import org.spectrum3847.robot.commands.auto.modes.CenterSWnoSensor;
 import org.spectrum3847.robot.commands.auto.modes.CenterSWpigeon;
+import org.spectrum3847.robot.commands.auto.modes.LeftSW;
+import org.spectrum3847.robot.commands.auto.modes.RightSW;
+import org.spectrum3847.robot.commands.auto.modes.StraightSW;
 import org.spectrum3847.robot.commands.drivetrain.TestVelocityMode;
 
 import edu.wpi.first.wpilibj.DriverStation;
@@ -28,6 +32,8 @@ public class Autonomous {
 	public static boolean isRight = false;
 	static Command AutonCommand = new CenterSWnoSensor();
 
+	public static GameState gameState = new GameState("RRR");
+	
 	public static void init() {
         Scheduler.getInstance().removeAll();
         Scheduler.getInstance().enable();
@@ -35,6 +41,7 @@ public class Autonomous {
 		Robot.gameState = new GameState(DriverStation.getInstance().getGameSpecificMessage());
 		selectAuto();
 		if (SmartDashboard.getBoolean("Autonomous ENABLED", true)) {
+			//AutonCommand = new CenterSWnoSensor();
 			AutonCommand.start();
 		}
 		Robot.compressor.stop();
@@ -55,8 +62,10 @@ public class Autonomous {
 
 	public static void selectAuto() {
 		if (AutoNumber != (int) Robot.prefs.getNumber("1A: AutoNumber", 1)
-				|| isRight != Robot.prefs.getBoolean("1A: On Right Side", false)) {
+				|| isRight != Robot.prefs.getBoolean("1A: On Right Side", false)
+				|| Autonomous.gameState != Robot.gameState) {
 			
+			Autonomous.gameState = Robot.gameState;
 			AutoNumber = (int) Robot.prefs.getNumber("1A: AutoNumber", 1);
 			isRight = Robot.prefs.getBoolean("1A: On Right Side", false);
 			switch (AutoNumber) {
@@ -82,6 +91,47 @@ public class Autonomous {
 				AutonCommand = new CenterSWpigeon();
 				break;
 			}
+			case (3): {
+				AutoName = "Left Straight or SW";
+				if(Robot.gameState.mySwitchSide == Side.LEFT) {
+					AutonCommand = new LeftSW();
+				} else {
+					AutonCommand = new DriveForTime(3,.6);
+				}
+				break;
+			}				
+			case (4): {
+				AutoName = "Right Straight or SW";
+				if(Robot.gameState.mySwitchSide == Side.RIGHT) {
+					AutonCommand = new RightSW();
+				} else {
+					AutonCommand = new DriveForTime(3,.6);
+				}
+				break;
+			}				
+			case (5): {
+				AutoName = "Left SW Straight";
+				if(Robot.gameState.mySwitchSide == Side.LEFT) {
+					AutonCommand = new StraightSW();
+				} else {
+					AutonCommand = new DriveForTime(3,.6);
+				}
+				break;
+			}	
+			case (6): {
+				AutoName = "Right SW Straight";
+				if(Robot.gameState.mySwitchSide == Side.RIGHT) {
+					AutonCommand = new StraightSW();
+				} else {
+					AutonCommand = new DriveForTime(3,.6);
+				}
+				break;
+			}	
+			case (10): {
+				AutoName = "Cross Line No Sensors";
+				AutonCommand = new DriveForTime(3,.6);
+				break;
+			}
 			case (11):{
 				AutoName = "Cross The Line";
 				AutonCommand = new FollowTrajectory(new CrossTheLine());
@@ -104,7 +154,7 @@ public class Autonomous {
 			}
 			case (97):{
 				AutoName = "Test Trajectory Follow";
-				AutonCommand = new FollowTrajectory(new TestSTurnAuto());
+				AutonCommand = new FollowTrajectory(new ThreeFeet());
 				break;
 			}
 			case (98): {
