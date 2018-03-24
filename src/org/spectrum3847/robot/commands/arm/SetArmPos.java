@@ -33,6 +33,7 @@ public class SetArmPos extends Command {
 	protected void initialize() {
 		Arm.printDebug("Set Arm Pos Running: " + pos.toString());
 		
+		
 		if (Robot.arm.canExtend() && (pos == Arm.Position.FwdHighScore || pos == Arm.Position.RevHighScore || pos == Arm.Position.CenterClimb)) {
 			Arm.printDebug("Setting Extension High");
 			Robot.extension.setTargetPosition(Robot.extension.getHighScorePos());
@@ -45,10 +46,15 @@ public class SetArmPos extends Command {
 				|| !(pos == Arm.Position.FwdHighScore || pos == Arm.Position.RevHighScore || pos == Arm.Position.CenterClimb))) {
 			
 			Arm.printDebug("Extension Setting to Zero");
-			//Robot.extension.setTargetPosition(0);
 			new ExtensionZero().start();
 		} else {
-			Robot.arm.setPos(pos, !OI.operatorController.leftBumper.get()); //Reverse based on he left bumper
+			boolean neg = OI.operatorController.leftBumper.get();
+			if (neg) {  //Reverse based on he left bumper
+				Robot.arm.setPos(Robot.arm.reversePos(pos));
+			} else {
+				Robot.arm.setPos(pos);
+			}
+			Arm.printDebug("Postion: " + Robot.arm.getCurrentPosName().toString());
 		}	
 		
 		if (pos != Arm.Position.CenterClimb) {

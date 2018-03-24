@@ -38,7 +38,7 @@ public class Arm extends Subsystem {
 	public final static int ARM_UP = 0;
 	public final static int ARM_DOWN = 1;
 	
-	public final static int fwdPositionLimit = 55000;// needs to be determined manually
+	public final static int fwdPositionLimit = 54500;// needs to be determined manually
 	public final static int revPositionLimit = 0;
 	
 	public SpectrumTalonSRX armBottomSRX = new SpectrumTalonSRX(HW.ARM_BOTTOM);
@@ -48,7 +48,8 @@ public class Arm extends Subsystem {
 	private int cruiseVel = 0;
 	
 
-	public int posRevIntake = 0;
+	public int posRevIntake = 1000;
+	public int posRevExchange = 2700;
 	public int posRevPortal = 10000;
 	public int posRevScore = 23000;
 	public int posRevExtensionLimit = 22000;
@@ -58,7 +59,8 @@ public class Arm extends Subsystem {
 	public int posFwdExtensionLimit = fwdPositionLimit - posRevExtensionLimit;
 	public int posFwdScore = fwdPositionLimit - posRevScore;
 	public int posFwdPortal = fwdPositionLimit - posRevPortal;
-	public int posFwdIntake = fwdPositionLimit;;// - posRevExchange;//FwdIntake is the same as FwdExchange for now
+	public int posFwdExchange = fwdPositionLimit - posRevExchange;
+	public int posFwdIntake = fwdPositionLimit - posRevIntake;// - posRevExchange;//FwdIntake is the same as FwdExchange for now
 
 	
 	private final SRXGains upGains = new SRXGains(ARM_UP, 0.560, 0.0, 5.600, 0.620, 100);
@@ -67,8 +69,10 @@ public class Arm extends Subsystem {
 	private int targetPosition = 0;
 	
 	public enum Position {
-		FwdIntake, FwdPortal, FwdScore, FwdHighScore, CENTER, CenterClimb, RevHighScore, RevScore, RevPortal, RevIntake
+		FwdIntake, FwdExchange, FwdPortal, FwdScore, FwdHighScore, CENTER, CenterClimb, RevHighScore, RevScore, RevPortal, RevExchange, RevIntake, NotZeroed
 	}
+	
+	public Position pos = Position.NotZeroed;
 	
 	public Arm() {
 		super("Arm");
@@ -84,13 +88,13 @@ public class Arm extends Subsystem {
     	armSRX.configReverseLimitSwitchSource(LimitSwitchSource.FeedbackConnector, LimitSwitchNormal.NormallyOpen);
     	armSRX.configNominalOutputForward(0);
     	armSRX.configNominalOutputReverse(0);
-    	armSRX.configPeakOutputForward(Robot.prefs.getNumber("E: Peak Output Forward Percent", 0.8));
-    	armSRX.configPeakOutputReverse(Robot.prefs.getNumber("E: Peak Output Reverse Percent", -0.8));
-    	armSRX.configVoltageCompSaturation(Robot.prefs.getNumber("E: Voltage Comp", 12));
+    	armSRX.configPeakOutputForward(1);
+    	armSRX.configPeakOutputReverse(-1);
+    	armSRX.configVoltageCompSaturation(12);
     	armSRX.enableVoltageCompensation(true);
-    	armSRX.configContinuousCurrentLimit((int)Robot.prefs.getNumber("E: Current Limit", 8.0));
-    	armSRX.configPeakCurrentLimit((int)Robot.prefs.getNumber("E: Current Peak Limit", 10.0));
-    	armSRX.configPeakCurrentDuration((int)Robot.prefs.getNumber("E: Current Peak Durration(ms)", 500));
+    	armSRX.configContinuousCurrentLimit(20);
+    	armSRX.configPeakCurrentLimit(20);
+    	armSRX.configPeakCurrentDuration(500);
     	armSRX.enableCurrentLimit(true);
     	armSRX.setStatusFramePeriod(StatusFrameEnhanced.Status_13_Base_PIDF0, 10);
     	armSRX.setStatusFramePeriod(StatusFrameEnhanced.Status_10_MotionMagic, 10);
@@ -101,7 +105,8 @@ public class Arm extends Subsystem {
     	
     	armSRX.configReverseSoftLimitEnable(false);
     	armSRX.configReverseSoftLimitThreshold(revPositionLimit);
-    	//Clear Arm Position on Reverse Limit Switch
+    	
+    	//Don't Clear Arm Position on Reverse Limit Switch
     	armSRX.configSetParameter(ParamEnum.eClearPositionOnLimitR, 0, 0, 0, 0);
     	
     	armBottomSRX.setFollowerFramePeriods();
@@ -115,6 +120,7 @@ public class Arm extends Subsystem {
 	
 	public void periodic() {
 		if (Robot.prefs.getBoolean("A: Set Gains", false)) {
+			Arm.printDebug("Setting Arm Gains");
 			setMotionMagicValues((int)Robot.prefs.getNumber("A: MM Accel", 5000), (int)Robot.prefs.getNumber("A: MM CruiseVel", 2000));
 			getPrefsGains();
 			armSRX.setGains(upGains);
@@ -122,11 +128,14 @@ public class Arm extends Subsystem {
 		} 
 	}
 	
-	public void setPos(Arm.Position pos, Boolean reverse) {
+	public void setPos(Arm.Position pos) {
 		int p = 0;
 		switch(pos) {
 			case FwdIntake:
 				p = Robot.arm.posFwdIntake;
+				break;
+			case FwdExchange:
+				p = Robot.arm.posFwdExchange;
 				break;
 			case FwdPortal:
 				p = Robot.arm.posFwdPortal;
@@ -152,18 +161,70 @@ public class Arm extends Subsystem {
 			case RevPortal:
 				p = Robot.arm.posRevPortal;
 				break;
+			case RevExchange:
+				p = Robot.arm.posRevExchange;
+				break;
 			case RevIntake:
 				p = Robot.arm.posRevIntake;
 				break;
+			case NotZeroed:
+				p = this.getCurrentPosition();
+				break;
 		}
-		if (!reverse) {
-			setTargetPosition(fwdPositionLimit - p);
-		} else {
-			setTargetPosition(p);
-		}
+		this.pos = pos;
+		setTargetPosition(p);
 		
 	}
 	
+	public Position reversePos(Position pos) {
+		Position p = Position.RevIntake;
+		switch(pos) {
+		case FwdIntake:
+			p = Position.RevIntake;
+			break;
+		case FwdExchange:
+			p = Position.RevExchange;
+			break;
+		case FwdPortal:
+			p = Position.RevPortal;
+			break;
+		case FwdScore:
+			p = Position.RevScore;
+			break;
+		case FwdHighScore:
+			p = Position.RevHighScore;
+			break;
+		case CENTER:
+			p = Position.CENTER;
+			break;
+		case CenterClimb:
+			p = Position.CenterClimb;
+			break;
+		case RevHighScore:
+			p = Position.FwdHighScore;
+			break;
+		case RevScore:
+			p = Position.FwdScore;
+			break;
+		case RevPortal:
+			p = Position.FwdPortal;
+			break;
+		case RevExchange:
+			p = Position.FwdExchange;
+			break;
+		case RevIntake:
+			p = Position.FwdIntake;
+			break;
+		case NotZeroed:
+			p = Position.NotZeroed;
+			break;
+		}
+		return p;
+	}
+	
+	public Position getCurrentPosName() {
+		return pos;
+	}
 	public void getPrefsGains() {
 		upGains.setGains(ARM_UP,
 		Robot.prefs.getNumber("A: up P", 0.0),
@@ -243,7 +304,12 @@ public class Arm extends Subsystem {
 	}
 	
 	public void setTargetToCurrentPosition() {
-		setTargetPosition(getCurrentPosition());
+		int currentPosition = getCurrentPosition();
+		if (currentPosition < 0) {
+			currentPosition = 0;
+			this.armSRX.setSelectedSensorPosition(0,0);
+		}
+		setTargetPosition(currentPosition);
 	}
 	
 	public boolean canExtend() {
@@ -272,6 +338,8 @@ public class Arm extends Subsystem {
 			cruiseVel = cruiseVelocity;
 			armSRX.configMotionAcceleration(accel);
 			armSRX.configMotionCruiseVelocity(cruiseVel);
+			Arm.printDebug("MM Accerlation Set:" + accel);
+			Arm.printDebug("MM Velocity Set:" + cruiseVel);
 		}
 	}
 	

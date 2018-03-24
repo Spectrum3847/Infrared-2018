@@ -7,29 +7,25 @@
 
 package org.spectrum3847.robot;
 
+import org.spectrum3847.lib.controllers.SpectrumAxisButton;
+import org.spectrum3847.lib.controllers.SpectrumAxisButton.ThresholdType;
 import org.spectrum3847.lib.controllers.SpectrumXboxController;
 import org.spectrum3847.robot.commands.arm.ArmManualControl;
-import org.spectrum3847.robot.commands.arm.ArmMotionMagicAngle;
-import org.spectrum3847.robot.commands.arm.ArmMotionMagicPos;
-import org.spectrum3847.robot.commands.arm.ArmMotionMagicPref;
 import org.spectrum3847.robot.commands.arm.ArmZero;
+import org.spectrum3847.robot.commands.arm.SetArmExchangePos;
 import org.spectrum3847.robot.commands.arm.SetArmPos;
 import org.spectrum3847.robot.commands.drivetrain.HighGear;
 import org.spectrum3847.robot.commands.extension.ExtensionClimb;
 import org.spectrum3847.robot.commands.extension.ExtensionManualControl;
-import org.spectrum3847.robot.commands.extension.ExtensionMotionMagicHold;
-import org.spectrum3847.robot.commands.extension.ExtensionMotionMagicPref;
 import org.spectrum3847.robot.commands.extension.ExtensionZero;
 import org.spectrum3847.robot.commands.hook.ReadyClimb;
 import org.spectrum3847.robot.commands.intake.IntakeOn;
 import org.spectrum3847.robot.commands.intake.IntakeUntilCurrent;
 import org.spectrum3847.robot.commands.intake.OpenIntake;
+import org.spectrum3847.robot.commands.puncher.HalfPuncher;
+import org.spectrum3847.robot.commands.puncher.OperatorPuncher;
 import org.spectrum3847.robot.commands.puncher.ShootPuncher;
 import org.spectrum3847.robot.subsystems.Arm;
-import org.spectrum3847.robot.commands.puncher.OperatorPuncher;
-
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.MatchType;
 /**
  * This class is the glue that binds the controls on the physical operator
  * interface to the commands and command groups that allow control of the robot.
@@ -45,6 +41,7 @@ public class OI {
 		operatorController = new SpectrumXboxController(1, .10, .10);
 		
 		driverController.rightBumper.whileHeld(new HighGear());
+		driverController.leftBumper.whileHeld(new SetArmExchangePos());
 		
 		driverController.aButton.whileHeld(new OpenIntake());
 		driverController.leftTriggerButton.whileHeld(new IntakeUntilCurrent());
@@ -63,7 +60,10 @@ public class OI {
 		operatorController.yButton.whileHeld(new SetArmPos(Arm.Position.FwdHighScore));
 		operatorController.startButton.whenPressed(new ArmZero());
 		operatorController.leftStickButton.toggleWhenPressed(new ArmManualControl());
-
+		new SpectrumAxisButton(OI.operatorController, SpectrumXboxController.XboxAxis.LEFT_Y, .97, ThresholdType.GREATER_THAN).whenPressed(
+				new ShootPuncher());
+		new SpectrumAxisButton(OI.operatorController, SpectrumXboxController.XboxAxis.LEFT_Y, -.97, ThresholdType.LESS_THAN).whenPressed(
+				new HalfPuncher());
 		operatorController.selectButton.whenPressed(new ExtensionZero());
 		operatorController.Dpad.Up.toggleWhenPressed(new ReadyClimb());
 		operatorController.Dpad.Down.whileHeld(new ExtensionClimb());

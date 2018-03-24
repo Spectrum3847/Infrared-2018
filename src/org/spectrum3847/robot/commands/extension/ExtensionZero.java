@@ -6,6 +6,7 @@ import org.spectrum3847.lib.controllers.SpectrumThumbStick;
 import org.spectrum3847.lib.controllers.SpectrumXboxController;
 import org.spectrum3847.robot.OI;
 import org.spectrum3847.robot.Robot;
+import org.spectrum3847.robot.subsystems.Arm;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 
@@ -21,22 +22,20 @@ public class ExtensionZero extends Command {
 	// Called just before this Command runs the first time
 	@Override
 	protected void initialize() {
+		Arm.printDebug("Extension Zero");
 		Robot.extension.extensionSRX.configReverseSoftLimitEnable(false);
 	}
 
 	// Called repeatedly when this Command is scheduled to run
 	@Override
 	protected void execute() {
-		Robot.extension.setOpenLoop(Robot.prefs.getNumber("E: Zero Speed", -.4));
+		Robot.extension.setOpenLoop(-.7);
+		Arm.printDebug("Extension Output:" + Robot.extension.getOutput());
 	}
 
 	// Make this return true when this Command no longer needs to run execute()
 	@Override
 	protected boolean isFinished() {
-		//stop the command if the current gets too high
-		if (Robot.extension.getCurrent() > Robot.prefs.getNumber("E: Zero Current Limit", 20)) {
-			return true;
-		}
 		return Robot.extension.getRevLimitSW();
 	}
 

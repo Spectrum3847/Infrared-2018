@@ -65,13 +65,13 @@ public class Extension extends Subsystem {
     	extensionSRX.configReverseLimitSwitchSource(LimitSwitchSource.FeedbackConnector, LimitSwitchNormal.NormallyOpen);
     	extensionSRX.configNominalOutputForward(0);
     	extensionSRX.configNominalOutputReverse(0);
-    	extensionSRX.configPeakOutputForward(Robot.prefs.getNumber("E: Peak Output Forward Percent", 0.8));
-    	extensionSRX.configPeakOutputReverse(Robot.prefs.getNumber("E: Peak Output Reverse Percent", -0.8));
+    	extensionSRX.configPeakOutputForward(1);
+    	extensionSRX.configPeakOutputReverse(-1);
     	extensionSRX.configVoltageCompSaturation(Robot.prefs.getNumber("E: Voltage Comp", 12));
     	extensionSRX.enableVoltageCompensation(true);
-    	extensionSRX.configContinuousCurrentLimit((int)Robot.prefs.getNumber("E: Current Limit", 8.0));
-    	extensionSRX.configPeakCurrentLimit((int)Robot.prefs.getNumber("E: Current Peak Limit", 10.0));
-    	extensionSRX.configPeakCurrentDuration((int)Robot.prefs.getNumber("E: Current Peak Durration(ms)", 500));
+    	extensionSRX.configContinuousCurrentLimit(20);
+    	extensionSRX.configPeakCurrentLimit(30);
+    	extensionSRX.configPeakCurrentDuration(1000);
     	extensionSRX.enableCurrentLimit(true);
     	extensionSRX.setStatusFramePeriod(StatusFrameEnhanced.Status_13_Base_PIDF0, 10);
     	extensionSRX.setStatusFramePeriod(StatusFrameEnhanced.Status_10_MotionMagic, 10);
@@ -183,7 +183,7 @@ public class Extension extends Subsystem {
 	}
 	
 	public boolean isDown() {
-		return getCurrentPosition() < 40;
+		return getCurrentPosition() < 100;
 	}
 	
 	public void manageGainProfile(double targetPosition) {

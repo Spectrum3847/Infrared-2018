@@ -55,7 +55,7 @@ public class SpectrumDifferentialDrive extends DifferentialDrive {
 	            + m_quickStopAlpha * limit(zRotation) * 2;
 	      }
 	      overPower = true;
-	      angularPower = zRotation;
+	      angularPower = zRotation * 2/3;
 	    } else {
 	      overPower = false;
 	      angularPower = Math.abs(xSpeed) * zRotation - m_quickStopAccumulator;

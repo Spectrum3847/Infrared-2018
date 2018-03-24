@@ -37,6 +37,7 @@ public class Dashboard {
     	Robot.arm.dashboard();
     	Robot.extension.dashboard();
     	Robot.intake.dashboard();
+    	Robot.pneumatics.dashboard();
     }
 
     private static void updatePutLong(){

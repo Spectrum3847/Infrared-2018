@@ -62,7 +62,7 @@ public class SpectrumXboxController extends Joystick {
 		}
 	}
 	
-	static enum XboxAxis
+	public static enum XboxAxis
 	{
 			LEFT_X(0), LEFT_Y(1),
 			LEFT_TRIGGER(2), RIGHT_TRIGGER(3),
@@ -80,7 +80,7 @@ public class SpectrumXboxController extends Joystick {
 			}
 		}
 	
-	static enum XboxDpad
+	public static enum XboxDpad
 	{
 		UNPRESSED(-1), UP(0), UP_RIGHT(45),
 		RIGHT(90), DOWN_RIGHT(135), 

@@ -41,8 +41,8 @@ public class Intake extends Subsystem {
 	private static boolean intakeComplete;
 	
 	public Intake() {
-		intakeSRX.setInverted(true);
-		intakeBottomSRX.setInverted(false);
+		intakeSRX.setInverted(true); //practice bot true, comp true
+		intakeBottomSRX.setInverted(false); //Practice bot false, comp false;
     	intakeSRX.configOpenloopRamp(0);
     	intakeSRX.configClosedloopRamp(0);
     	intakeSRX.setNeutralMode(NeutralMode.Brake);

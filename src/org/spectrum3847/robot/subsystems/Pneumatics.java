@@ -7,7 +7,10 @@
 
 package org.spectrum3847.robot.subsystems;
 
+import org.spectrum3847.lib.drivers.PressureTransducer;
+
 import edu.wpi.first.wpilibj.command.Subsystem;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
  * An example subsystem.  You can replace me with your own Subsystem.
@@ -15,7 +18,14 @@ import edu.wpi.first.wpilibj.command.Subsystem;
 public class Pneumatics extends Subsystem {
 	// Put methods for controlling this subsystem
 	// here. Call these from Commands.
+	public PressureTransducer pressure;;
 
+	public Pneumatics() {
+		pressure = new PressureTransducer(0);
+	}
+	public void periodic() {
+		
+	}
 	public void initDefaultCommand() {
 		// Set the default command for a subsystem here.
 		// setDefaultCommand(new MySpecialCommand());
@@ -23,6 +33,8 @@ public class Pneumatics extends Subsystem {
 	
 	//Add the dashboard values for this subsystem
 	public void dashboard() {
+		SmartDashboard.putNumber("Pressure", pressure.getPressure());
+		SmartDashboard.putBoolean("Can Shoot", pressure.canShoot());
 	}
 	
 	

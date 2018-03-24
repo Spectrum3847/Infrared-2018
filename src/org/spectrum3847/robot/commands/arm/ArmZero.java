@@ -13,6 +13,7 @@ import org.spectrum3847.lib.controllers.SpectrumThumbStick;
 import org.spectrum3847.lib.controllers.SpectrumXboxController;
 import org.spectrum3847.robot.OI;
 import org.spectrum3847.robot.Robot;
+import org.spectrum3847.robot.subsystems.Arm.Position;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 
@@ -34,7 +35,7 @@ public class ArmZero extends Command {
 	// Called repeatedly when this Command is scheduled to run
 	@Override
 	protected void execute() {
-		Robot.arm.setOpenLoop( -.4);
+		Robot.arm.setOpenLoop( -.7);
 	}
 
 	// Make this return true when this Command no longer needs to run execute()
@@ -47,6 +48,7 @@ public class ArmZero extends Command {
 	@Override
 	protected void end() {
 		Robot.arm.setOpenLoop(0);
+		Robot.arm.pos = Position.RevIntake;
 		Robot.arm.armSRX.configReverseSoftLimitEnable(true);
 		Robot.arm.armSRX.setSelectedSensorPosition(0, 0); // Manually set it to zero
 	}

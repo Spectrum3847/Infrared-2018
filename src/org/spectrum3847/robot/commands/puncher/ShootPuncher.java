@@ -11,17 +11,25 @@ import edu.wpi.first.wpilibj.command.Command;
 import org.spectrum3847.robot.Robot;
 
 public class ShootPuncher extends Command {
+
+	private double shotTime;
 	
-	public ShootPuncher() {
+	public ShootPuncher(double time) {
 		// Use requires() here to declare subsystem dependencies
 		requires(Robot.puncher);
 		requires(Robot.intake);
+		shotTime = time;
+	}
+	
+	public ShootPuncher() {
+		// Use requires() here to declare subsystem dependencies
+		this(1);
 	}
 
 	// Called just before this Command runs the first time
 	@Override
 	protected void initialize() {
-		this.setTimeout(1);
+		this.setTimeout(shotTime);
 		Robot.intake.solOpen();
 		Robot.puncher.puncherFullExtend();
 		

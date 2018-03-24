@@ -2,15 +2,21 @@ package org.spectrum3847.lib.controllers;
 
 import org.spectrum3847.lib.controllers.SpectrumXboxController.XboxAxis;
 
+import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.buttons.Button;
 
 public class SpectrumAxisButton extends Button{
-		private final Joystick joy;
+		private final GenericHID joy;
 		private final int axis;
 		private double targetVal;
 		private ThresholdType thresholdType;
+		private double cel = 1.1;
+		
+	public static enum ThresholdType
+	{
+			LESS_THAN, GREATER_THAN, EXACT, POV;	
+	}
 
 	public SpectrumAxisButton(Joystick joystick, int axis, double threshold, ThresholdType thresholdType) {
 		this.joy = joystick;
@@ -22,7 +28,6 @@ public class SpectrumAxisButton extends Button{
 	public SpectrumAxisButton(Joystick joystick, XboxAxis axis, double threshold, ThresholdType thresholdType) {
 		this(joystick, axis.value, threshold, thresholdType);
 	}
-		
 	
 
 	public boolean get() {
@@ -41,9 +46,4 @@ public class SpectrumAxisButton extends Button{
 		}
 	}
 	
-	static enum ThresholdType
-	{
-			LESS_THAN, GREATER_THAN, EXACT, POV;	
-	}
-
 }

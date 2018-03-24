@@ -20,6 +20,10 @@ public class HalfPuncher extends Command {
 		requires(Robot.intake);
 		shotTime = time;
 	}
+	public HalfPuncher() {
+		// Set to 1 sec if left unset
+		this(1);
+	}
 
 	// Called just before this Command runs the first time
 	@Override

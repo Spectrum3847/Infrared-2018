@@ -16,6 +16,7 @@ import org.spectrum3847.robot.subsystems.Extension;
 import org.spectrum3847.robot.subsystems.Hook;
 import org.spectrum3847.robot.subsystems.Intake;
 import org.spectrum3847.robot.subsystems.LEDs;
+import org.spectrum3847.robot.subsystems.Pneumatics;
 import org.spectrum3847.robot.subsystems.Puncher;
 import org.spectrum3847.lib.drivers.GameState;
 
@@ -65,6 +66,7 @@ public class Robot extends TimedRobot {
 	public static Intake intake;
 	public static Puncher puncher;
 	public static Hook hook;
+	public static Pneumatics pneumatics;
 	
 	public static LEDs leds;
 	
@@ -88,6 +90,8 @@ public class Robot extends TimedRobot {
     	
     	//Pigeon setup has to happen after SRXs are configured
     	pigeon = new PigeonIMU(intake.intakeBottomSRX);
+    	
+    	pneumatics = new Pneumatics();
     }
 	
 	//Used to keep track of the robot current state easily
