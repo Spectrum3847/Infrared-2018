@@ -13,7 +13,7 @@ import org.spectrum3847.robot.Robot;
 
 
 public class LEDController extends Command {
-	public LEDController(String c, double seconds, boolean blink) {
+	/*public LEDController(String c, double seconds, boolean blink) {
 		requires(Robot.leds);
 		
 		Robot.leds.timeToDisplay = seconds;
@@ -34,7 +34,7 @@ public class LEDController extends Command {
 		
 		Robot.leds.currentColor = c;
 		Robot.leds.blinking = false;
-	}
+	}*/
 	
 	public LEDController() {
 		requires(Robot.leds);
@@ -69,7 +69,7 @@ public class LEDController extends Command {
 			//System.out.println("This time is: " + ((Timer.getFPGATimestamp() - Robot.leds.startTime) < Robot.leds.timeToDisplay));
 		}
 		else {
-			Robot.leds.currentColor = Robot.leds.defaultColor;
+			//Robot.leds.currentColor = Robot.leds.defaultColor;
 			Robot.leds.timeToDisplay = 0;
 			Robot.leds.displayColor();
 		}

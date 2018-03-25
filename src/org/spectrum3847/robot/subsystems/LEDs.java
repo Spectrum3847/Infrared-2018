@@ -18,13 +18,13 @@ public class LEDs extends Subsystem {
 	// Put methods for controlling this subsystem
 	// here. Call these from Commands.
 	I2C i2c;
-	byte[] tosend = new byte[1];
+	byte[] toSend = new byte[1];
 	
 	public double timeToDisplay = 0;
 	public double startTime = Timer.getFPGATimestamp();
 	public double blinkTime = 0;
-	public final String defaultColor = "violet";
-	public String currentColor = "purple";
+	public final String defaultColor = "default";
+	public String currentColor;
 	public boolean blinking = false;
 	
 	public LEDs() {
@@ -60,17 +60,24 @@ public class LEDs extends Subsystem {
 	
 	public void displayColor() {
 		switch(currentColor) {
-			case"purple":
-			case"white":
-			case"red":	
-			case"blue":
-			case"green":
+			case"purple": 
+				toSend[0] = 71;
+			case"red": 
+				toSend[0] = 72;
+			case"yellow": 
+				toSend[0] = 73;
+			case"green": 
+				toSend[0] = 74;
+			case"default": 
+				toSend[0] = 75;
 		}
+		i2c.transaction(toSend, 1, null, 0);
 	}
 	
 	public void off() {
-		
+			toSend[0] = 70;
 	}
+	
 	public void initDefaultCommand() {
 		// Set the default command for a subsystem here.
 		setDefaultCommand(new LEDController());
