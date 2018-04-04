@@ -29,6 +29,9 @@ public class ArmMotionMagicPos extends Command {
 	protected void initialize() {
 		Robot.arm.setTargetPosition(position);
 		Robot.arm.motionMagicControl();
+		if (Robot.arm.getRevLimitSW()) {
+			Robot.arm.armSRX.setSelectedSensorPosition(0, 0); // Manually set it to zero
+		}
 	}
 
 	// Called repeatedly when this Command is scheduled to run

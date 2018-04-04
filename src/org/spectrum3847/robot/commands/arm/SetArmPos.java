@@ -18,7 +18,6 @@ import org.spectrum3847.robot.subsystems.Arm;
  * An example command.  You can replace me with your own command.
  */
 public class SetArmPos extends Command {
-	private static boolean buttonReleased = false;
 	
 	Arm.Position pos;
 	public SetArmPos(Arm.Position p) {
@@ -31,7 +30,7 @@ public class SetArmPos extends Command {
 	// Called just before this Command runs the first time
 	@Override
 	protected void initialize() {
-		Arm.printDebug("Set Arm Pos Running: " + pos.toString());
+		Arm.printDebug("Set Arm Pos Running:");
 		
 		
 		if (Robot.arm.canExtend() && (pos == Arm.Position.FwdHighScore || pos == Arm.Position.RevHighScore || pos == Arm.Position.CenterClimb)) {
@@ -80,7 +79,6 @@ public class SetArmPos extends Command {
 	// Called once after isFinished returns true
 	@Override
 	protected void end() {
-		buttonReleased = true;
 	}
 
 	// Called when another command which requires one or more of the same

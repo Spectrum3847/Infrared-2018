@@ -17,7 +17,6 @@ public class HalfPuncher extends Command {
 	public HalfPuncher(double time) {
 		// Use requires() here to declare subsystem dependencies
 		requires(Robot.puncher);
-		requires(Robot.intake);
 		shotTime = time;
 	}
 	public HalfPuncher() {
@@ -29,8 +28,7 @@ public class HalfPuncher extends Command {
 	@Override
 	protected void initialize() {
 		this.setTimeout(shotTime);
-		Robot.intake.solOpen();
-		Robot.puncher.puncherFullExtend();
+		Robot.puncher.puncherHalfExtend();
 		
 	}
 
@@ -49,7 +47,6 @@ public class HalfPuncher extends Command {
 	@Override
 	protected void end() {
 		Robot.puncher.puncherSolRetract();
-		Robot.intake.solClose();
 	}
 
 	// Called when another command which requires one or more of the same

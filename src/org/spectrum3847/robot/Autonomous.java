@@ -6,6 +6,10 @@ import org.spectrum3847.lib.util.Debugger;
 import org.spectrum3847.paths.CrossTheLine;
 import org.spectrum3847.paths.FiveFeet;
 import org.spectrum3847.paths.FiveFeetAndTurn;
+import org.spectrum3847.paths.LeftEasySwitch;
+import org.spectrum3847.paths.LeftSideRightScale;
+import org.spectrum3847.paths.LeftSwitchCenter;
+import org.spectrum3847.paths.LeftSwitchCenter2;
 import org.spectrum3847.paths.TestSTurnAuto;
 import org.spectrum3847.paths.ThreeFeet;
 import org.spectrum3847.robot.commands.FollowTrajectory;
@@ -15,9 +19,14 @@ import org.spectrum3847.robot.commands.auto.InPlaceTurn;
 import org.spectrum3847.robot.commands.auto.modes.CenterSWnoSensor;
 import org.spectrum3847.robot.commands.auto.modes.CenterSWpigeon;
 import org.spectrum3847.robot.commands.auto.modes.LeftSW;
+import org.spectrum3847.robot.commands.auto.modes.LeftSWMultiCube;
+import org.spectrum3847.robot.commands.auto.modes.LeftScaleMode;
 import org.spectrum3847.robot.commands.auto.modes.RightSW;
 import org.spectrum3847.robot.commands.auto.modes.StraightSW;
 import org.spectrum3847.robot.commands.drivetrain.TestVelocityMode;
+import org.spectrum3847.robot.subsystems.Arm;
+
+import com.ctre.phoenix.motorcontrol.NeutralMode;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.command.Command;
@@ -38,6 +47,9 @@ public class Autonomous {
         Scheduler.getInstance().removeAll();
         Scheduler.getInstance().enable();
         Robot.drive.difDrive.setSafetyEnabled(false);
+    	Robot.drive.setNeutralMode(NeutralMode.Brake);
+    	Robot.arm.armSRX.setSelectedSensorPosition(Robot.arm.posCenterUp, 0);//Start Auto with the arm in FwdHighScore
+    	Robot.arm.setPos(Arm.Position.CENTER);
 		Robot.gameState = new GameState(DriverStation.getInstance().getGameSpecificMessage());
 		selectAuto();
 		if (SmartDashboard.getBoolean("Autonomous ENABLED", true)) {
@@ -136,9 +148,24 @@ public class Autonomous {
 				AutoName = "Cross The Line";
 				AutonCommand = new FollowTrajectory(new CrossTheLine());
 				break;
+			}				
+			case (88):{
+				AutoName = "Left Side Right Scale";
+				AutonCommand = new FollowTrajectory(new LeftSideRightScale());
+				break;
+			}		
+			case (89):{
+				AutoName = "Left Scale";
+				AutonCommand = new LeftScaleMode();
+				break;
+			}
+			case (90):{
+				AutoName = "Left Multi Cube Auto";
+				AutonCommand = new LeftSWMultiCube();
+				break;
 			}
 			case (94):{
-				AutoName = "90 Test IPT Turn Mode";
+				AutoName = "-90 Test IPT Turn Mode";
 				AutonCommand = new InPlaceTurn(-90);
 				break;
 			}
@@ -148,13 +175,13 @@ public class Autonomous {
 				break;
 			}
 			case (96):{
-				AutoName = "Test Velocity Mode";
-				AutonCommand = new TestVelocityMode();
+				AutoName = "Five Feet and Turn";
+				AutonCommand = new FollowTrajectory(new FiveFeetAndTurn());
 				break;
 			}
 			case (97):{
-				AutoName = "Test Trajectory Follow";
-				AutonCommand = new FollowTrajectory(new ThreeFeet());
+				AutoName = "Five Feet Straight";
+				AutonCommand = new FollowTrajectory(new FiveFeet());
 				break;
 			}
 			case (98): {

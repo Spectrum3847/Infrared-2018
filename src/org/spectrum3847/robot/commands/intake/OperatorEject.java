@@ -5,31 +5,36 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-package org.spectrum3847.robot.commands.puncher;
+package org.spectrum3847.robot.commands.intake;
 
 import edu.wpi.first.wpilibj.command.Command;
+
+import org.spectrum3847.robot.OI;
 import org.spectrum3847.robot.Robot;
 
-public class ShootPuncher extends Command {
-
-	private double shotTime;
+public class OperatorEject extends Command {
 	
-	public ShootPuncher(double time) {
+	public OperatorEject() {
 		// Use requires() here to declare subsystem dependencies
 		requires(Robot.puncher);
-		shotTime = time;
-	}
-	
-	public ShootPuncher() {
-		// Use requires() here to declare subsystem dependencies
-		this(1);
+		requires(Robot.intake);
+		//Make sure the command runs for at least two seconds
+		this.setTimeout(1);
 	}
 
 	// Called just before this Command runs the first time
 	@Override
 	protected void initialize() {
-		this.setTimeout(shotTime);
-		Robot.puncher.puncherFullExtend();
+		double trigger = OI.operatorController.triggers.getLeft();
+		
+		//If we aren't opening keep it close
+		if (trigger <= 0.1) {
+			Robot.intake.setOpenLoop(-0.6);
+		} else if (trigger > .95) {
+			Robot.intake.setOpenLoop(-1);
+		} else if (trigger > 0.1) {
+			Robot.intake.solOpen();
+		}
 		
 	}
 
@@ -41,13 +46,15 @@ public class ShootPuncher extends Command {
 	// Make this return true when this Command no longer needs to run execute()
 	@Override
 	protected boolean isFinished() {
-		return isTimedOut();
+		return isTimedOut() && !OI.operatorController.rightBumper.get();
 	}
 
 	// Called once after isFinished returns true
 	@Override
 	protected void end() {
 		Robot.puncher.puncherSolRetract();
+		Robot.intake.solClose();
+		Robot.intake.setOpenLoop(0);
 	}
 
 	// Called when another command which requires one or more of the same

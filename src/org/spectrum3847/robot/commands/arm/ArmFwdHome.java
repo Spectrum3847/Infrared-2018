@@ -5,56 +5,58 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-package org.spectrum3847.robot.commands.puncher;
+package org.spectrum3847.robot.commands.arm;
 
 import edu.wpi.first.wpilibj.command.Command;
+
+import org.spectrum3847.lib.controllers.SpectrumThumbStick;
+import org.spectrum3847.lib.controllers.SpectrumXboxController;
+import org.spectrum3847.robot.OI;
 import org.spectrum3847.robot.Robot;
+import org.spectrum3847.robot.subsystems.Arm.Position;
 
-public class ShootPuncher extends Command {
+import com.ctre.phoenix.motorcontrol.ControlMode;
 
-	private double shotTime;
-	
-	public ShootPuncher(double time) {
+/**
+ * An example command.  You can replace me with your own command.
+ */
+public class ArmFwdHome extends Command {
+	public ArmFwdHome() {
 		// Use requires() here to declare subsystem dependencies
-		requires(Robot.puncher);
-		shotTime = time;
-	}
-	
-	public ShootPuncher() {
-		// Use requires() here to declare subsystem dependencies
-		this(1);
+		requires(Robot.arm);
 	}
 
 	// Called just before this Command runs the first time
 	@Override
 	protected void initialize() {
-		this.setTimeout(shotTime);
-		Robot.puncher.puncherFullExtend();
-		
+		Robot.arm.armSRX.configForwardSoftLimitEnable(false);
 	}
 
 	// Called repeatedly when this Command is scheduled to run
 	@Override
 	protected void execute() {
+		Robot.arm.setOpenLoop( .7);
 	}
 
 	// Make this return true when this Command no longer needs to run execute()
 	@Override
 	protected boolean isFinished() {
-		return isTimedOut();
+		return Robot.arm.getFwdLimitSW();
 	}
 
 	// Called once after isFinished returns true
 	@Override
 	protected void end() {
-		Robot.puncher.puncherSolRetract();
+		Robot.arm.setOpenLoop(0);
+		Robot.arm.pos = Position.FwdIntake;
+		Robot.arm.armSRX.configForwardSoftLimitEnable(true);
+		Robot.arm.armSRX.setSelectedSensorPosition(Robot.arm.fwdPositionLimit, 0); // Manually set it to FwdLimit
 	}
 
 	// Called when another command which requires one or more of the same
 	// subsystems is scheduled to run
 	@Override
 	protected void interrupted() {
-		this.end();
+		end();
 	}
-	
 }

@@ -5,32 +5,23 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-package org.spectrum3847.robot.commands.puncher;
+package org.spectrum3847.robot.commands.intake;
 
 import edu.wpi.first.wpilibj.command.Command;
 import org.spectrum3847.robot.Robot;
+import org.spectrum3847.robot.subsystems.Intake;
 
-public class ShootPuncher extends Command {
 
-	private double shotTime;
+public class IntakeStop extends Command {
 	
-	public ShootPuncher(double time) {
-		// Use requires() here to declare subsystem dependencies
-		requires(Robot.puncher);
-		shotTime = time;
-	}
-	
-	public ShootPuncher() {
-		// Use requires() here to declare subsystem dependencies
-		this(1);
+	public IntakeStop() {
+		requires(Robot.intake);
 	}
 
 	// Called just before this Command runs the first time
 	@Override
 	protected void initialize() {
-		this.setTimeout(shotTime);
-		Robot.puncher.puncherFullExtend();
-		
+		Robot.intake.setOpenLoop(0);
 	}
 
 	// Called repeatedly when this Command is scheduled to run
@@ -41,13 +32,13 @@ public class ShootPuncher extends Command {
 	// Make this return true when this Command no longer needs to run execute()
 	@Override
 	protected boolean isFinished() {
-		return isTimedOut();
+		return true;
 	}
 
 	// Called once after isFinished returns true
 	@Override
 	protected void end() {
-		Robot.puncher.puncherSolRetract();
+		Robot.intake.setOpenLoop(0);
 	}
 
 	// Called when another command which requires one or more of the same
@@ -56,5 +47,4 @@ public class ShootPuncher extends Command {
 	protected void interrupted() {
 		this.end();
 	}
-	
 }

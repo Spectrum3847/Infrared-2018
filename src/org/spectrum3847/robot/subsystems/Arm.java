@@ -38,7 +38,7 @@ public class Arm extends Subsystem {
 	public final static int ARM_UP = 0;
 	public final static int ARM_DOWN = 1;
 	
-	public final static int fwdPositionLimit = 54500;// needs to be determined manually
+	public final static int fwdPositionLimit = 55400;// needs to be determined manually
 	public final static int revPositionLimit = 0;
 	
 	public SpectrumTalonSRX armBottomSRX = new SpectrumTalonSRX(HW.ARM_BOTTOM);
@@ -48,12 +48,12 @@ public class Arm extends Subsystem {
 	private int cruiseVel = 0;
 	
 
-	public int posRevIntake = 1000;
+	public int posRevIntake = 500;
 	public int posRevExchange = 2700;
-	public int posRevPortal = 10000;
-	public int posRevScore = 23000;
+	public int posRevPortal = 14000;
+	public int posRevScore = 24000;
 	public int posRevExtensionLimit = 22000;
-	public int posRevHighScore = 25000;
+	public int posRevHighScore = 24000;
 	public int posCenterUp = fwdPositionLimit/2;
 	public int posFwdHighScore = fwdPositionLimit - posRevHighScore;
 	public int posFwdExtensionLimit = fwdPositionLimit - posRevExtensionLimit;
@@ -61,6 +61,7 @@ public class Arm extends Subsystem {
 	public int posFwdPortal = fwdPositionLimit - posRevPortal;
 	public int posFwdExchange = fwdPositionLimit - posRevExchange;
 	public int posFwdIntake = fwdPositionLimit - posRevIntake;// - posRevExchange;//FwdIntake is the same as FwdExchange for now
+	public int pos2ndRowCube = fwdPositionLimit - 5000;
 
 	
 	private final SRXGains upGains = new SRXGains(ARM_UP, 0.560, 0.0, 5.600, 0.620, 100);

@@ -10,44 +10,40 @@ package org.spectrum3847.robot.commands.puncher;
 import edu.wpi.first.wpilibj.command.Command;
 import org.spectrum3847.robot.Robot;
 
-public class ShootPuncher extends Command {
+public class QuickPunch extends Command {
 
-	private double shotTime;
+	private double shotTime = 0;
 	
-	public ShootPuncher(double time) {
+	public QuickPunch() {
 		// Use requires() here to declare subsystem dependencies
 		requires(Robot.puncher);
-		shotTime = time;
-	}
-	
-	public ShootPuncher() {
-		// Use requires() here to declare subsystem dependencies
-		this(1);
 	}
 
 	// Called just before this Command runs the first time
 	@Override
 	protected void initialize() {
-		this.setTimeout(shotTime);
+		shotTime = 0;
 		Robot.puncher.puncherFullExtend();
-		
 	}
 
 	// Called repeatedly when this Command is scheduled to run
 	@Override
 	protected void execute() {
+		shotTime++;
 	}
 
 	// Make this return true when this Command no longer needs to run execute()
 	@Override
 	protected boolean isFinished() {
-		return isTimedOut();
+		return shotTime > 1;
 	}
 
 	// Called once after isFinished returns true
 	@Override
 	protected void end() {
+		Robot.intake.setOpenLoop(0);
 		Robot.puncher.puncherSolRetract();
+		shotTime = 0;
 	}
 
 	// Called when another command which requires one or more of the same

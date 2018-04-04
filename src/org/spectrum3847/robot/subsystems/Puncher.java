@@ -48,6 +48,16 @@ public class Puncher extends Subsystem {
 		
 	}
 	
+	public void puncherOneFire() {
+		puncherSolOne.set(true);
+		puncherSolTwo.set(false);
+	}
+	
+	public void puncherTwoFire() {
+		puncherSolOne.set(false);
+		puncherSolTwo.set(true);
+	}
+	
 	public void stop() {
 		puncherSolRetract();
 	}

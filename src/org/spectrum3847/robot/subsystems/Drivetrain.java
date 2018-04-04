@@ -275,6 +275,10 @@ public class Drivetrain extends Subsystem {
 	public void setNeutralMode(NeutralMode neutralMode) {
 		this.leftSRX.setNeutralMode(neutralMode);
 		this.rightSRX.setNeutralMode(neutralMode);
+		this.leftBottomSPX.setNeutralMode(neutralMode);
+		this.leftMiddleSPX.setNeutralMode(neutralMode);
+		this.rightBottomSPX.setNeutralMode(neutralMode);
+		this.rightMiddleSPX.setNeutralMode(neutralMode);
 	}
 	
 	public void setHighGear() {

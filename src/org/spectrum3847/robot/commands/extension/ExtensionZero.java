@@ -30,7 +30,6 @@ public class ExtensionZero extends Command {
 	@Override
 	protected void execute() {
 		Robot.extension.setOpenLoop(-.7);
-		Arm.printDebug("Extension Output:" + Robot.extension.getOutput());
 	}
 
 	// Make this return true when this Command no longer needs to run execute()

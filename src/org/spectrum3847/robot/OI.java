@@ -17,14 +17,18 @@ import org.spectrum3847.robot.commands.arm.SetArmPos;
 import org.spectrum3847.robot.commands.drivetrain.HighGear;
 import org.spectrum3847.robot.commands.extension.ExtensionClimb;
 import org.spectrum3847.robot.commands.extension.ExtensionManualControl;
+import org.spectrum3847.robot.commands.extension.ExtensionMotionMagicPos;
 import org.spectrum3847.robot.commands.extension.ExtensionZero;
 import org.spectrum3847.robot.commands.hook.ReadyClimb;
 import org.spectrum3847.robot.commands.intake.IntakeOn;
 import org.spectrum3847.robot.commands.intake.IntakeUntilCurrent;
 import org.spectrum3847.robot.commands.intake.OpenIntake;
+import org.spectrum3847.robot.commands.intake.OperatorEject;
+import org.spectrum3847.robot.commands.puncher.FullPunchGroup;
+import org.spectrum3847.robot.commands.puncher.HalfPunchGroup;
 import org.spectrum3847.robot.commands.puncher.HalfPuncher;
-import org.spectrum3847.robot.commands.puncher.OperatorPuncher;
 import org.spectrum3847.robot.commands.puncher.ShootPuncher;
+import org.spectrum3847.robot.commands.puncher.ShootPuncherTime;
 import org.spectrum3847.robot.subsystems.Arm;
 /**
  * This class is the glue that binds the controls on the physical operator
@@ -51,7 +55,7 @@ public class OI {
 		operatorController.rightTriggerButton.toggleWhenPressed(new IntakeUntilCurrent());
 		
 		//Left Trigger sets the speed of the punch either wheeled outtake, soft punch, full punch in OperatorPuncher() command
-		operatorController.rightBumper.toggleWhenPressed(new OperatorPuncher());
+		operatorController.rightBumper.toggleWhenPressed(new OperatorEject());
 
 		//Left Bumper reverses these positions in SetArmPos command
 		operatorController.aButton.whileHeld(new SetArmPos(Arm.Position.FwdIntake));
@@ -60,10 +64,12 @@ public class OI {
 		operatorController.yButton.whileHeld(new SetArmPos(Arm.Position.FwdHighScore));
 		operatorController.startButton.whenPressed(new ArmZero());
 		operatorController.leftStickButton.toggleWhenPressed(new ArmManualControl());
-		new SpectrumAxisButton(OI.operatorController, SpectrumXboxController.XboxAxis.LEFT_Y, .97, ThresholdType.GREATER_THAN).whenPressed(
-				new ShootPuncher());
-		new SpectrumAxisButton(OI.operatorController, SpectrumXboxController.XboxAxis.LEFT_Y, -.97, ThresholdType.LESS_THAN).whenPressed(
-				new HalfPuncher());
+		new SpectrumAxisButton(OI.operatorController, SpectrumXboxController.XboxAxis.LEFT_Y, .9, ThresholdType.GREATER_THAN).whenPressed(
+				new HalfPunchGroup());
+		new SpectrumAxisButton(OI.operatorController, SpectrumXboxController.XboxAxis.LEFT_Y, -.9, ThresholdType.LESS_THAN).whenPressed(
+				new FullPunchGroup()); //ShootPuncher());
+		new SpectrumAxisButton(OI.operatorController, SpectrumXboxController.XboxAxis.RIGHT_Y, -.9, ThresholdType.LESS_THAN).whenPressed(
+				new ExtensionMotionMagicPos(11000));
 		operatorController.selectButton.whenPressed(new ExtensionZero());
 		operatorController.Dpad.Up.toggleWhenPressed(new ReadyClimb());
 		operatorController.Dpad.Down.whileHeld(new ExtensionClimb());
