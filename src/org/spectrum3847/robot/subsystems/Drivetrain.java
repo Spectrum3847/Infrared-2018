@@ -30,6 +30,7 @@ import com.ctre.phoenix.motorcontrol.StatusFrame;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.sensors.PigeonIMU;
 
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.command.Subsystem;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
@@ -138,11 +139,11 @@ public class Drivetrain extends Subsystem {
 				1, /* remote filter 0 */
 				10); /* timeout ms */
 		/* select a Pigeon on CAN Bus. */
-		leftSRX.configRemoteFeedbackFilter(
-				imu.getDeviceID(),
-				RemoteSensorSource.GadgeteerPigeon_Yaw,
-				0, /* remote filter 1 */
-				10); /* timeout ms */
+		//leftSRX.configRemoteFeedbackFilter(
+		//		imu.getDeviceID(),
+		//		RemoteSensorSource.GadgeteerPigeon_Yaw,
+		//		0, // remote filter 1
+		//		10); // timeout ms 
 		
 		/* turn off remote 0 */
 		rightSRX.configRemoteFeedbackFilter(
@@ -151,15 +152,15 @@ public class Drivetrain extends Subsystem {
 				1, /* remote filter 0 */
 				10); /* timeout ms */
 		/* select a Pigeon on CAN Bus. */
-		rightSRX.configRemoteFeedbackFilter(
+		/*rightSRX.configRemoteFeedbackFilter(
 				imu.getDeviceID(),
 				RemoteSensorSource.GadgeteerPigeon_Yaw,
-				0, /* remote filter 1 */
-				10); /* timeout ms */
-
+				0, //remote filter 1
+				10); // timeout ms */
+		
 		//Put Pigeon as Feedback Sensor 2
-		leftSRX.configSelectedFeedbackSensor(RemoteFeedbackDevice.RemoteSensor0, 1, 0);
-		rightSRX.configSelectedFeedbackSensor(RemoteFeedbackDevice.RemoteSensor0, 1, 0);
+		//leftSRX.configSelectedFeedbackSensor(RemoteFeedbackDevice.RemoteSensor0, 1, 0);
+		//rightSRX.configSelectedFeedbackSensor(RemoteFeedbackDevice.RemoteSensor0, 1, 0);
 	}
 	
 	//Not needed sense you can't get velocity from the pigeon right now as a Talon Sensor
@@ -324,6 +325,10 @@ public class Drivetrain extends Subsystem {
 		 */
 		turnThrottle = Util.limit(turnThrottle, 1.0);
 		return turnThrottle;
+	}
+	
+	public double getCubeX() {
+		return NetworkTableInstance.getDefault().getTable("limelight").getEntry("tx").getDouble(0.0);
 	}
 	
 	public double getHeading() {

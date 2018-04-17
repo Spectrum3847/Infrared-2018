@@ -86,7 +86,7 @@ public class Robot extends TimedRobot {
     	puncher = new Puncher();
     	hook = new Hook();
     	
-    	leds = new LEDs();
+    	//leds = new LEDs();
     	
     	//Pigeon setup has to happen after SRXs are configured
     	pigeon = new PigeonIMU(intake.intakeBottomSRX);
@@ -207,15 +207,15 @@ public class Robot extends TimedRobot {
 	}
 	
     private static void initDebugger(){
-    	Debugger.setLevel(Debugger.verbose1); //Set the initial Debugger Level
-    	Debugger.flagOn(_general); //Set all the flags on, comment out ones you want off
-    	Debugger.flagOn(_controls);
+    	Debugger.setLevel(Debugger.debug2); //Set the initial Debugger Level
+    	Debugger.flagOff(_general); //Set all the flags on, comment out ones you want off
+    	Debugger.flagOff(_controls);
     	Debugger.flagOn(_auton);
-    	Debugger.flagOn(_commands);
+    	Debugger.flagOff(_commands);
     	Debugger.flagOn(_drive);
-    	Debugger.flagOn(_intake);
+    	Debugger.flagOff(_intake);
     	Debugger.flagOn(_arm);
-    	Debugger.flagOn(_extension);
+    	Debugger.flagOff(_extension);
     }
     
     public static void printDebug(String msg){

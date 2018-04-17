@@ -12,7 +12,8 @@ public class PressureTransducer extends AnalogInput{
 	}
 	
 	public double getPressure() {
-		return (this.getAverageVoltage() - .52) * 37.5;
+		//return (this.getAverageVoltage() - .52) * 37.5;
+		return (this.getAverageVoltage() - .492) * 50.529;//2.57
 	}
 	
 	public boolean canShoot() {

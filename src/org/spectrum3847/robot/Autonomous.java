@@ -3,10 +3,11 @@ package org.spectrum3847.robot;
 import org.spectrum3847.lib.drivers.GameState;
 import org.spectrum3847.lib.drivers.GameState.Side;
 import org.spectrum3847.lib.util.Debugger;
+import org.spectrum3847.paths.ArcLeft;
 import org.spectrum3847.paths.CrossTheLine;
 import org.spectrum3847.paths.FiveFeet;
 import org.spectrum3847.paths.FiveFeetAndTurn;
-import org.spectrum3847.paths.LeftEasySwitch;
+import org.spectrum3847.paths.LeftCrossScale;
 import org.spectrum3847.paths.LeftSideRightScale;
 import org.spectrum3847.paths.LeftSwitchCenter;
 import org.spectrum3847.paths.LeftSwitchCenter2;
@@ -16,12 +17,22 @@ import org.spectrum3847.robot.commands.FollowTrajectory;
 import org.spectrum3847.robot.commands.AutoTune.AutoTuneVelocity;
 import org.spectrum3847.robot.commands.auto.DriveForTime;
 import org.spectrum3847.robot.commands.auto.InPlaceTurn;
+import org.spectrum3847.robot.commands.auto.WaitBeforeAuton;
 import org.spectrum3847.robot.commands.auto.modes.CenterSWnoSensor;
 import org.spectrum3847.robot.commands.auto.modes.CenterSWpigeon;
 import org.spectrum3847.robot.commands.auto.modes.LeftSW;
-import org.spectrum3847.robot.commands.auto.modes.LeftSWMultiCube;
+import org.spectrum3847.robot.commands.auto.modes.LeftSWOneAndHalf;
+import org.spectrum3847.robot.commands.auto.modes.LeftSWOneAndHalfPlusArc;
+import org.spectrum3847.robot.commands.auto.modes.LeftSWTwoAndHalf;
+import org.spectrum3847.robot.commands.auto.modes.LeftScale2Cube;
 import org.spectrum3847.robot.commands.auto.modes.LeftScaleMode;
+import org.spectrum3847.robot.commands.auto.modes.LeftSneakyScaleMode;
 import org.spectrum3847.robot.commands.auto.modes.RightSW;
+import org.spectrum3847.robot.commands.auto.modes.RightSWOneAndHalf;
+import org.spectrum3847.robot.commands.auto.modes.RightSWOneAndHalfPlusArc;
+import org.spectrum3847.robot.commands.auto.modes.RightSWTwoAndHalf;
+import org.spectrum3847.robot.commands.auto.modes.RightScaleMode;
+import org.spectrum3847.robot.commands.auto.modes.RightSneakyScaleMode;
 import org.spectrum3847.robot.commands.auto.modes.StraightSW;
 import org.spectrum3847.robot.commands.drivetrain.TestVelocityMode;
 import org.spectrum3847.robot.subsystems.Arm;
@@ -46,15 +57,20 @@ public class Autonomous {
 	public static void init() {
         Scheduler.getInstance().removeAll();
         Scheduler.getInstance().enable();
+        Robot.drive.zeroSensors();
         Robot.drive.difDrive.setSafetyEnabled(false);
     	Robot.drive.setNeutralMode(NeutralMode.Brake);
-    	Robot.arm.armSRX.setSelectedSensorPosition(Robot.arm.posCenterUp, 0);//Start Auto with the arm in FwdHighScore
+    	Robot.arm.armSRX.setSelectedSensorPosition(Robot.arm.posCenterUp, 0);
     	Robot.arm.setPos(Arm.Position.CENTER);
 		Robot.gameState = new GameState(DriverStation.getInstance().getGameSpecificMessage());
 		selectAuto();
-		if (SmartDashboard.getBoolean("Autonomous ENABLED", true)) {
-			//AutonCommand = new CenterSWnoSensor();
-			AutonCommand.start();
+		if (SmartDashboard.getBoolean("Auto ENABLED", true)) {
+			Debugger.println("Auton Command: " + AutonCommand.getName(),Robot._auton, Debugger.info3);
+			if (SmartDashboard.getBoolean("Auto DELAY", false)){
+				new WaitBeforeAuton(Robot.prefs.getNumber("A: Delay Time", 0), AutonCommand).start();
+			} else {
+				AutonCommand.start();
+			}
 		}
 		Robot.compressor.stop();
 		Debugger.println("Auto Init with GameState: " + Robot.gameState.message, Robot._auton, Debugger.info3);
@@ -99,8 +115,12 @@ public class Autonomous {
 				break;
 			}
 			case (2): {
-				AutoName = "Center SW Pigeon";
-				AutonCommand = new CenterSWpigeon();
+				AutoName = "Center SW Spline";
+				if(Robot.gameState.mySwitchSide == Side.LEFT) {
+					AutonCommand = new LeftSWTwoAndHalf();
+				} else {
+					AutonCommand = new RightSWTwoAndHalf();
+				}
 				break;
 			}
 			case (3): {
@@ -139,6 +159,7 @@ public class Autonomous {
 				}
 				break;
 			}	
+			
 			case (10): {
 				AutoName = "Cross Line No Sensors";
 				AutonCommand = new DriveForTime(3,.6);
@@ -148,20 +169,89 @@ public class Autonomous {
 				AutoName = "Cross The Line";
 				AutonCommand = new FollowTrajectory(new CrossTheLine());
 				break;
-			}				
+			}		
+			
+			case (20):{
+				AutoName = "Left Scale or straight";
+				if(Robot.gameState.scaleSide == Side.LEFT) {
+						AutonCommand = new LeftScaleMode();
+				} //else if (Robot.gameState.mySwitchSide == Side.LEFT) {
+					//AutonCommand = new LeftSW();
+				 else {
+					AutonCommand = new FollowTrajectory(new CrossTheLine());
+				}
+				break;
+			}
+			
+			case (21):{
+				AutoName = "Right Scale or straight";
+				if(Robot.gameState.scaleSide == Side.RIGHT) {
+						AutonCommand = new RightScaleMode();
+				} //else if (Robot.gameState.mySwitchSide == Side.RIGHT) {
+				//	AutonCommand = new RightSW();
+				 else {
+					AutonCommand = new FollowTrajectory(new CrossTheLine());
+				}
+				break;
+			}
+			
+			case (22):{
+				AutoName = "Left Sneaky Scale or RightSW or straight";
+				if(Robot.gameState.scaleSide == Side.LEFT) {
+						AutonCommand = new LeftSneakyScaleMode();
+				} //else if (Robot.gameState.mySwitchSide == Side.LEFT) {
+					//AutonCommand = new LeftSW();
+				 else {
+					 if(Robot.gameState.mySwitchSide == Side.LEFT) {
+							AutonCommand = new LeftSW();
+						} else {
+							AutonCommand = new FollowTrajectory(new CrossTheLine());
+						}
+				}
+				break;
+			}			
+			
+			case (23):{
+				AutoName = "Right Sneaky Scale or LeftSW or straight";
+				if(Robot.gameState.scaleSide == Side.RIGHT) {
+						AutonCommand = new RightSneakyScaleMode();
+				} //else if (Robot.gameState.mySwitchSide == Side.LEFT) {
+					//AutonCommand = new LeftSW();
+				 else {
+					 if(Robot.gameState.mySwitchSide == Side.RIGHT) {
+							AutonCommand = new RightSW();
+						} else {
+							AutonCommand = new FollowTrajectory(new CrossTheLine());
+						}
+				}
+				break;
+			}	
+			
+			
+			
+			case (31):{
+				AutoName = "Center SW Spline + Arc Scale";
+				if(Robot.gameState.mySwitchSide == Side.LEFT) {
+					AutonCommand = new LeftSWOneAndHalfPlusArc();
+				} else {
+					AutonCommand = new RightSWOneAndHalfPlusArc();
+				}
+				break;
+			}
+			
 			case (88):{
-				AutoName = "Left Side Right Scale";
-				AutonCommand = new FollowTrajectory(new LeftSideRightScale());
+				AutoName = "Arc to scale left";
+				AutonCommand = new FollowTrajectory(new ArcLeft());
 				break;
 			}		
 			case (89):{
-				AutoName = "Left Scale";
-				AutonCommand = new LeftScaleMode();
+				AutoName = "Left Scale 2";
+				AutonCommand = new LeftScale2Cube();
 				break;
 			}
 			case (90):{
 				AutoName = "Left Multi Cube Auto";
-				AutonCommand = new LeftSWMultiCube();
+				AutonCommand = new LeftSWOneAndHalf();
 				break;
 			}
 			case (94):{

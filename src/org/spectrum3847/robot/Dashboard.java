@@ -26,8 +26,9 @@ public class Dashboard {
 
     public static void intializeDashboard() {
     	if(ENABLE_DASHBOARD){
-    		SmartDashboard.putBoolean("Auto/ENABLED", true);
+    		SmartDashboard.putBoolean("Auto ENABLED", true);
     		SmartDashboard.putBoolean("Compressor ENABLE", true);
+    		SmartDashboard.putBoolean("Auto DELAY", false);
     	}
     }
 

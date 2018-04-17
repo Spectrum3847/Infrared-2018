@@ -26,10 +26,19 @@ public class InPlaceTurn extends Command {
 	double kP = 0;
 	double kD = 0;
 	double kF = 0;
+	boolean r = true;
+	public InPlaceTurn(double ang, boolean reset) {
+		// Use requires() here to declare subsystem dependencies
+		requires(Robot.drive);
+		angle = ang;
+		r = reset;
+	}
+	
 	public InPlaceTurn(double ang) {
 		// Use requires() here to declare subsystem dependencies
 		requires(Robot.drive);
 		angle = ang;
+		r = true;
 	}
 
 	// Called just before this Command runs the first time
@@ -38,7 +47,9 @@ public class InPlaceTurn extends Command {
 		//Backup values set on 3-12 to be good enough for 90 and 180 degree turns
 		kP = Robot.prefs.getNumber("D: IPT P", 0.014);
 		kD = Robot.prefs.getNumber("D: IPT D", 0.027);
-		Robot.drive.zeroSensors();
+		if (r) {
+			Robot.drive.zeroSensors();
+		}
 		Debugger.println("In place Turn");
 	}
 
@@ -55,7 +66,7 @@ public class InPlaceTurn extends Command {
 	// Make this return true when this Command no longer needs to run execute()
 	@Override
 	protected boolean isFinished() {
-		return Util.closeTo((double)Robot.drive.getHeading(), angle, 0.5);
+		return Util.closeTo((double)Robot.drive.getHeading(), angle, 10);
 	}
 
 	// Called once after isFinished returns true

@@ -14,13 +14,13 @@ public class DriveUntilWall extends Command {
 	private double initTime;
 	private double lastUpdate;
 	
-	public DriveUntilWall() {
+	public DriveUntilWall(double speed) {
 		this.requires(Robot.drive);
+		throttle = speed;
 	}
 
 	public void initialize(){
 		Debugger.println("Driving to wall", Robot._auton, Debugger.info3);
-		this.throttle = Robot.prefs.getNumber("2A: Drive To Wall Throttle", 5);
 		this.turnAdjustment = Robot.prefs.getNumber("2A: Drive to Wall Drive Straight Adjust", -.05);
 		this.initTime = Timer.getFPGATimestamp();
 		this.lastUpdate = initTime;
@@ -44,7 +44,7 @@ public class DriveUntilWall extends Command {
 	@Override
 	protected boolean isFinished() {
 		// TODO Auto-generated method stub
-		if ((Timer.getFPGATimestamp() - initTime > .75) && Robot.drive.leftSRX.getOutputCurrent() > Robot.prefs.getNumber("2A: Drive to Wall Current Trigger", 9)){
+		if ((Timer.getFPGATimestamp() - initTime > .75) && Math.abs(Robot.drive.leftSRX.getOutputCurrent()) > Robot.prefs.getNumber("2A: Drive to Wall Current Trigger", 9)){
 			
 			Debugger.println("Hit wall. Time: " + (Timer.getFPGATimestamp() - initTime) + " Current: " + Robot.drive.leftSRX.getOutputCurrent(), Robot._auton, Debugger.info3);
 			return true;

@@ -6,28 +6,36 @@ import org.spectrum3847.robot.commands.FollowTrajectory;
 import org.spectrum3847.robot.commands.arm.ArmFwdHome;
 import org.spectrum3847.robot.commands.arm.ArmMotionMagicHold;
 import org.spectrum3847.robot.commands.arm.ArmMotionMagicPos;
-import org.spectrum3847.robot.commands.arm.ArmZero;
+import org.spectrum3847.robot.commands.arm.ArmRevHome;
 import org.spectrum3847.robot.commands.arm.SetArmPos;
 import org.spectrum3847.robot.commands.auto.DriveForTime;
+import org.spectrum3847.robot.commands.auto.DriveUntilWall;
 import org.spectrum3847.robot.commands.intake.EjectCube;
 import org.spectrum3847.robot.commands.intake.IntakeOn;
 import org.spectrum3847.robot.commands.intake.IntakeStop;
+import org.spectrum3847.robot.commands.intake.IntakeUntilCurrent;
+import org.spectrum3847.robot.commands.intake.OpenIntakeOn;
 import org.spectrum3847.robot.subsystems.Arm;
 
 import edu.wpi.first.wpilibj.command.CommandGroup;
 
-public class LeftSWMultiCube extends CommandGroup {
+public class LeftSWOneAndHalf extends CommandGroup {
 	
 	double ejectCubeTime = 0.5;
 
-	public LeftSWMultiCube() {
+	public LeftSWOneAndHalf() {
 		super("CeneterSWpigeon");
 		//If the switch is on the left make sure we turn before driving
-		this.addParallel(new SetArmPos(Arm.Position.FwdScore)); //Arm to 2nd Cube Position
+		this.addParallel(new SetArmPos(Arm.Position.FwdPortal)); //Arm to 2nd Cube Position
 		this.addSequential(new FollowTrajectory(new LeftSwitchCenter()),4);
-		this.addSequential(new EjectCube(), ejectCubeTime);
-		this.addSequential(new FollowTrajectory(new LeftSwitchCenter2()),3);
+		//this.addSequential(new DriveUntilWall());
+		this.addParallel(new EjectCube(), ejectCubeTime);
+		this.addSequential(new FollowTrajectory(new LeftSwitchCenter2()),6);
 		this.addSequential(new ArmFwdHome());
+		this.addParallel(new OpenIntakeOn(1));
+		this.addSequential(new FollowTrajectory(new LeftSwitchCenter3()),4);
+		this.addParallel(new IntakeOn(1),1);
+		this.addSequential(new DriveForTime(1,-.5));//Only used to end with a cube in hand
 		/*this.addParallel(new IntakeOn(1));
 		this.addSequential(new FollowTrajectory(new LeftSwitchCenter3()),5); //Drive Forward
 		this.addSequential(new FollowTrajectory(new LeftSwitchCenter4()),5); //Backup

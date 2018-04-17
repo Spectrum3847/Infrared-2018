@@ -32,12 +32,12 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  */
 public class Extension extends Subsystem {
 
-	public final static int EXTENSION_UP = 0;
-	public final static int EXTENSION_DOWN = 1;
+	public final static int EXTENSION_REG = 0;
+	public final static int EXTENSION_CLIMB = 1;
 	
 	public final static int upPositionLimit = 22500;// needs to be determined manually
 	public final static int downPositionLimit = 0;
-	private static int highScorePos = 20000;
+	private static int highScorePos = 22000;
 	
 	private int accel = 0;
 	private int cruiseVel = 0;
@@ -45,8 +45,8 @@ public class Extension extends Subsystem {
 	public SpectrumTalonSRX extensionBottomSRX = new SpectrumTalonSRX(HW.EXTENSION_BOTTOM);
 	public LeaderTalonSRX extensionSRX = new LeaderTalonSRX(HW.EXTENSION_TOP, extensionBottomSRX);
 	
-	private SRXGains upGains = new SRXGains(EXTENSION_UP, 0.560, 0.0, 5.600, 0.620, 100);
-	private SRXGains downGains = new SRXGains(EXTENSION_DOWN, 0.0, 0.0, 0.0, 0.427, 0);
+	private SRXGains regularGains = new SRXGains(EXTENSION_REG, 0.560, 0.0, 5.600, 0.620, 100);
+	private SRXGains climbGains = new SRXGains(EXTENSION_CLIMB, 0.0, 0.0, 0.0, 0.427, 0);
 	private boolean zeroWhenDownLimit = true;
 	
 	private int targetPosition = 0;
@@ -86,6 +86,7 @@ public class Extension extends Subsystem {
     	extensionSRX.configSetParameter(ParamEnum.eClearPositionOnLimitR, 1, 0, 0, 0);
     	
     	extensionBottomSRX.setFollowerFramePeriods();
+		extensionSRX.selectProfileSlot(EXTENSION_REG, 0);
 	}
 	
 	public void initDefaultCommand() {
@@ -98,25 +99,34 @@ public class Extension extends Subsystem {
 		if (Robot.prefs.getBoolean("E: Set Gains", false)) {
 			setMotionMagicValues((int)Robot.prefs.getNumber("E: MM Accel", 5000), (int)Robot.prefs.getNumber("E: MM CruiseVel", 2000));
 			getPrefsGains();
-			extensionSRX.setGains(upGains);
-			extensionSRX.setGains(downGains);
+			extensionSRX.setGains(regularGains);
+			extensionSRX.setGains(climbGains);
 		}
 	}
 	
 	public void getPrefsGains() {
-		upGains.setGains(EXTENSION_UP,
-		Robot.prefs.getNumber("E: up P", 0.0),
+		regularGains.setGains(EXTENSION_REG,
+		Robot.prefs.getNumber("E: up P", 3.5),
 		Robot.prefs.getNumber("E: up I", 0.0),
-		Robot.prefs.getNumber("E: up D", 0.0),
-		Robot.prefs.getNumber("E: up F", 0.0),
+		Robot.prefs.getNumber("E: up D", 30.0),
+		Robot.prefs.getNumber("E: up F", 0.5115),
 		0);
 		
-		downGains.setGains(EXTENSION_DOWN,
-		Robot.prefs.getNumber("E: down P", 0.0),
-		Robot.prefs.getNumber("E: down I", 0.0),
-		Robot.prefs.getNumber("E: down D", 0.0),
-		Robot.prefs.getNumber("E: down F", 0.0),
+		climbGains.setGains(EXTENSION_CLIMB,
+		Robot.prefs.getNumber("E: climb P", 6.0),
+		Robot.prefs.getNumber("E: climb I", 0.0),
+		Robot.prefs.getNumber("E: climb D", 60.0),
+		Robot.prefs.getNumber("E: climb F", 0.5115),
 		0);
+	}
+	
+	public void setToClimbeGains() {
+		extensionSRX.selectProfileSlot(EXTENSION_CLIMB, 0);
+	}
+	
+	public void setToRegularGains() {
+		extensionSRX.selectProfileSlot(EXTENSION_REG, 0);
+		
 	}
 	
 	public void setHighScorePos() {
@@ -140,9 +150,9 @@ public class Extension extends Subsystem {
 	}
 	
 	public void set(ControlMode controlMode, double signal) {
-    	if(controlMode == ControlMode.MotionMagic) {
+    	/*if(controlMode == ControlMode.MotionMagic) {
     		this.manageGainProfile(signal);
-    	}
+    	}*/
     	extensionSRX.set(controlMode, signal);
     }
 	
@@ -175,7 +185,7 @@ public class Extension extends Subsystem {
 	}
 	
 	public double getOutput() {
-		return extensionSRX.get();
+		return extensionSRX.getMotorOutputVoltage();
 	}
 	
 	public void setTargetToCurrentPosition() {
@@ -189,9 +199,9 @@ public class Extension extends Subsystem {
 	public void manageGainProfile(double targetPosition) {
 		double currentPosition = getCurrentPosition();
 		if (currentPosition < targetPosition) {
-				extensionSRX.selectProfileSlot(EXTENSION_UP, 0);
+				extensionSRX.selectProfileSlot(EXTENSION_REG, 0);
 		} else {
-			extensionSRX.selectProfileSlot(EXTENSION_DOWN, 0);
+			extensionSRX.selectProfileSlot(EXTENSION_CLIMB, 0);
 		}
 	} 
 	
@@ -209,7 +219,7 @@ public class Extension extends Subsystem {
 		 if (!Robot.arm.canExtend()) {
 			targetPosition = 0;
 		 }
-		manageGainProfile(targetPosition);
+		//manageGainProfile(targetPosition);
     	extensionSRX.set(ControlMode.MotionMagic, targetPosition);
 	 }
 	 

@@ -18,7 +18,7 @@ public class CenterSWnoSensor extends CommandGroup {
 		//If the switch is on the left make sure we turn before driving
 		this.addSequential(new SWTurnForTime(Robot.prefs.getNumber("2A: SW Turn Time", 1),
 					Robot.prefs.getNumber("2A: SW Turn Throttle", -.3)));
-		this.addSequential(new DriveUntilWall(),10);
+		this.addSequential(new DriveUntilWall(.6),10);
 		this.addSequential(new IntakeOn(-1));
 		this.addSequential(new DriveForTime(1,-.3));
 	}

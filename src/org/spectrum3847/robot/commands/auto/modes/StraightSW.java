@@ -1,6 +1,5 @@
 package org.spectrum3847.robot.commands.auto.modes;
 
-import org.spectrum3847.paths.LeftEasySwitch;
 import org.spectrum3847.paths.LeftScale;
 import org.spectrum3847.paths.TestSTurnAuto;
 import org.spectrum3847.robot.Robot;
@@ -20,7 +19,7 @@ public class StraightSW extends CommandGroup {
 	public StraightSW() {
 		super("CeneterSWpigeon");
 		//Drive Until Wall, score cube if it's on the color
-		this.addSequential(new DriveUntilWall(),4);
+		this.addSequential(new DriveUntilWall(.6),4);
 		this.addSequential(new IntakeOn(-1), 3);
 		this.addSequential(new DriveForTime(1,-.3));
 	}

@@ -55,13 +55,14 @@ public class Arm extends Subsystem {
 	public int posRevExtensionLimit = 22000;
 	public int posRevHighScore = 24000;
 	public int posCenterUp = fwdPositionLimit/2;
+	public int posCurl = posCenterUp + 3000;
 	public int posFwdHighScore = fwdPositionLimit - posRevHighScore;
 	public int posFwdExtensionLimit = fwdPositionLimit - posRevExtensionLimit;
 	public int posFwdScore = fwdPositionLimit - posRevScore;
 	public int posFwdPortal = fwdPositionLimit - posRevPortal;
 	public int posFwdExchange = fwdPositionLimit - posRevExchange;
 	public int posFwdIntake = fwdPositionLimit - posRevIntake;// - posRevExchange;//FwdIntake is the same as FwdExchange for now
-	public int pos2ndRowCube = fwdPositionLimit - 5000;
+	public int posFwd2ndRowCube = fwdPositionLimit - 7000;
 
 	
 	private final SRXGains upGains = new SRXGains(ARM_UP, 0.560, 0.0, 5.600, 0.620, 100);
@@ -70,7 +71,7 @@ public class Arm extends Subsystem {
 	private int targetPosition = 0;
 	
 	public enum Position {
-		FwdIntake, FwdExchange, FwdPortal, FwdScore, FwdHighScore, CENTER, CenterClimb, RevHighScore, RevScore, RevPortal, RevExchange, RevIntake, NotZeroed
+		FwdIntake, FwdExchange, Fwd2ndRowCube, FwdPortal, FwdScore, FwdHighScore, CENTER, CenterClimb, Curl, RevHighScore, RevScore, RevPortal, RevExchange, RevIntake, NotZeroed
 	}
 	
 	public Position pos = Position.NotZeroed;
@@ -87,6 +88,7 @@ public class Arm extends Subsystem {
     	armSRX.setSensorPhase(armPhase);
     	armSRX.configForwardLimitSwitchSource(LimitSwitchSource.FeedbackConnector, LimitSwitchNormal.NormallyOpen);
     	armSRX.configReverseLimitSwitchSource(LimitSwitchSource.FeedbackConnector, LimitSwitchNormal.NormallyOpen);
+    	armSRX.overrideLimitSwitchesEnable(true); //Ignore Arm limit switches
     	armSRX.configNominalOutputForward(0);
     	armSRX.configNominalOutputReverse(0);
     	armSRX.configPeakOutputForward(1);
@@ -101,10 +103,10 @@ public class Arm extends Subsystem {
     	armSRX.setStatusFramePeriod(StatusFrameEnhanced.Status_10_MotionMagic, 10);
 		armSRX.setStatusFramePeriod(StatusFrame.Status_2_Feedback0, 5, 0);
     		
-    	armSRX.configForwardSoftLimitEnable(false);
+    	armSRX.configForwardSoftLimitEnable(true);
     	armSRX.configForwardSoftLimitThreshold(fwdPositionLimit);
     	
-    	armSRX.configReverseSoftLimitEnable(false);
+    	armSRX.configReverseSoftLimitEnable(true);
     	armSRX.configReverseSoftLimitThreshold(revPositionLimit);
     	
     	//Don't Clear Arm Position on Reverse Limit Switch
@@ -138,6 +140,9 @@ public class Arm extends Subsystem {
 			case FwdExchange:
 				p = Robot.arm.posFwdExchange;
 				break;
+			case Fwd2ndRowCube:
+				p = Robot.arm.posFwd2ndRowCube;
+				break;
 			case FwdPortal:
 				p = Robot.arm.posFwdPortal;
 				break;
@@ -152,6 +157,9 @@ public class Arm extends Subsystem {
 				break;
 			case CenterClimb:
 				p = Robot.arm.posCenterUp;
+				break;
+			case Curl:
+				p = Robot.arm.posCurl;
 				break;
 			case RevHighScore:
 				p = Robot.arm.posRevHighScore;

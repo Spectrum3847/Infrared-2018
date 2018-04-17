@@ -11,7 +11,8 @@ import org.spectrum3847.lib.controllers.SpectrumAxisButton;
 import org.spectrum3847.lib.controllers.SpectrumAxisButton.ThresholdType;
 import org.spectrum3847.lib.controllers.SpectrumXboxController;
 import org.spectrum3847.robot.commands.arm.ArmManualControl;
-import org.spectrum3847.robot.commands.arm.ArmZero;
+import org.spectrum3847.robot.commands.arm.ArmRevHome;
+import org.spectrum3847.robot.commands.arm.OperatorHome;
 import org.spectrum3847.robot.commands.arm.SetArmExchangePos;
 import org.spectrum3847.robot.commands.arm.SetArmPos;
 import org.spectrum3847.robot.commands.drivetrain.HighGear;
@@ -23,6 +24,7 @@ import org.spectrum3847.robot.commands.hook.ReadyClimb;
 import org.spectrum3847.robot.commands.intake.IntakeOn;
 import org.spectrum3847.robot.commands.intake.IntakeUntilCurrent;
 import org.spectrum3847.robot.commands.intake.OpenIntake;
+import org.spectrum3847.robot.commands.intake.OpenIntakeOn;
 import org.spectrum3847.robot.commands.intake.OperatorEject;
 import org.spectrum3847.robot.commands.puncher.FullPunchGroup;
 import org.spectrum3847.robot.commands.puncher.HalfPunchGroup;
@@ -48,8 +50,9 @@ public class OI {
 		driverController.leftBumper.whileHeld(new SetArmExchangePos());
 		
 		driverController.aButton.whileHeld(new OpenIntake());
-		driverController.leftTriggerButton.whileHeld(new IntakeUntilCurrent());
+		//driverController.leftTriggerButton.whileHeld(new IntakeUntilCurrent());
 		driverController.rightTriggerButton.whileHeld(new IntakeOn(-1));
+		driverController.leftTriggerButton.whileHeld(new OpenIntakeOn(1));
 		
 		//Hold to force intake to continue past current limit, happens in IntakeUntilCurrent
 		operatorController.rightTriggerButton.toggleWhenPressed(new IntakeUntilCurrent());
@@ -62,16 +65,16 @@ public class OI {
 		operatorController.xButton.whileHeld(new SetArmPos(Arm.Position.FwdScore));
 		operatorController.bButton.whileHeld(new SetArmPos(Arm.Position.FwdPortal));
 		operatorController.yButton.whileHeld(new SetArmPos(Arm.Position.FwdHighScore));
-		operatorController.startButton.whenPressed(new ArmZero());
+		operatorController.startButton.whenPressed(new OperatorHome());
 		operatorController.leftStickButton.toggleWhenPressed(new ArmManualControl());
 		new SpectrumAxisButton(OI.operatorController, SpectrumXboxController.XboxAxis.LEFT_Y, .9, ThresholdType.GREATER_THAN).whenPressed(
 				new HalfPunchGroup());
 		new SpectrumAxisButton(OI.operatorController, SpectrumXboxController.XboxAxis.LEFT_Y, -.9, ThresholdType.LESS_THAN).whenPressed(
 				new FullPunchGroup()); //ShootPuncher());
 		new SpectrumAxisButton(OI.operatorController, SpectrumXboxController.XboxAxis.RIGHT_Y, -.9, ThresholdType.LESS_THAN).whenPressed(
-				new ExtensionMotionMagicPos(11000));
+				new ExtensionMotionMagicPos(15000));
 		operatorController.selectButton.whenPressed(new ExtensionZero());
-		operatorController.Dpad.Up.toggleWhenPressed(new ReadyClimb());
+		operatorController.Dpad.Up.whenPressed(new ReadyClimb());
 		operatorController.Dpad.Down.whileHeld(new ExtensionClimb());
 		operatorController.rightStickButton.whenPressed(new ExtensionManualControl());
 		

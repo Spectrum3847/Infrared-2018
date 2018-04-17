@@ -13,6 +13,7 @@ import org.spectrum3847.lib.controllers.SpectrumThumbStick;
 import org.spectrum3847.lib.controllers.SpectrumXboxController;
 import org.spectrum3847.robot.OI;
 import org.spectrum3847.robot.Robot;
+import org.spectrum3847.robot.subsystems.Arm;
 import org.spectrum3847.robot.subsystems.Arm.Position;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
@@ -20,8 +21,8 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 /**
  * An example command.  You can replace me with your own command.
  */
-public class ArmZero extends Command {
-	public ArmZero() {
+public class ArmReadyCurl extends Command {
+	public ArmReadyCurl() {
 		// Use requires() here to declare subsystem dependencies
 		requires(Robot.arm);
 	}
@@ -29,28 +30,25 @@ public class ArmZero extends Command {
 	// Called just before this Command runs the first time
 	@Override
 	protected void initialize() {
-		Robot.arm.armSRX.configReverseSoftLimitEnable(false);
 	}
 
 	// Called repeatedly when this Command is scheduled to run
 	@Override
 	protected void execute() {
-		Robot.arm.setOpenLoop( -.7);
+		if (OI.operatorController.leftBumper.get()) {
+			Robot.arm.setPos(Arm.Position.Curl);
+		}
 	}
 
 	// Make this return true when this Command no longer needs to run execute()
 	@Override
 	protected boolean isFinished() {
-		return Robot.arm.getRevLimitSW();
+		return false;
 	}
 
 	// Called once after isFinished returns true
 	@Override
 	protected void end() {
-		Robot.arm.setOpenLoop(0);
-		Robot.arm.pos = Position.RevIntake;
-		Robot.arm.armSRX.configReverseSoftLimitEnable(true);
-		Robot.arm.armSRX.setSelectedSensorPosition(0, 0); // Manually set it to zero
 	}
 
 	// Called when another command which requires one or more of the same

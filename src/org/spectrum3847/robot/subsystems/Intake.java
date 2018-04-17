@@ -12,6 +12,7 @@ import org.spectrum3847.lib.util.Debugger;
 import org.spectrum3847.lib.drivers.LeaderTalonSRX;
 import org.spectrum3847.lib.drivers.SpectrumSolenoid;
 import org.spectrum3847.robot.HW;
+import org.spectrum3847.robot.OI;
 import org.spectrum3847.robot.Robot;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
@@ -39,10 +40,10 @@ public class Intake extends Subsystem {
 	
 	public static double thresholdStart;
 	private static boolean intakeComplete;
-	
+	  
 	public Intake() {
-		intakeSRX.setInverted(true); //practice bot true, comp true
-		intakeBottomSRX.setInverted(false); //Practice bot false, comp false;
+		intakeSRX.setInverted(false); //practice bot true, comp true
+		intakeBottomSRX.setInverted(true); //Practice bot false, comp false;
     	intakeSRX.configOpenloopRamp(0);
     	intakeSRX.configClosedloopRamp(0);
     	intakeSRX.setNeutralMode(NeutralMode.Brake);
@@ -68,6 +69,15 @@ public class Intake extends Subsystem {
 		// Set the default command for a subsystem here.
 		//setDefaultCommand();
 	}
+	
+	 public void periodic() {
+		    if (intakeSRX.getMotorOutputPercent() != 0) {
+		    	Intake.printDebug("Rumbling Operator cause Intake");
+		    	OI.operatorController.setRumble(.6, .6);
+		    } else {
+		    	OI.operatorController.setRumble(0, 0);
+		    }
+	 }
 	
 	public void setOpenLoop(double value) {
 		intakeSRX.set(ControlMode.PercentOutput, value);
@@ -117,9 +127,9 @@ public class Intake extends Subsystem {
 	
 	//Add the dashboard values for this subsystem
 	public void dashboard() {
-		SmartDashboard.putNumber("Intake Output", intakeSRX.get());
+		SmartDashboard.putNumber("Intake Output", intakeSRX.getMotorOutputPercent());
 		SmartDashboard.putNumber("Intake Current Total", getCurrent());
-		
+		SmartDashboard.putBoolean("Intake On?", intakeSRX.getMotorOutputPercent() != 0);
 	}
 	
     public static void printDebug(String msg){
