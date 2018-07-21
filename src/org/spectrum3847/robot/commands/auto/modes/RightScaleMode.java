@@ -23,10 +23,10 @@ public class RightScaleMode extends CommandGroup {
 		super("RightScale");
 		//If the switch is on the left make sure we turn before driving
 		this.addParallel(new SetArmPos(Arm.Position.FwdScore));
-		this.addSequential(new FollowTrajectory(new RightScale()));
+		this.addSequential(new FollowTrajectory(new RightScale()),9);
 		//this.addSequential(new DriveUntilLine(),3);
 		this.addSequential(new ShootPuncher(), 1);
-		this.addParallel(new ArmFwdHome());
+		this.addParallel(new ArmFwdHome(),3);
 		//this.addSequential(new DriveForTime(1,-.3));
 	}
 

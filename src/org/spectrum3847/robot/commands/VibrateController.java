@@ -1,5 +1,6 @@
 package org.spectrum3847.robot.commands;
 
+import org.spectrum3847.lib.controllers.SpectrumXboxController;
 import org.spectrum3847.lib.drivers.Gamepad;
 import org.spectrum3847.lib.util.Debugger;
 import org.spectrum3847.lib.util.Util;
@@ -15,7 +16,7 @@ import edu.wpi.first.wpilibj.command.Command;
  */
 public class VibrateController extends Command {
 
-	private XboxController gp;
+	private SpectrumXboxController gp;
 	private double duration;
 	private double intensity;
 	private double startTime;
@@ -27,7 +28,7 @@ public class VibrateController extends Command {
 	 * @param d
 	 * @param i
 	 */
-    public VibrateController(XboxController g, double d, double i) {
+    public VibrateController(SpectrumXboxController g, double d, double i) {
     	super("vibrate");
     	gp = g;
     	duration = d; //In seconds

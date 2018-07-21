@@ -27,6 +27,8 @@ public class ArmManualControl extends Command {
 	@Override
 	protected void initialize() {
 		Robot.arm.disableLimitSwitches(true);
+		Robot.arm.armSRX.configForwardSoftLimitEnable(false);
+		Robot.arm.armSRX.configReverseSoftLimitEnable(false);
 	}
 
 	// Called repeatedly when this Command is scheduled to run
@@ -45,6 +47,8 @@ public class ArmManualControl extends Command {
 	@Override
 	protected void end() {
 		Robot.arm.disableLimitSwitches(false);
+		Robot.arm.armSRX.configForwardSoftLimitEnable(true);
+		Robot.arm.armSRX.configReverseSoftLimitEnable(true);
 		Robot.arm.setOpenLoop(0);
 	}
 

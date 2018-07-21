@@ -34,7 +34,7 @@ public class Intake extends Subsystem {
 	// Put methods for controlling this subsystem
 	// here. Call these from Commands.
 	public SpectrumTalonSRX intakeBottomSRX = new SpectrumTalonSRX(HW.INTAKE_BOTTOM);
-	public LeaderTalonSRX intakeSRX = new LeaderTalonSRX(HW.INTAKE_TOP, intakeBottomSRX);
+	public SpectrumTalonSRX intakeSRX = new SpectrumTalonSRX(HW.INTAKE_TOP);
 	
 	public SpectrumSolenoid intakeSol = new SpectrumSolenoid(HW.INTAKE_SOL);
 	
@@ -42,8 +42,8 @@ public class Intake extends Subsystem {
 	private static boolean intakeComplete;
 	  
 	public Intake() {
-		intakeSRX.setInverted(false); //practice bot true, comp true
-		intakeBottomSRX.setInverted(true); //Practice bot false, comp false;
+		intakeSRX.setInverted(Robot.prefs.getBoolean("I: SetInverted", true)); //practice bot true, comp true
+		intakeBottomSRX.setInverted(!Robot.prefs.getBoolean("I: SetInverted", false)); //Practice bot false, comp false;
     	intakeSRX.configOpenloopRamp(0);
     	intakeSRX.configClosedloopRamp(0);
     	intakeSRX.setNeutralMode(NeutralMode.Brake);
@@ -61,7 +61,23 @@ public class Intake extends Subsystem {
     	intakeSRX.configPeakCurrentDuration((int)Robot.prefs.getNumber("I: Current Peak Durration(ms)", 1000));
     	intakeSRX.enableCurrentLimit(true);
     	
-    	intakeBottomSRX.setFollowerFramePeriods();
+    	//intakeBottomSRX.setFollowerFramePeriods();
+    	intakeBottomSRX.configOpenloopRamp(0);
+    	intakeBottomSRX.configClosedloopRamp(0);
+    	intakeBottomSRX.setNeutralMode(NeutralMode.Brake);
+    	intakeBottomSRX.configSelectedFeedbackSensor(FeedbackDevice.None, 0);
+    	intakeBottomSRX.configForwardLimitSwitchSource(LimitSwitchSource.FeedbackConnector, LimitSwitchNormal.Disabled);
+    	intakeBottomSRX.configReverseLimitSwitchSource(LimitSwitchSource.FeedbackConnector, LimitSwitchNormal.Disabled);
+    	intakeBottomSRX.configNominalOutputForward(0);
+    	intakeBottomSRX.configNominalOutputReverse(0);
+    	intakeBottomSRX.configPeakOutputForward(Robot.prefs.getNumber("I: Peak Output Forward Percent", 1));
+    	intakeBottomSRX.configPeakOutputReverse(Robot.prefs.getNumber("I: Peak Output Reverse Percent", -1));
+    	intakeBottomSRX.configVoltageCompSaturation(Robot.prefs.getNumber("I: Voltage Comp", 12));
+    	intakeBottomSRX.enableVoltageCompensation(true);
+    	intakeBottomSRX.configContinuousCurrentLimit((int)Robot.prefs.getNumber("I: Current Limit", 8.0));
+    	intakeBottomSRX.configPeakCurrentLimit((int)Robot.prefs.getNumber("I: Current Peak Limit", 15.0));
+    	intakeBottomSRX.configPeakCurrentDuration((int)Robot.prefs.getNumber("I: Current Peak Durration(ms)", 1000));
+    	intakeBottomSRX.enableCurrentLimit(true);
 	}
 
 	
@@ -81,6 +97,12 @@ public class Intake extends Subsystem {
 	
 	public void setOpenLoop(double value) {
 		intakeSRX.set(ControlMode.PercentOutput, value);
+		intakeBottomSRX.set(ControlMode.PercentOutput, value);
+	}
+	
+	public void setOpenLoop(double value, double slow) {
+		intakeSRX.set(ControlMode.PercentOutput, slow);
+		intakeBottomSRX.set(ControlMode.PercentOutput, value);
 	}
 	
 	public void stop() {

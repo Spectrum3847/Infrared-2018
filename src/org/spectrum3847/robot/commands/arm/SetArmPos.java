@@ -48,7 +48,7 @@ public class SetArmPos extends Command {
 			new ExtensionZero().start();
 		} else {
 			boolean neg = OI.operatorController.leftBumper.get();
-			if (neg) {  //Reverse based on he left bumper
+			if (neg && !Robot.prefs.getBoolean("Arm: EZ Arm", false)) {  //Reverse based on he left bumper
 				Robot.arm.setPos(Robot.arm.reversePos(pos));
 			} else {
 				Robot.arm.setPos(pos);
