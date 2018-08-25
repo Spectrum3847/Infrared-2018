@@ -43,8 +43,8 @@ public class Puncher extends Subsystem {
 		
 	}
 	public void puncherHalfExtend() {
-		puncherSolOne.set(true);
-		puncherSolTwo.set(false);
+		puncherSolOne.set(false);
+		puncherSolTwo.set(true);
 		
 	}
 	

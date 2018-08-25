@@ -117,9 +117,9 @@ public class Autonomous {
 			case (2): {
 				AutoName = "Center SW Spline";
 				if(Robot.gameState.mySwitchSide == Side.LEFT) {
-					AutonCommand = new LeftSWOneAndHalf();
+					AutonCommand = new LeftSWTwoAndHalf();
 				} else {
-					AutonCommand = new RightSWOneAndHalf();
+					AutonCommand = new RightSWTwoAndHalf();
 				}
 				break;
 			}

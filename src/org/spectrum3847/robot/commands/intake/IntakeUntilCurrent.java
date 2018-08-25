@@ -18,7 +18,6 @@ import org.spectrum3847.robot.subsystems.Intake;
 public class IntakeUntilCurrent extends Command {
 	
 	private double speed;
-	private double startTime = 0;
 	
 	public IntakeUntilCurrent() {
 		// Use requires() here to declare subsystem dependencies
@@ -28,24 +27,14 @@ public class IntakeUntilCurrent extends Command {
 	// Called just before this Command runs the first time
 	@Override
 	protected void initialize() {
-		speed = 1;//Robot.prefs.getNumber("I: Intake Speed", 1);
-		startTime = Timer.getFPGATimestamp();
+		speed = Robot.prefs.getNumber("I: Intake Speed", 1);
 	}
 
 	// Called repeatedly when this Command is scheduled to run
 	@Override
 	protected void execute() {
-		if (Timer.getFPGATimestamp() - startTime > 2) {
-			if (Robot.intake.getCurrent() < Robot.prefs.getNumber("I: stalled", 10)) {
-				Robot.intake.setOpenLoop(speed, speed - Robot.prefs.getNumber("I: intake diff", .2));
-			} else {
-				Robot.intake.setOpenLoop(speed, -.15);
-			}
-		} else {
-			Robot.intake.setOpenLoop(speed, speed - Robot.prefs.getNumber("I: intake diff", .2));
-		}	
+		Robot.intake.setOpenLoop(speed);
 	}
-		
 
 	// Make this return true when this Command no longer needs to run execute()
 	@Override

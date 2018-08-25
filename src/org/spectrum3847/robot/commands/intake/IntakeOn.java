@@ -15,18 +15,10 @@ import org.spectrum3847.robot.subsystems.Intake;
 public class IntakeOn extends Command {
 	
 	private double spd;
-	private double slow;
 	
 	public IntakeOn(double speed) {
 		requires(Robot.intake);
 		spd = speed;
-		slow = speed;
-	}
-	
-	public IntakeOn(double speed, double slow) {
-		requires(Robot.intake);
-		spd = speed;
-		this.slow = slow;
 	}
 
 	// Called just before this Command runs the first time
@@ -37,8 +29,7 @@ public class IntakeOn extends Command {
 	// Called repeatedly when this Command is scheduled to run
 	@Override
 	protected void execute() {
-		Robot.intake.setOpenLoop(spd, slow);
-		
+		Robot.intake.setOpenLoop(spd);
 	}
 
 	// Make this return true when this Command no longer needs to run execute()

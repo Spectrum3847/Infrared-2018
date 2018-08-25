@@ -15,7 +15,6 @@ import org.spectrum3847.robot.commands.arm.ArmRevHome;
 import org.spectrum3847.robot.commands.arm.OperatorHome;
 import org.spectrum3847.robot.commands.arm.SetArmExchangePos;
 import org.spectrum3847.robot.commands.arm.SetArmPos;
-import org.spectrum3847.robot.commands.drivetrain.DriveBrakeOn;
 import org.spectrum3847.robot.commands.drivetrain.HighGear;
 import org.spectrum3847.robot.commands.extension.ExtensionClimb;
 import org.spectrum3847.robot.commands.extension.ExtensionManualControl;
@@ -48,33 +47,26 @@ public class OI {
 		operatorController = new SpectrumXboxController(1, .10, .10);
 		
 		driverController.rightBumper.whileHeld(new HighGear());
-		driverController.leftBumper.whileHeld(new DriveBrakeOn());
+		driverController.leftBumper.whileHeld(new SetArmExchangePos());
 		
 		driverController.aButton.whileHeld(new OpenIntake());
-		driverController.bButton.whileHeld(new SetArmExchangePos());
 		//driverController.leftTriggerButton.whileHeld(new IntakeUntilCurrent());
 		driverController.rightTriggerButton.whileHeld(new IntakeOn(-1));
 		driverController.leftTriggerButton.whileHeld(new OpenIntakeOn(1));
-		//driverController.bButton.whileHeld(new);
 		
 		//Hold to force intake to continue past current limit, happens in IntakeUntilCurrent
 		operatorController.rightTriggerButton.toggleWhenPressed(new IntakeUntilCurrent());
 		
 		//Left Trigger sets the speed of the punch either wheeled outtake, soft punch, full punch in OperatorPuncher() command
 		operatorController.rightBumper.toggleWhenPressed(new OperatorEject());
-		
-		if(!Robot.prefs.getBoolean("A: Training Wheels Protocol", false))
-		{
-			operatorController.leftStickButton.toggleWhenPressed(new ArmManualControl());
-			operatorController.rightStickButton.whenPressed(new ExtensionManualControl());
-		}
+
 		//Left Bumper reverses these positions in SetArmPos command
 		operatorController.aButton.whileHeld(new SetArmPos(Arm.Position.FwdIntake));
 		operatorController.xButton.whileHeld(new SetArmPos(Arm.Position.FwdScore));
 		operatorController.bButton.whileHeld(new SetArmPos(Arm.Position.FwdPortal));
 		operatorController.yButton.whileHeld(new SetArmPos(Arm.Position.FwdHighScore));
 		operatorController.startButton.whenPressed(new OperatorHome());
-		//operatorController.leftStickButton.toggleWhenPressed(new ArmManualControl());
+		operatorController.leftStickButton.toggleWhenPressed(new ArmManualControl());
 		new SpectrumAxisButton(OI.operatorController, SpectrumXboxController.XboxAxis.LEFT_Y, .9, ThresholdType.GREATER_THAN).whenPressed(
 				new HalfPunchGroup());
 		new SpectrumAxisButton(OI.operatorController, SpectrumXboxController.XboxAxis.LEFT_Y, -.9, ThresholdType.LESS_THAN).whenPressed(
@@ -82,9 +74,9 @@ public class OI {
 		new SpectrumAxisButton(OI.operatorController, SpectrumXboxController.XboxAxis.RIGHT_Y, -.9, ThresholdType.LESS_THAN).whenPressed(
 				new ExtensionMotionMagicPos(15000));
 		operatorController.selectButton.whenPressed(new ExtensionZero());
-		operatorController.Dpad.Up.whileHeld(new ReadyClimb());
+		operatorController.Dpad.Up.whenPressed(new ReadyClimb());
 		operatorController.Dpad.Down.whileHeld(new ExtensionClimb());
-		
+		operatorController.rightStickButton.whenPressed(new ExtensionManualControl());
 		
 		
 	}

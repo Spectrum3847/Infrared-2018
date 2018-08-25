@@ -1,6 +1,5 @@
 package org.spectrum3847.robot;
 
-import org.spectrum3847.robot.commands.VibrateController;
 import org.spectrum3847.robot.commands.arm.ArmMotionMagicHold;
 import org.spectrum3847.robot.commands.extension.ExtensionMotionMagicHold;
 
@@ -29,7 +28,6 @@ public class Teleop {
         
         //Do things if connected to FMS only, so when telop starts during a match but not during testing
         if (DriverStation.getInstance().isFMSAttached()){
-            new VibrateController(OI.operatorController, 4, .8);
         }
    
         
