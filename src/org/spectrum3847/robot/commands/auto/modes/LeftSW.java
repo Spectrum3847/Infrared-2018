@@ -20,7 +20,7 @@ import edu.wpi.first.wpilibj.command.CommandGroup;
 public class LeftSW extends CommandGroup {
 
 	public LeftSW() {
-		super("CeneterSWpigeon");
+		super("LeftSW");
 		//If the switch is on the left make sure we turn before driving
 		this.addSequential(new FollowTrajectory(new CrossTheLine()),4);
 		this.addParallel(new SetArmPos(Position.FwdPortal));

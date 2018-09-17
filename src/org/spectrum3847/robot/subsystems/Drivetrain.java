@@ -110,7 +110,9 @@ public class Drivetrain extends Subsystem {
 		leftSRX.configPeakCurrentDuration(500);
 		leftSRX.enableCurrentLimit(true);
 		leftSRX.setStatusFramePeriod(StatusFrame.Status_2_Feedback0, 5, 0);
-
+		leftSRX.config_kP(0, Robot.prefs.getNumber("D: Left P", 0.035));
+		leftSRX.config_kF(0, Robot.prefs.getNumber("D: Left F", 0.059377));
+		
 		//RIGHT SIDE CONFIGURATION
 		rightSRX.setInverted(true);//true
 		rightSRX.configForwardLimitSwitchSource(LimitSwitchSource.FeedbackConnector, LimitSwitchNormal.Disabled);
@@ -128,7 +130,9 @@ public class Drivetrain extends Subsystem {
 		rightSRX.configPeakCurrentDuration(500);
 		rightSRX.enableCurrentLimit(true);
 		rightSRX.setStatusFramePeriod(StatusFrame.Status_2_Feedback0, 5, 0);
-		
+		rightSRX.config_kP(0, Robot.prefs.getNumber("D: Right P", 0.035));
+		rightSRX.config_kF(0, Robot.prefs.getNumber("D: Right F", 0.059377));
+
 		setPositionTalonConfig();
 		
 		//Setup Pigeon

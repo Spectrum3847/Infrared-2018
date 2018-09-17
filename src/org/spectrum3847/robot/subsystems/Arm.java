@@ -234,6 +234,7 @@ public class Arm extends Subsystem {
 	public Position getCurrentPosName() {
 		return pos;
 	}
+	
 	public void getPrefsGains() {
 		upGains.setGains(ARM_UP,
 		Robot.prefs.getNumber("A: up P", 0.0),
@@ -252,14 +253,15 @@ public class Arm extends Subsystem {
 	}
 
 	public void setOpenLoop(double value) {
-		armSRX.set(ControlMode.PercentOutput, value);
+		this.set(ControlMode.PercentOutput, value);
 	}
 	
-	public void set(ControlMode controlMode, double signal) {
-    	if(controlMode == ControlMode.MotionMagic) {
-    		this.manageGainProfile(signal);
-    	}
-    	armSRX.set(controlMode, signal);
+	public void set(ControlMode controlMode, double signal) { 
+		if (Robot.prefs.getBoolean("A: Enable", true)) {
+			armSRX.set(controlMode, signal);
+		} else {
+			printWarning("Arm Disabled, Value not sent");
+		}
     }
 	
 	public boolean getFwdLimitSW() {
@@ -338,7 +340,7 @@ public class Arm extends Subsystem {
 	public void motionMagicControl() {
     	//manageGainProfile(targetPosition);
 		//armSRX.selectProfileSlot(ARM_UP, 0);
-    	armSRX.set(ControlMode.MotionMagic, targetPosition);
+    	this.set(ControlMode.MotionMagic, targetPosition);
     }
 	
 	public void setMotionMagicValues(int acceleration, int cruiseVelocity) {

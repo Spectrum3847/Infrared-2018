@@ -32,15 +32,16 @@ public class SpectrumDrive extends Command {
 	protected void execute() {
 		boolean quickTurn = Robot.drive.quickTurnController();
 		double moveValue = OI.driverController.leftStick.getY() * -1;
-		//Drivetrain.printDebug("Throttle: " + moveValue);
+		Drivetrain.printDebug("Throttle: " + moveValue);
 		double rotateValue = OI.driverController.rightStick.getX();
-		//Drivetrain.printDebug("Rotate: " + rotateValue);
+		Drivetrain.printDebug("Rotate: " + rotateValue);
 		moveValue = Util.powKeepSign(moveValue, throttlePow);
 		rotateValue = Util.powKeepSign(rotateValue, turnPow);
-		//Drivetrain.printDebug("Throttle Filtered: " + moveValue);
-		//Drivetrain.printDebug("Rotate Filtered: " + rotateValue);
-		//Drivetrain.printDebug("Quick Turn: " + quickTurn);
+		Drivetrain.printDebug("Throttle Filtered: " + moveValue);
+		Drivetrain.printDebug("Rotate Filtered: " + rotateValue);
+		Drivetrain.printDebug("Quick Turn: " + quickTurn);
 		Robot.drive.difDrive.curvatureDrive(moveValue, rotateValue, quickTurn);
+		System.out.println("Spectrum Driving: " + moveValue + ", " + rotateValue);
 	}
 
 	// Make this return true when this Command no longer needs to run execute()
