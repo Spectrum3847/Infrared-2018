@@ -4,8 +4,6 @@ import edu.wpi.first.wpilibj.Timer;
 
 import org.spectrum3847.lib.util.Util;
 
-import com.ctre.CANTalon;
-
 import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
